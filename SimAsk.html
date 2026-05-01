@@ -579,6 +579,8 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
     <input type="password" class="si" id="si-ak" placeholder="sk-ant-api03-..." oninput="doSaveAK(this.value)" autocomplete="off"/>
     <div id="ak-st" style="font-size:.7rem;margin-top:3px;display:none"></div>
     <div style="font-size:.67rem;color:var(--tm);margin-top:3px">Dari console.anthropic.com → API Keys</div>
+    <button onclick="doTestAK()" style="margin-top:7px;width:100%;padding:7px;border-radius:8px;background:rgba(0,112,205,.1);border:1.5px solid var(--bd);color:var(--p);font-size:.76rem;font-weight:600;cursor:pointer;transition:all .2s">🧪 Test Koneksi API</button>
+    <div id="ak-test-result" style="font-size:.73rem;margin-top:5px;display:none;line-height:1.5;padding:7px 9px;border-radius:7px;background:var(--bg)"></div>
   </div>
   <div><div class="sl">Tema</div><div style="display:flex;gap:7px"><button class="thb on" id="th-lt" onclick="doSetTheme('light')">☀️ Light</button><button class="thb" id="th-dk" onclick="doSetTheme('dark')">🌙 Dark</button></div></div>
   <div><div class="sl">Nama Panggilan</div><input type="text" class="si" id="si-nk" placeholder="Panggil saya..." oninput="doSaveSt('nick',this.value)"/></div>
@@ -911,6 +913,42 @@ function fmt(t){
 // ══════════════════════════════════════════════════════
 // OAUTH & LOGIN
 // ══════════════════════════════════════════════════════
+
+async function doTestAK(){
+  const result = G('ak-test-result');
+  const ak=(cfg.apiKey||localStorage.getItem('sk4_apikey')||'').trim();
+  if(!ak){
+    result.style.display='block'; result.style.color='#EF4444';
+    result.textContent='⚠️ API Key kosong. Isi dulu di field di atas.'; return;
+  }
+  result.style.display='block'; result.style.color='var(--tm)';
+  result.textContent='⏳ Testing...';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':ak,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-5',max_tokens:30,messages:[{role:'user',content:'Reply with just: OK'}]})
+    });
+    const body=await r.text();
+    console.log('Test response:', r.status, body);
+    if(r.status===200){
+      result.style.color='#22C55E';
+      result.textContent='✅ Berhasil! API Key valid dan terhubung ke Claude.';
+    } else if(r.status===401){
+      result.style.color='#EF4444';
+      result.textContent='❌ API Key salah atau expired. Cek kembali di console.anthropic.com → API Keys.';
+    } else if(r.status===403){
+      result.style.color='#EF4444';
+      result.textContent='❌ Akses ditolak (403). Pastikan API Key aktif dan punya kredit.';
+    } else {
+      result.style.color='#EF4444';
+      result.textContent='❌ Error '+r.status+': '+body.substring(0,100);
+    }
+  }catch(err){
+    result.style.color='#F59E0B';
+    result.textContent='⚠️ Network error: '+err.message+'. Mungkin browser/perusahaan memblokir koneksi ke Anthropic.';
+  }
+}
 function initLogin(){
   const sv = localStorage.getItem('sk4_gcfg');
   if(sv){ try{ const c=JSON.parse(sv); gCI=c.ci||''; gAK=c.ak||''; if(G('inp-ci'))G('inp-ci').value=gCI; if(G('inp-ak'))G('inp-ak').value=gAK; }catch(e){} }
@@ -1290,19 +1328,70 @@ function buildSys(emp,lang,nick,mem,ctxS,isGrp,mems){
   if(mem&&mem.length) memCtx='\n\nTopik sebelumnya: '+mem.slice(-4).map(m=>`"${m.q}"→"${m.a}"`).join('; ');
   return `Kamu adalah ${tc(emp.n)}, berusia ${a} tahun (lahir ${emp.y}), ${emp.p} di divisi ${emp.dv}${emp.dt&&emp.dt!==emp.dv?', dept '+emp.dt:''}, Asuransi Simas Jiwa (ASJ).\n\nKEPRIBADIAN DISC ${emp.d}: ${ds}\nGender: ${emp.g}. Gaya bicara: ${langG}\n\nLawan bicara: ${nick} (${CU.p}${CU.dv?' – '+CU.dv:''}).\n\nKEAHLIAN: ${emp.dv}. Paham produk asuransi jiwa Indonesia, regulasi OJK, proses bisnis ASJ.\n\nJIKA DI LUAR KEAHLIAN: Sampaikan terus terang, tawarkan: 1) Referral ke kolega lain, atau 2) Buat group chat bersama.\n\nFORM & PROSES: Jika topik butuh formulir, jelaskan prosesnya dan tawarkan bantu isi form interaktif (tanya satu field per pesan).\n\nATURAN: Jangan bahas SARA/politik. Jawab ringkas (3-4 kalimat) kecuali diminta detail.${grpCtx}${ctxS?'\n\nKONTEKS SEBELUMNYA:\n'+ctxS:''}${memCtx}`;
 }
+
+function getErrMsg(code, lang){
+  const isInformal = lang==='informal';
+  if(code==='__ERR_401__') return isInformal
+    ? '❌ API Key-nya salah atau expired nih. Cek lagi di ⚙️ Pengaturan ya, pastiin key-nya bener (harus diawali sk-ant-).'
+    : '❌ API Key tidak valid atau sudah kedaluwarsa. Silakan periksa kembali API Key Anda di ⚙️ Pengaturan.';
+  if(code==='__ERR_403__') return isInformal
+    ? '❌ API Key-nya nggak punya akses nih. Cek lagi di console.anthropic.com.'
+    : '❌ API Key tidak memiliki akses. Periksa kembali di console.anthropic.com.';
+  if(code==='__ERR_429__') return isInformal
+    ? '⏳ Lagi banyak request nih, rate limit kena. Tunggu bentar terus coba lagi ya!'
+    : '⏳ Terlalu banyak permintaan. Silakan tunggu sebentar dan coba lagi.';
+  if(code==='__ERR_500__') return isInformal
+    ? '😵 Server Anthropic lagi down kayaknya. Coba lagi bentar ya!'
+    : '😵 Server Anthropic sedang mengalami gangguan. Silakan coba beberapa saat lagi.';
+  if(code.startsWith('__ERR_NETWORK__')) return isInformal
+    ? '🌐 Koneksi bermasalah nih. Pastiin internet kamu stabil, terus coba lagi.'
+    : '🌐 Terjadi masalah koneksi jaringan. Pastikan koneksi internet Anda stabil.';
+  // Generic with detail
+  const detail = code.includes(':') ? code.split(':').slice(1).join(':') : '';
+  return (isInformal?'❌ Ada error: ':'❌ Terjadi kesalahan: ') + (detail||code);
+}
 async function callAPI(sys,msgs,mt=900){
   const ak=(cfg.apiKey||localStorage.getItem('sk4_apikey')||'').trim();
   if(!ak) return '__NO_KEY__';
   try{
     const r=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':ak,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:mt,system:sys,messages:msgs.map(m=>({role:m.role==='user'?'user':'assistant',content:m.content}))})
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':ak,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-sonnet-4-5',
+        max_tokens:mt,
+        system:sys,
+        messages:msgs.map(m=>({role:m.role==='user'?'user':'assistant',content:m.content}))
+      })
     });
-    if(!r.ok){ const et=await r.text(); console.error('API',r.status,et); return null; }
+    if(!r.ok){
+      let errBody='';
+      try{ errBody=await r.text(); }catch(e){}
+      let errMsg='';
+      try{
+        const errJson=JSON.parse(errBody);
+        errMsg=errJson?.error?.message||errBody;
+      }catch(e){ errMsg=errBody; }
+      console.error('API error',r.status,errMsg);
+      // Return specific error codes so UI can show helpful message
+      if(r.status===401) return '__ERR_401__';
+      if(r.status===403) return '__ERR_403__';
+      if(r.status===429) return '__ERR_429__';
+      if(r.status===500||r.status===529) return '__ERR_500__';
+      return '__ERR_'+r.status+'__:'+errMsg.substring(0,120);
+    }
     const d=await r.json();
     return d.content?.[0]?.text||null;
-  }catch(err){ console.error('API err:',err); return null; }
+  }catch(err){
+    console.error('API fetch err:',err);
+    // Network error - likely CORS or connection issue
+    return '__ERR_NETWORK__:'+err.message;
+  }
 }
 const NO_KEY_MSG='⚠️ Anthropic API Key belum diatur!\n\n1. Klik tombol ⚙️ di pojok kanan atas sidebar\n2. Isi kolom "Anthropic API Key" dengan key dari console.anthropic.com\n3. Key harus diawali sk-ant-...\n4. Coba kirim pesan lagi.';
 const fbMsg=lang=>lang==='informal'?'Eh maaf, lagi ada gangguan teknis nih 😅 Coba lagi ya!':'Mohon maaf, ada gangguan teknis. Silakan ulangi.';
@@ -1319,7 +1408,10 @@ async function botWelcome(id){
   showTy();
   const resp=await callAPI(sys,[{role:'user',content:pr}]);
   rmTy();
-  const content=resp==='__NO_KEY__'?NO_KEY_MSG:(resp||fbMsg(s.lang));
+  let content;
+  if(resp==='__NO_KEY__') content=NO_KEY_MSG;
+  else if(resp&&resp.startsWith('__ERR_')) content=getErrMsg(resp,s.lang);
+  else content=resp||fbMsg(s.lang);
   const msg={role:'assistant',content,snm:tc(emp.n),sav:BAV[emp.g]||'🤖',ts:N()};
   s.msgs.push(msg); apM(msg); rCL(); saveS();
 }
@@ -1333,7 +1425,10 @@ async function grpIntro(id){
   showTy();
   const resp=await callAPI(sys,[{role:'user',content:pr}]);
   rmTy();
-  const content=resp==='__NO_KEY__'?NO_KEY_MSG:(resp||fbMsg(s.lang));
+  let content;
+  if(resp==='__NO_KEY__') content=NO_KEY_MSG;
+  else if(resp&&resp.startsWith('__ERR_')) content=getErrMsg(resp,s.lang);
+  else content=resp||fbMsg(s.lang);
   const msg={role:'assistant',content,snm:tc(emp.n),sav:BAV[emp.g]||'🤖',ts:N()};
   s.msgs.push(msg); apM(msg); rCL(); saveS();
 }
@@ -1364,6 +1459,11 @@ async function doSend(){
   rmTy();
   if(resp==='__NO_KEY__'){
     const km={role:'assistant',content:NO_KEY_MSG,snm:tc(rEmp.n),sav:BAV[rEmp.g]||'🤖',ts:N()};
+    s.msgs.push(km); apM(km); rCL(); saveS(); return;
+  }
+  if(resp&&resp.startsWith('__ERR_')){
+    const errMsg=getErrMsg(resp,s.lang);
+    const km={role:'assistant',content:errMsg,snm:tc(rEmp.n),sav:BAV[rEmp.g]||'🤖',ts:N()};
     s.msgs.push(km); apM(km); rCL(); saveS(); return;
   }
   const txt2=resp||fbMsg(s.lang);
