@@ -695,6 +695,12 @@ button{cursor:pointer;font-family:inherit;}
 <div class="set-pan" id="set-pan">
   <h3>⚙️ Pengaturan</h3>
   <div><div class="sl">Tema</div><div class="th-btns"><button class="th-b act" id="th-lt" onclick="setTheme('light')">☀️ Light</button><button class="th-b" id="th-dk" onclick="setTheme('dark')">🌙 Dark</button></div></div>
+  <div>
+    <div class="sl">Anthropic API Key</div>
+    <input type="password" class="si" id="si-apikey" placeholder="sk-ant-api03-..." oninput="saveApiKey(this.value)" autocomplete="off"/>
+    <div style="font-size:.68rem;color:var(--tm);margin-top:4px;line-height:1.5">Dapatkan di <strong>console.anthropic.com</strong> → API Keys. Diperlukan agar bot bisa menjawab.</div>
+    <div id="apikey-status" style="font-size:.72rem;margin-top:4px;display:none"></div>
+  </div>
   <div><div class="sl">Nama Panggilan</div><input type="text" class="si" id="si-nick" placeholder="Panggil saya..." oninput="saveSetting('nickname',this.value)"/></div>
   <div><div class="sl">Nickname Close Friend</div><input type="text" class="si" id="si-cfnick" placeholder="Panggilan bestie..." oninput="saveSetting('cfNick',this.value)"/></div>
   <div id="g-panel">
@@ -1521,7 +1527,13 @@ async function botWelcome(id){
   const resp=await callAPI(sys,[{role:'user',content:prompt}]);
   removeTyping();
   let content;
-  if(resp==='__NO_KEY__'){content='⚠️ API Key belum diatur. Masukkan Anthropic API Key di Pengaturan (⚙️) untuk mulai chat.';}
+  if(resp==='__NO_KEY__'){content='⚠️ Anthropic API Key belum diatur!
+
+Cara setting:
+1. Klik tombol ⚙️ di pojok kanan atas sidebar
+2. Isi kolom "Anthropic API Key" dengan key dari console.anthropic.com
+3. Key harus diawali dengan sk-ant-...
+4. Setelah diisi, coba kirim pesan lagi';}
   else{content=resp||fallbackMsg(s.lang);}
   const msg={role:'assistant',content,snm:tc(emp.n),sav:BAV[emp.g]||'🤖',ts:NOW()};
   s.msgs.push(msg);appendMsg(msg);rCL_list();saveSession();
@@ -1540,7 +1552,13 @@ KONTEKS: ${s.contextSummary}`;
   const resp=await callAPI(sys,[{role:'user',content:prompt}]);
   removeTyping();
   let content;
-  if(resp==='__NO_KEY__'){content='⚠️ API Key belum diatur. Masukkan Anthropic API Key di Pengaturan (⚙️) untuk mulai chat.';}
+  if(resp==='__NO_KEY__'){content='⚠️ Anthropic API Key belum diatur!
+
+Cara setting:
+1. Klik tombol ⚙️ di pojok kanan atas sidebar
+2. Isi kolom "Anthropic API Key" dengan key dari console.anthropic.com
+3. Key harus diawali dengan sk-ant-...
+4. Setelah diisi, coba kirim pesan lagi';}
   else{content=resp||fallbackMsg(s.lang);}
   const msg={role:'assistant',content,snm:tc(emp.n),sav:BAV[emp.g]||'🤖',ts:NOW()};
   s.msgs.push(msg);appendMsg(msg);rCL_list();saveSession();
@@ -1594,7 +1612,13 @@ async function sendMsg(){
   removeTyping();
 
   if(resp==='__NO_KEY__'){
-    const km={role:'assistant',content:'⚠️ API Key belum diatur. Masukkan Anthropic API Key di Pengaturan (⚙️) untuk mulai chat.',snm:tc(respondingEmp.n),sav:BAV[respondingEmp.g]||'🤖',ts:NOW()};
+    const km={role:'assistant',content:'⚠️ Anthropic API Key belum diatur!
+
+Cara setting:
+1. Klik tombol ⚙️ di pojok kanan atas sidebar
+2. Isi kolom "Anthropic API Key" dengan key dari console.anthropic.com
+3. Key harus diawali dengan sk-ant-...
+4. Setelah diisi, coba kirim pesan lagi',snm:tc(respondingEmp.n),sav:BAV[respondingEmp.g]||'🤖',ts:NOW()};
     s.msgs.push(km);appendMsg(km);rCL_list();saveSession();return;
   }
   if(!resp){resp=fallbackMsg(s.lang);}
@@ -2066,6 +2090,25 @@ function saveSetting(k,v){
   cfg[k]=v;
   if(k==='nickname')$('sb-name').textContent=v||fn(CU.n);
   if(k==='apiKey')localStorage.setItem('sk3_apikey',v);
+  saveSession();
+}
+
+function saveApiKey(v){
+  const key=(v||'').trim();
+  cfg.apiKey=key;
+  try{localStorage.setItem('sk3_apikey',key);}catch(e){}
+  const st=$('apikey-status');
+  if(!st)return;
+  if(!key){st.style.display='none';return;}
+  if(key.startsWith('sk-ant-')){
+    st.style.display='block';
+    st.style.color='#22C55E';
+    st.textContent='✅ API Key tersimpan!';
+  } else {
+    st.style.display='block';
+    st.style.color='#EF4444';
+    st.textContent='⚠️ Format salah — harus diawali dengan sk-ant-';
+  }
   saveSession();
 }
 
