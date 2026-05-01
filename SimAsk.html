@@ -17,7 +17,42 @@ body{height:100%;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif;back
   --t1:#0D1B2A;--t2:#4A6080;--tm:#8BA3BF;--bd:#D4E6F7;
   --tr:.2s ease
 }
-[data-theme=dark]{--bg:#08131F;--sb:#0D1E33;--ct:#071019;--bm:#0052A3;--bo:#112240;--t1:#E2EDF8;--t2:#7AA3C4;--tm:#3D6080;--bd:#172D47}
+[data-theme=dark]{--bg:#08131F;--sb:#0D1E33;--ct:#071019;--bm:#0052A3;--bo:#1A2E4A;--t1:#E8F4FF;--t2:#93BDD4;--tm:#5A7FA0;--bd:#1E3A55}
+[data-theme=dark] input,[data-theme=dark] textarea,[data-theme=dark] select{color:#E8F4FF;background:var(--bg)}
+[data-theme=dark] .bb.th{background:#1A2E4A;color:#E8F4FF}
+[data-theme=dark] .bb.me{background:#0052A3;color:#fff}
+[data-theme=dark] .fc{background:rgba(0,80,160,.2);border-color:rgba(0,150,255,.2)}
+[data-theme=dark] .fc-t{color:#60B4FF}
+[data-theme=dark] .ffl{color:#7AABCC}
+[data-theme=dark] .ffv{color:#E8F4FF}
+[data-theme=dark] .ov-c{background:#0D1E33;color:#E8F4FF}
+[data-theme=dark] .ov-c h3{color:#E8F4FF}
+[data-theme=dark] .ov-si{background:#08131F;color:#E8F4FF;border-color:#1E3A55}
+[data-theme=dark] .em{background:#0D1E33}
+[data-theme=dark] .em h3{color:#E8F4FF}
+[data-theme=dark] .ef input,[data-theme=dark] .ef select,[data-theme=dark] .ef textarea{background:#08131F;color:#E8F4FF;border-color:#1E3A55}
+[data-theme=dark] .ef label{color:#7AABCC}
+[data-theme=dark] .sp2{background:#0D1E33}
+[data-theme=dark] .sp2 h3{color:#E8F4FF}
+[data-theme=dark] .si{background:#08131F;color:#E8F4FF;border-color:#1E3A55}
+[data-theme=dark] .sl{color:#7AABCC}
+[data-theme=dark] .adm-b{background:#08131F}
+[data-theme=dark] .adm-si{background:#0D1E33;color:#E8F4FF;border-color:#1E3A55}
+[data-theme=dark] .at td{color:#E8F4FF}
+[data-theme=dark] .at th{color:#60B4FF}
+[data-theme=dark] .pi-n{color:#E8F4FF}
+[data-theme=dark] .pi-p{color:#7AABCC}
+[data-theme=dark] .ma-it{color:#E8F4FF}
+[data-theme=dark] .ob2{color:#60B4FF}
+[data-theme=dark] .pch{color:#60B4FF}
+[data-theme=dark] .sm span{color:#7AABCC}
+[data-theme=dark] .ci-n{color:#E8F4FF}
+[data-theme=dark] .ci-p{color:#7AABCC}
+[data-theme=dark] .me-n{color:#E8F4FF}
+[data-theme=dark] .me-r{color:#7AABCC}
+[data-theme=dark] .ca-n{color:#E8F4FF}
+[data-theme=dark] .ca-s{color:#7AABCC}
+[data-theme=dark] .wl-s{color:#93BDD4}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px}
 button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inherit}
 
@@ -207,7 +242,26 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 .ff{display:flex;gap:6px;margin-bottom:2px}.ffl{color:var(--tm);min-width:95px;font-size:.72rem}.ffv{color:var(--t1);font-weight:500;font-size:.76rem}
 /* INPUT */
 .ia{padding:8px 12px;background:var(--sb);border-top:1px solid var(--bd);
-  display:flex;gap:7px;align-items:flex-end;flex-shrink:0;position:relative}
+  display:flex;gap:7px;align-items:flex-end;flex-shrink:0;position:relative;flex-direction:column}
+.ia-attachments{display:flex;flex-wrap:wrap;gap:5px;width:100%}
+.ia-attach{display:flex;align-items:center;gap:5px;padding:3px 9px;border-radius:6px;
+  background:var(--lt);border:1.5px solid var(--bd);font-size:.72rem;color:var(--p)}
+[data-theme=dark] .ia-attach{background:rgba(0,80,160,.2);color:#60B4FF}
+.ia-attach button{border:none;background:none;color:var(--re);cursor:pointer;font-size:12px;padding:0;line-height:1}
+.ia-row{display:flex;gap:7px;align-items:flex-end;width:100%}
+.att-btn{width:34px;height:34px;border-radius:8px;border:1.5px solid var(--bd);background:var(--bg);
+  color:var(--tm);display:flex;align-items:center;justify-content:center;font-size:15px;
+  flex-shrink:0;cursor:pointer;transition:all var(--tr)}
+.att-btn:hover{background:var(--lt);color:var(--p);border-color:var(--s)}
+[data-theme=dark] .att-btn{background:var(--bg);border-color:#1E3A55}
+.file-bubble{background:var(--lt);border:1.5px solid var(--bd);border-radius:10px;
+  padding:8px 12px;margin-top:5px;display:flex;align-items:center;gap:9px;font-size:.79rem}
+[data-theme=dark] .file-bubble{background:rgba(0,80,160,.2);border-color:rgba(0,150,255,.2);color:#E8F4FF}
+.file-ic{font-size:22px;flex-shrink:0}
+.file-info{flex:1;min-width:0}
+.file-nm{font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+[data-theme=dark] .file-nm{color:#E8F4FF}
+.file-sz{font-size:.69rem;color:var(--tm)}
 .ci2{flex:1;padding:9px 12px;border-radius:16px;border:1.5px solid var(--bd);
   background:var(--bg);color:var(--t1);font-size:.82rem;outline:none;
   resize:none;max-height:100px;min-height:37px;transition:border var(--tr)}
@@ -259,8 +313,11 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 [data-theme=dark] .gc{background:rgba(0,61,124,.2);color:var(--a)}
 .dbt{padding:6px 11px;border-radius:7px;border:1.5px solid var(--bd);background:var(--bg);color:var(--t1);font-size:.76rem;font-weight:600;transition:all var(--tr)}
 .dbt.on,.dbt:hover{background:var(--p);color:#fff;border-color:var(--p)}
-.cs{padding:8px 10px;border-radius:8px;background:var(--sb);border:1.5px solid var(--bd);cursor:pointer;transition:all var(--tr);font-size:.79rem;margin-bottom:5px}
-.cs:hover,.cs.on{border-color:var(--s);background:rgba(0,112,205,.06)}
+.cs{padding:8px 10px;border-radius:8px;background:var(--sb);border:1.5px solid var(--bd);cursor:pointer;transition:all var(--tr);font-size:.79rem;margin-bottom:5px;flex-shrink:0}
+.cs:hover,.cs.on{border-color:var(--s);background:rgba(0,112,205,.09)}
+[data-theme=dark] .cs{background:var(--sb);color:#E8F4FF}
+[data-theme=dark] .cs:hover,[data-theme=dark] .cs.on{background:rgba(0,112,205,.18)}
+#cal-sl{max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:0;padding-right:4px}
 
 /* SETTINGS PANEL */
 .sp2{position:fixed;right:0;top:0;bottom:0;width:270px;background:var(--sb);
@@ -309,6 +366,14 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 .ef input:focus,.ef select:focus{border-color:var(--s)}
 .ef-oth{margin-top:4px;display:none}.ef-oth.on{display:block}
 
+/* EMAIL AUTOCOMPLETE */
+.eml-ac{position:absolute;top:100%;left:0;right:0;background:var(--sb);border:1.5px solid var(--bd);border-radius:9px;box-shadow:0 4px 16px rgba(0,61,124,.15);z-index:200;max-height:160px;overflow-y:auto;display:none}
+.eml-ac.on{display:block}
+.eml-ac-it{padding:7px 11px;cursor:pointer;font-size:.79rem;display:flex;align-items:center;gap:8px;transition:background .15s}
+.eml-ac-it:hover{background:var(--lt)}
+[data-theme=dark] .eml-ac{background:#0D1E33;border-color:#1E3A55}
+[data-theme=dark] .eml-ac-it:hover{background:rgba(0,112,205,.15)}
+[data-theme=dark] .eml-ac-it{color:#E8F4FF}
 /* TOAST */
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(60px);
   background:#001226;color:#fff;padding:9px 18px;border-radius:9px;font-size:.79rem;font-weight:600;
@@ -316,6 +381,29 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
   box-shadow:0 4px 18px rgba(0,0,0,.35)}
 .toast.on{transform:translateX(-50%) translateY(0)}
 
+/* KNOWLEDGE BASE */
+.kb-panel{padding:16px;border-top:1px solid var(--bd);background:var(--lt)}
+[data-theme=dark] .kb-panel{background:rgba(0,61,124,.1)}
+.kb-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.kb-tab{padding:6px 12px;border-radius:8px;border:1.5px solid var(--bd);background:var(--bg);color:var(--t2);font-size:.75rem;font-weight:600;cursor:pointer;transition:all var(--tr)}
+.kb-tab.on{background:var(--p);color:#fff;border-color:var(--p)}
+.kb-entry{background:var(--sb);border:1.5px solid var(--bd);border-radius:10px;padding:12px;margin-bottom:9px}
+[data-theme=dark] .kb-entry{background:var(--sb);border-color:var(--bd)}
+.kb-entry-hdr{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.kb-entry-lbl{flex:1;font-weight:700;font-size:.8rem;color:var(--t1)}
+.kb-del{border:none;background:rgba(239,68,68,.1);color:#DC2626;border-radius:6px;padding:3px 8px;font-size:.72rem;cursor:pointer;transition:all var(--tr)}
+.kb-del:hover{background:#DC2626;color:#fff}
+.kb-sel{width:100%;padding:7px 10px;border-radius:7px;border:1.5px solid var(--bd);background:var(--bg);color:var(--t1);font-size:.79rem;margin-bottom:7px;outline:none}
+[data-theme=dark] .kb-sel{background:var(--bg);color:#E8F4FF}
+.kb-sel:focus{border-color:var(--s)}
+.kb-ta{width:100%;padding:8px 10px;border-radius:7px;border:1.5px solid var(--bd);background:var(--bg);color:var(--t1);font-size:.79rem;resize:vertical;min-height:70px;outline:none;font-family:inherit}
+[data-theme=dark] .kb-ta{background:var(--bg);color:#E8F4FF}
+.kb-ta:focus{border-color:var(--s)}
+.kb-file-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border-radius:7px;background:var(--lt);border:1.5px dashed var(--bd);color:var(--p);font-size:.76rem;font-weight:600;cursor:pointer;transition:all var(--tr);margin-top:5px}
+.kb-file-btn:hover{background:var(--p);color:#fff;border-color:var(--p)}
+.kb-docs{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.kb-doc{background:rgba(0,112,205,.08);color:var(--p);padding:3px 9px;border-radius:6px;font-size:.72rem;font-weight:600;display:flex;align-items:center;gap:4px}
+[data-theme=dark] .kb-doc{color:#60B4FF;background:rgba(0,112,205,.2)}
 /* MOBILE */
 @media(max-width:680px){
   .sb{position:absolute;z-index:20;height:100vh;transition:transform var(--tr)}
@@ -435,17 +523,68 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
         </div>
       </div>
       <div class="msgs" id="msgs"></div>
-      <div class="ia">
+      <div class="ia" id="ia">
         <div class="mac" id="mac"></div>
-        <textarea class="ci2" id="ci2" placeholder="Ketik pesan... (@ untuk mention)" rows="1" onkeydown="onCKey(event)" oninput="onCInp(this)"></textarea>
-        <button class="sb2" onclick="doSend()">➤</button>
+        <div class="ia-attachments" id="ia-attachments" style="display:none"></div>
+        <div class="ia-row">
+          <button class="att-btn" onclick="triggerFileUpload()" title="Lampirkan dokumen">📎</button>
+          <input type="file" id="file-input" accept=".pdf,.doc,.docx,.txt,.xlsx,.xls,.png,.jpg,.jpeg" multiple style="display:none" onchange="handleFileAttach(this)"/>
+          <textarea class="ci2" id="ci2" placeholder="Ketik pesan... (@ untuk mention)" rows="1" onkeydown="onCKey(event)" oninput="onCInp(this)"></textarea>
+          <button class="sb2" onclick="doSend()">➤</button>
+        </div>
       </div>
     </div>
     <div id="adm" class="adm" style="display:none">
-      <div class="adm-h"><span style="font-size:18px">🔐</span><h2>Admin Panel <span class="adm-bk">MASTER ADMIN</span></h2><span style="font-size:.7rem;opacity:.65">Total: <span id="admc">0</span></span></div>
-      <div class="adm-b">
-        <div class="adm-ctl"><input class="adm-si" id="admsr" placeholder="🔍 Cari..." oninput="doRAdm(this.value)"/><button class="ab add" onclick="doShowAdd()">+ Tambah</button></div>
+      <div class="adm-h">
+        <span style="font-size:18px">🔐</span>
+        <h2>Admin Panel <span class="adm-bk">MASTER ADMIN</span></h2>
+        <span style="font-size:.7rem;opacity:.65">Total: <span id="admc">0</span></span>
+      </div>
+      <!-- Admin Tabs -->
+      <div style="display:flex;border-bottom:1px solid var(--bd);flex-shrink:0;background:var(--sb)">
+        <button class="sb-tab on" id="adm-tab-emp" onclick="admSwTab('emp')" style="padding:10px 16px;font-size:.8rem">👥 Karyawan</button>
+        <button class="sb-tab" id="adm-tab-kb" onclick="admSwTab('kb')" style="padding:10px 16px;font-size:.8rem">📚 Knowledge Base</button>
+      </div>
+      <!-- Employee Tab -->
+      <div id="adm-sec-emp" class="adm-b">
+        <div class="adm-ctl"><input class="adm-si" id="admsr" placeholder="🔍 Cari nama, divisi, posisi..." oninput="doRAdm(this.value)"/><button class="ab add" onclick="doShowAdd()">+ Tambah</button></div>
         <div class="tw"><table class="at"><thead><tr><th>Nama</th><th>Divisi</th><th>Posisi</th><th>Thn</th><th>Email</th><th>DISC</th><th>G</th><th>Aksi</th></tr></thead><tbody id="admtb"></tbody></table></div>
+      </div>
+      <!-- Knowledge Base Tab -->
+      <div id="adm-sec-kb" style="display:none;flex:1;overflow-y:auto;padding:16px">
+        <p style="font-size:.8rem;color:var(--t2);margin-bottom:14px;line-height:1.5">Tambahkan knowledge & skill khusus per divisi, departemen, atau posisi. Bot-person akan otomatis menggunakan info ini.</p>
+        <!-- Add New KB Entry -->
+        <div style="background:var(--lt);border-radius:11px;padding:14px;margin-bottom:14px;border:1.5px solid var(--bd)">
+          <p style="font-weight:700;font-size:.82rem;color:var(--p);margin-bottom:10px">➕ Tambah Knowledge Baru</p>
+          <label style="font-size:.71rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Scope</label>
+          <select id="kb-scope" class="kb-sel" onchange="updateKBSelectors()">
+            <option value="div">Per Divisi</option>
+            <option value="dept">Per Departemen</option>
+            <option value="pos">Per Posisi</option>
+          </select>
+          <div id="kb-div-wrap">
+            <label style="font-size:.71rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Divisi</label>
+            <select id="kb-div" class="kb-sel"></select>
+          </div>
+          <div id="kb-dept-wrap" style="display:none">
+            <label style="font-size:.71rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Departemen</label>
+            <select id="kb-dept" class="kb-sel"></select>
+          </div>
+          <div id="kb-pos-wrap" style="display:none">
+            <label style="font-size:.71rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Posisi</label>
+            <select id="kb-pos" class="kb-sel"></select>
+          </div>
+          <label style="font-size:.71rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px;margin-top:8px">Knowledge & Skill (tuliskan di sini)</label>
+          <textarea id="kb-text" class="kb-ta" placeholder="Contoh: Tim ini bertanggung jawab untuk proses X, Y, Z. Prosedur pengajuan A adalah... SLA untuk B adalah... Kontak untuk C adalah..."></textarea>
+          <label style="font-size:.71rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-top:8px;margin-bottom:3px">Upload Dokumen (opsional)</label>
+          <div id="kb-docs-preview" class="kb-docs"></div>
+          <label class="kb-file-btn" for="kb-file-input">📎 Upload Dokumen</label>
+          <input type="file" id="kb-file-input" accept=".pdf,.txt,.docx,.doc" multiple style="display:none" onchange="handleKBFile(this)"/>
+          <button onclick="saveKBEntry()" style="width:100%;margin-top:10px;padding:9px;border-radius:8px;background:linear-gradient(135deg,var(--p),var(--s));color:#fff;border:none;font-weight:600;font-size:.82rem;cursor:pointer">💾 Simpan Knowledge</button>
+        </div>
+        <!-- Existing KB Entries -->
+        <p style="font-weight:700;font-size:.82rem;color:var(--t1);margin-bottom:8px">📋 Knowledge yang Tersimpan</p>
+        <div id="kb-list"></div>
       </div>
     </div>
   </div>
@@ -559,13 +698,21 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 
 <!-- OVERLAY: Gmail -->
 <div class="ov" id="ov-gml" style="display:none">
-  <div class="ov-c" style="max-width:460px">
+  <div class="ov-c" style="max-width:480px">
     <h3>📧 Compose Email</h3>
     <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px">
-      <div><label style="font-size:.69rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">To</label><input type="text" class="ov-si" id="gml-to" placeholder="email@simasjiwa.co.id" style="margin-bottom:0"/></div>
-      <div><label style="font-size:.69rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">CC</label><input type="text" class="ov-si" id="gml-cc" placeholder="cc (opsional)" style="margin-bottom:0"/></div>
-      <div><label style="font-size:.69rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Subjek</label><input type="text" class="ov-si" id="gml-s" placeholder="Subjek..." style="margin-bottom:0"/></div>
-      <div><label style="font-size:.69rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Isi</label><textarea class="ov-si" id="gml-b" rows="5" style="resize:vertical;min-height:80px;margin-bottom:0" placeholder="Isi email..."></textarea></div>
+      <div style="position:relative">
+        <label style="font-size:.69rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">To</label>
+        <input type="text" class="ov-si" id="gml-to" placeholder="Ketik nama atau email..." style="margin-bottom:0" oninput="emlAC(this,'gml-to-ac')" autocomplete="off"/>
+        <div class="eml-ac" id="gml-to-ac"></div>
+      </div>
+      <div style="position:relative">
+        <label style="font-size:.69rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">CC</label>
+        <input type="text" class="ov-si" id="gml-cc" placeholder="Ketik nama atau email..." style="margin-bottom:0" oninput="emlAC(this,'gml-cc-ac')" autocomplete="off"/>
+        <div class="eml-ac" id="gml-cc-ac"></div>
+      </div>
+      <div><label style="font-size:.69rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Subjek</label><input type="text" class="ov-si" id="gml-s" placeholder="Subjek email..." style="margin-bottom:0"/></div>
+      <div><label style="font-size:.69rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Isi Email</label><textarea class="ov-si" id="gml-b" rows="5" style="resize:vertical;min-height:80px;margin-bottom:0" placeholder="Isi email..."></textarea></div>
     </div>
     <div class="ob-btns"><button class="bc" style="flex:1" onclick="doClOv('ov-gml')">Batal</button><button class="bp" style="flex:1" onclick="doSendEmail()">Kirim 📤</button></div>
   </div>
@@ -949,6 +1096,218 @@ async function doTestAK(){
     result.textContent='⚠️ Network error: '+err.message+'. Mungkin browser/perusahaan memblokir koneksi ke Anthropic.';
   }
 }
+
+// ══════════════════════════════════════════════════════
+// FILE ATTACHMENT
+// ══════════════════════════════════════════════════════
+let pendingFiles = []; // {name, size, type, b64, text}
+
+function triggerFileUpload(){ G('file-input').click(); }
+
+function handleFileAttach(inp){
+  const files=Array.from(inp.files);
+  if(!files.length)return;
+  const MAX=5*1024*1024; // 5MB per file
+  files.forEach(file=>{
+    if(file.size>MAX){ toast(`File ${file.name} terlalu besar (max 5MB)`); return; }
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const result=e.target.result;
+      let entry={name:file.name,size:file.size,type:file.type};
+      if(file.type.startsWith('image/')){
+        entry.b64=result.split(',')[1];
+        entry.mediaType=file.type;
+      } else if(file.type==='application/pdf'){
+        entry.b64=result.split(',')[1];
+        entry.mediaType='application/pdf';
+      } else {
+        // Text-based: read as text
+        const textReader=new FileReader();
+        textReader.onload=e2=>{
+          entry.text=e2.target.result;
+          addPendingFile(entry);
+        };
+        textReader.readAsText(file);
+        return;
+      }
+      addPendingFile(entry);
+    };
+    reader.readAsDataURL(file);
+  });
+  inp.value=''; // reset
+}
+
+function addPendingFile(entry){
+  pendingFiles.push(entry);
+  renderPendingFiles();
+}
+
+function renderPendingFiles(){
+  const area=G('ia-attachments');
+  if(!pendingFiles.length){ area.style.display='none'; return; }
+  area.style.display='flex';
+  area.innerHTML=pendingFiles.map((f,i)=>`
+    <div class="ia-attach">
+      <span>${getFileIcon(f.type)}</span>
+      <span>${f.name.substring(0,20)}${f.name.length>20?'...':''}</span>
+      <button onclick="removePendingFile(${i})">✕</button>
+    </div>`).join('');
+}
+
+function removePendingFile(i){
+  pendingFiles.splice(i,1);
+  renderPendingFiles();
+}
+
+function getFileIcon(type){
+  if(!type)return'📄';
+  if(type.includes('pdf'))return'📕';
+  if(type.includes('image'))return'🖼️';
+  if(type.includes('word')||type.includes('document'))return'📝';
+  if(type.includes('sheet')||type.includes('excel'))return'📊';
+  if(type.includes('text'))return'📃';
+  return'📄';
+}
+
+function formatBytes(b){ if(b<1024)return b+'B'; if(b<1048576)return (b/1024).toFixed(1)+'KB'; return (b/1048576).toFixed(1)+'MB'; }
+
+// ══════════════════════════════════════════════════════
+// ADMIN KNOWLEDGE BASE
+// ══════════════════════════════════════════════════════
+let kbDocs=[]; // pending docs for current entry
+
+function admSwTab(tab){
+  ['emp','kb'].forEach(t=>{
+    const btn=G('adm-tab-'+t); const sec=G('adm-sec-'+t);
+    if(btn) btn.classList.toggle('on', t===tab);
+    if(sec) sec.style.display= t===tab?(tab==='kb'?'block':'block'):'none';
+  });
+  if(tab==='kb'){ renderKBList(); initKBSelectors(); }
+  else if(tab==='emp'){ G('adm-sec-emp').style.display='block'; }
+}
+
+function initKBSelectors(){
+  const dvSel=G('kb-div'); const dtSel=G('kb-dept'); const posSel=G('kb-pos');
+  if(!dvSel)return;
+  dvSel.innerHTML=[...new Set(DB.map(e=>e.dv))].sort().map(v=>`<option value="${v}">${v}</option>`).join('');
+  dtSel.innerHTML=[...new Set(DB.map(e=>e.dt))].sort().map(v=>`<option value="${v}">${v}</option>`).join('');
+  posSel.innerHTML=[...new Set(DB.map(e=>e.p))].sort().map(v=>`<option value="${v}">${v.substring(0,50)}</option>`).join('');
+}
+
+function updateKBSelectors(){
+  const scope=(G('kb-scope').value||'div');
+  G('kb-div-wrap').style.display=scope==='div'||scope==='dept'?'block':'none';
+  G('kb-dept-wrap').style.display=scope==='dept'?'block':'none';
+  G('kb-pos-wrap').style.display=scope==='pos'?'block':'none';
+}
+
+async function handleKBFile(inp){
+  const files=Array.from(inp.files);
+  for(const file of files){
+    const reader=new FileReader();
+    await new Promise(res=>{
+      reader.onload=e=>{
+        const isText=file.type.includes('text')||file.name.endsWith('.txt');
+        const isPDF=file.type.includes('pdf');
+        if(isText){
+          const tr=new FileReader();
+          tr.onload=e2=>{ kbDocs.push({name:file.name,text:e2.target.result.substring(0,5000)}); renderKBDocPreview(); res(); };
+          tr.readAsText(file);
+        } else if(isPDF){
+          // PDF: store as b64 for display note
+          kbDocs.push({name:file.name,note:'[PDF uploaded - content akan diproses]',b64:e.target.result.split(',')[1]});
+          renderKBDocPreview(); res();
+        } else {
+          kbDocs.push({name:file.name,note:'[File: '+file.name+']'}); renderKBDocPreview(); res();
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+  inp.value='';
+}
+
+function renderKBDocPreview(){
+  const el=G('kb-docs-preview'); if(!el)return;
+  el.innerHTML=kbDocs.map((d,i)=>`<div class="kb-doc">📄 ${d.name} <span onclick="kbDocs.splice(${i},1);renderKBDocPreview()" style="cursor:pointer;color:var(--re)">✕</span></div>`).join('');
+}
+
+function saveKBEntry(){
+  const scope=G('kb-scope').value;
+  let key='', label='';
+  if(scope==='div'){
+    key=G('kb-div').value; label='Divisi: '+key;
+  } else if(scope==='dept'){
+    key=G('kb-div').value+'::'+G('kb-dept').value;
+    label='Dept: '+G('kb-dept').value;
+  } else {
+    key='pos::'+G('kb-pos').value; label='Posisi: '+G('kb-pos').value;
+  }
+  const text=(G('kb-text').value||'').trim();
+  const docTexts=kbDocs.map(d=>d.text||d.note||'').filter(Boolean).join('
+
+');
+  const fullText=[text,docTexts].filter(Boolean).join('
+
+');
+  if(!fullText){ toast('Isi knowledge terlebih dahulu'); return; }
+  try{
+    const kb=JSON.parse(localStorage.getItem('sk4_knowledgeBase')||'{}');
+    const existing=kb[key]||'';
+    kb[key]=existing?(existing+'
+
+---
+
+'+fullText):fullText;
+    kb['__labels']=kb['__labels']||{};
+    kb['__labels'][key]=label;
+    localStorage.setItem('sk4_knowledgeBase',JSON.stringify(kb));
+    toast('✅ Knowledge berhasil disimpan!');
+    G('kb-text').value=''; kbDocs=[]; renderKBDocPreview();
+    renderKBList();
+  }catch(e){ toast('Error: '+e.message); }
+}
+
+function renderKBList(){
+  const el=G('kb-list'); if(!el)return;
+  try{
+    const kb=JSON.parse(localStorage.getItem('sk4_knowledgeBase')||'{}');
+    const labels=kb['__labels']||{};
+    const keys=Object.keys(kb).filter(k=>k!=='__labels');
+    if(!keys.length){ el.innerHTML='<p style="color:var(--tm);font-size:.79rem;text-align:center;padding:16px">Belum ada knowledge yang disimpan.</p>'; return; }
+    el.innerHTML=keys.map(k=>`
+      <div class="kb-entry">
+        <div class="kb-entry-hdr">
+          <div class="kb-entry-lbl">🏷️ ${labels[k]||k}</div>
+          <button class="kb-del" onclick="deleteKB('${k.replace(/'/g,"\'")}')">Hapus</button>
+        </div>
+        <div style="font-size:.76rem;color:var(--t2);line-height:1.5;max-height:80px;overflow:hidden">${ESC((kb[k]||'').substring(0,200))}${(kb[k]||'').length>200?'...':''}</div>
+      </div>`).join('');
+  }catch(e){ el.innerHTML='<p style="color:var(--re)">Error loading KB.</p>'; }
+}
+
+function deleteKB(key){
+  if(!confirm('Hapus knowledge ini?'))return;
+  try{
+    const kb=JSON.parse(localStorage.getItem('sk4_knowledgeBase')||'{}');
+    delete kb[key]; if(kb['__labels']) delete kb['__labels'][key];
+    localStorage.setItem('sk4_knowledgeBase',JSON.stringify(kb));
+    toast('Knowledge dihapus'); renderKBList();
+  }catch(e){ toast('Error: '+e.message); }
+}
+
+// Override getCustomKnowledge to check pos:: keys too
+function getCustomKnowledge(dv, dt){
+  try{
+    const kb=JSON.parse(localStorage.getItem('sk4_knowledgeBase')||'{}');
+    const parts=[];
+    if(kb[dv]) parts.push(kb[dv]);
+    if(dt&&dt!==dv&&kb[dv+'::'+dt]) parts.push(kb[dv+'::'+dt]);
+    return parts.join('
+
+');
+  }catch(e){ return ''; }
+}
 function initLogin(){
   const sv = localStorage.getItem('sk4_gcfg');
   if(sv){ try{ const c=JSON.parse(sv); gCI=c.ci||''; gAK=c.ak||''; if(G('inp-ci'))G('inp-ci').value=gCI; if(G('inp-ak'))G('inp-ak').value=gAK; }catch(e){} }
@@ -1315,19 +1674,256 @@ document.addEventListener('click',e=>{ if(!G('mac').contains(e.target)&&e.target
 // ══════════════════════════════════════════════════════
 function buildSys(emp,lang,nick,mem,ctxS,isGrp,mems){
   const a=age(emp);
+  const userAge=CU.y?CY-CU.y:30;
+  const ageDiff=a-userAge;
+
+  // ── DISC ──
   const ds=(emp.d||'C').split('').map(l=>DISC[l]||'').join('; ');
-  const langG=lang==='informal'
-    ?'Gunakan bahasa santai Gen-Z Indonesia: "btw","sih","dong","ngl","wkwk","bro","sis","nggak","asli","beneran","gue","lo". Tetap profesional.'
-    :'Gunakan bahasa Indonesia formal dan sopan.';
+
+  // ── Level flags ──
+  const isDirector=emp.p.includes('Direktur')||emp.p.includes('Pimpinan Unit');
+  const isDivHead=emp.p.includes('Division Head');
+  const isDeptHead=emp.p.includes('Department Head');
+  const isSectHead=emp.p.includes('Section Head');
+  const isSenior=isDirector||isDivHead||isDeptHead;
+  const lvlLabel=isDirector?'Direktur':isDivHead?'Division Head':isDeptHead?'Department Head':isSectHead?'Section Head':emp.p.includes('Specialist')?'Specialist':'Staff/Officer';
+
+  // ── Same div/dept ──
+  const sameDiv=!!(CU.dv&&CU.dv===emp.dv);
+  const sameDept=!!(CU.dt&&CU.dt===emp.dt);
+  const sameDivCtx=sameDept?'Kalian 1 departemen — kamu kenal baik konteks kerja harian mereka, bisa lebih direct dan akrab.':sameDiv?'Kalian 1 divisi — bicara sebagai rekan yang saling kenal, lebih terbuka.':'';
+
+  // ── Prefix (Bapak/Ibu/Mas/Mbak/Kak) ──
+  const uPfx=CU.g==='Wanita'?(ageDiff>8?'Ibu':ageDiff>2?'Mbak':'Mbak'):(ageDiff>8?'Bapak':ageDiff>2?'Mas':'Mas');
+  const sPfx=emp.g==='Wanita'?(a>45?'Ibu':a>30?'Bu':a>25?'Mbak':'Mbak'):(a>45?'Bapak':a>30?'Pak':a>25?'Mas':'Mas');
+
+  // ── Language style ──
+  let langG;
+  if(isSenior){
+    langG=`Kamu adalah ${lvlLabel} — WAJIB gunakan bahasa profesional & berwibawa. DILARANG KERAS: gue/lo, wkwk, btw, ngl, slang Gen-Z, atau kata tidak sopan. Sapa user dengan "${uPfx} ${nick}". Boleh hangat dan approachable tapi tetap elegan sebagai pemimpin.`;
+  } else if(lang==='informal'){
+    if(ageDiff>5){
+      langG=`Kamu lebih senior ${ageDiff} tahun dari ${nick}. Gunakan bahasa santai hangat seperti kakak ke adik. Panggil "${uPfx} ${nick}", bisa pakai "kamu" tapi hindari gue/lo. Boleh sesekali slang ringan.`;
+    } else if(ageDiff<-5){
+      langG=`${nick} lebih senior ${Math.abs(ageDiff)} tahun. Tunjukkan rasa hormat — panggil "${uPfx} ${nick}", hindari terlalu slang, tetap sopan meski santai.`;
+    } else {
+      langG=`Kalian sebaya (selisih ${Math.abs(ageDiff)} tahun). Gunakan bahasa santai Gen-Z: btw/sih/dong/ngl/wkwk/bestie/gue/lo/tau nggak/asli. Seru dan relatable!`;
+    }
+  } else {
+    langG=`Bahasa Indonesia formal profesional. Sapa dengan "${uPfx} ${nick}". Jelas, efisien, dan sopan.`;
+  }
+
+  // ── DISC application ──
+  const dApp=`DISC ${emp.d}: ${ds}`
+    +(emp.d.includes('D')?'\n→ Langsung ke inti, tegas, to the point, tidak bertele-tele.':'')
+    +(emp.d.includes('I')?'\n→ Antusias & ekspresif, pakai analogi/cerita ringan, humor hangat.':'')
+    +(emp.d.includes('S')?'\n→ Penuh empati, perhatikan perasaan, sabar mendengarkan.':'')
+    +(emp.d.includes('C')?'\n→ Terstruktur, berbasis data/fakta, minta klarifikasi sebelum jawab.':'');
+
+  // ── Div knowledge ──
+  const divK=getDivKnowledge(emp.dv,emp.dt,emp.p,lvlLabel);
+  const custK=getCustomKnowledge(emp.dv,emp.dt);
+
+  // ── Group context ──
   let grpCtx='';
   if(isGrp&&mems){
     const oth=mems.filter(m=>m.e!==emp.e);
-    if(oth.length) grpCtx=`\n\nINI GROUP CHAT. Anggota lain: ${oth.map(m=>`${tc(m.n)} (${m.p})`).join(', ')}. Jika pertanyaan lebih tepat dijawab anggota lain, mention dengan @${oth.map(m=>fn(m.n)).join(' atau @')}.`;
+    if(oth.length) grpCtx=`\n\nGROUP CHAT — Anggota lain: ${oth.map(m=>`${tc(m.n)} (${m.p})`).join(', ')}.\nMention @${oth.map(m=>fn(m.n)).join('/@')} jika topik lebih cocok untuk mereka. Koordinasikan jawaban antar bot-person.`;
   }
   let memCtx='';
-  if(mem&&mem.length) memCtx='\n\nTopik sebelumnya: '+mem.slice(-4).map(m=>`"${m.q}"→"${m.a}"`).join('; ');
-  return `Kamu adalah ${tc(emp.n)}, berusia ${a} tahun (lahir ${emp.y}), ${emp.p} di divisi ${emp.dv}${emp.dt&&emp.dt!==emp.dv?', dept '+emp.dt:''}, Asuransi Simas Jiwa (ASJ).\n\nKEPRIBADIAN DISC ${emp.d}: ${ds}\nGender: ${emp.g}. Gaya bicara: ${langG}\n\nLawan bicara: ${nick} (${CU.p}${CU.dv?' – '+CU.dv:''}).\n\nKEAHLIAN: ${emp.dv}. Paham produk asuransi jiwa Indonesia, regulasi OJK, proses bisnis ASJ.\n\nJIKA DI LUAR KEAHLIAN: Sampaikan terus terang, tawarkan: 1) Referral ke kolega lain, atau 2) Buat group chat bersama.\n\nFORM & PROSES: Jika topik butuh formulir, jelaskan prosesnya dan tawarkan bantu isi form interaktif (tanya satu field per pesan).\n\nATURAN: Jangan bahas SARA/politik. Jawab ringkas (3-4 kalimat) kecuali diminta detail.${grpCtx}${ctxS?'\n\nKONTEKS SEBELUMNYA:\n'+ctxS:''}${memCtx}`;
+  if(mem&&mem.length) memCtx='\n\nRiwayat: '+mem.slice(-5).map(m=>`"${m.q}"→"${m.a}"`).join('; ');
+
+  return `Kamu adalah ${tc(emp.n)} (${sPfx} ${fn(emp.n)}), usia ${a} tahun, ${emp.p} di ${emp.dv}${emp.dt&&emp.dt!==emp.dv?' — '+emp.dt:''}, Asuransi Simas Jiwa.
+
+LEVEL: ${lvlLabel}${isSenior?' [Senior Executive — bicara dengan wibawa & kepemimpinan]':''}
+${sameDivCtx?'RELASI: '+sameDivCtx:''}
+
+KEPRIBADIAN (terapkan KONSISTEN):
+${dApp}
+
+GAYA BICARA:
+${langG}
+
+LAWAN BICARA: ${uPfx} ${nick}${CU.p?' ('+CU.p+(CU.dv?', '+CU.dv:'')+')'  :''}
+
+${divK}
+
+DATABASE KARYAWAN: Kamu punya akses ke semua data & email karyawan ASJ. JANGAN minta email dari user — gunakan langsung dari database.
+${custK?'\nKNOWLEDGE TAMBAHAN:\n'+custK:''}
+CARA MERESPONS:
+1. Sapa "${uPfx} ${nick}" di pembuka atau transisi topik penting.
+2. Jawab dari perspektif keahlian posisimu — spesifik, berbobot, bukan generik.
+3. Dokumen/file: BACA dan ANALISIS mendalam, berikan insight relevan.
+4. Form/proses: jelaskan step-by-step, tawarkan bantu isi otomatis per field.
+5. Di luar keahlian: akui jujur, @mention kolega yang tepat.
+6. Ringkas 3-5 kalimat kecuali diminta detail atau sedang isi form.
+7. DILARANG: SARA, politik, hal tidak etis.${grpCtx}${ctxS?'\n\nKONTEKS SEBELUMNYA:\n'+ctxS:''}${memCtx}`;
 }
+function getDivKnowledge(dv,dt,pos,lvl){
+  // Rich division-specific knowledge
+  const dvLow=(dv||'').toUpperCase();
+  let k='KEAHLIAN & TANGGUNG JAWAB:\n';
+  
+  if(dvLow.includes('HUMAN CAPITAL')){
+    k+=`Kamu ahli di bidang HR/Human Capital ASJ:
+- Rekrutmen & seleksi karyawan (job posting, interview, onboarding)
+- Pengelolaan data karyawan, kontrak, PKWT/PKWTT
+- Penggajian, tunjangan, BPJS Ketenagakerjaan & Kesehatan
+- Pengajuan cuti (tahunan/sakit/melahirkan/izin) → form via HC Operations
+- Reimbursement biaya → form via Finance
+- Pengembangan talent, pelatihan & training
+- Performance review, promosi, mutasi
+- Prosedur PHK, resign, pensiun
+- Peraturan perusahaan, kode etik, disiplin karyawan
+- Form yang kamu handle: Form Cuti, Form Training, Surat Keterangan Kerja
+- Approver cuti: pajar.yonatan@simasjiwa.co.id, CC: inneke.tanudjaya@simasjiwa.co.id
+- Approver training: fitri.zakiyah@simasjiwa.co.id, CC: pajar.yonatan@simasjiwa.co.id`;
+  } else if(dvLow.includes('FINANCE')||dvLow.includes('ACCOUNTING')){
+    k+=`Kamu ahli di bidang Finance & Accounting ASJ:
+- Pengelolaan anggaran divisi dan laporan keuangan perusahaan
+- Reimbursement & klaim biaya operasional → approver: muara.sitorus@simasjiwa.co.id
+- Proses pembayaran vendor, tagihan, purchase order
+- Laporan IFRS 17, SAK, standar akuntansi asuransi
+- Pajak perusahaan (PPh Badan, PPN, PPh 21/23/4(2))
+- Cash flow management, treasury
+- Audit internal & eksternal, laporan OJK
+- Form yang kamu handle: Form Reimbursement, Purchase Request, Payment Request
+- Approver reimbursement: muara.sitorus@simasjiwa.co.id, CC: kathierina.meidri@simasjiwa.co.id`;
+  } else if(dvLow.includes('DIGITAL TECHNOLOGY')||dvLow.includes('IT')){
+    k+=`Kamu ahli di bidang Digital Technology & IT ASJ:
+- Pengembangan & maintenance aplikasi core (sistem polis, klaim, agen)
+- IT infrastructure: server, network, cloud, database
+- Cybersecurity, backup, disaster recovery
+- Helpdesk & troubleshooting sistem
+- Digital transformation, AI/ML implementation
+- Integrasi API dengan mitra bank dan agen
+- IT procurement & vendor management
+- SOP penggunaan sistem, user access management
+- Jika ada masalah sistem: catat detail error, waktu kejadian, user yang terdampak`;
+  } else if(dvLow.includes('CLAIM')||dvLow.includes('UNDERWRITING')){
+    k+=`Kamu ahli di bidang Claim & Underwriting ASJ:
+- Proses klaim asuransi jiwa (pengajuan, investigasi, persetujuan, pembayaran)
+- Dokumen klaim yang dibutuhkan: formulir klaim, surat kematian/dokter, KTP, buku tabungan
+- SLA proses klaim: simple 14 hari kerja, kompleks 30 hari kerja
+- Underwriting: seleksi risiko, analisis medical report, acceptance/rejection
+- Reasuransi untuk risiko besar
+- Fraud investigation
+- Produk yang dicover: jiwa, kesehatan, kecelakaan diri, unit link`;
+  } else if(dvLow.includes('PRODUCT')||dvLow.includes('MARKETING')){
+    k+=`Kamu ahli di bidang Product & Marketing Intelligence ASJ:
+- Produk asuransi: jiwa tradisional, unit link, syariah, group insurance
+- Fitur produk: premi, manfaat, pengecualian, surrender value
+- Analisis kompetitor dan tren pasar asuransi Indonesia
+- Marketing campaign, branding, komunikasi korporat
+- Product development: riset kebutuhan, pricing, filing OJK
+- KPI distribusi: new business, conservation ratio, persistency`;
+  } else if(dvLow.includes('BANCASSURANCE')){
+    k+=`Kamu ahli di bidang Bancassurance & Distribution ASJ:
+- Distribusi produk melalui mitra bank (pillar & non-pillar)
+- Onboarding, training, coaching bancassurance officer/agent
+- Target penjualan, pipeline management
+- Produk yang dijual di bank: saving plan, proteksi, unit link
+- Proses aplikasi nasabah: KYC, anti money laundering
+- Service nasabah dan dispute handling
+- Koordinasi dengan mitra bank: laporan, review, meeting`;
+  } else if(dvLow.includes('COMPLIANCE')||dvLow.includes('LEGAL')){
+    k+=`Kamu ahli di bidang Compliance & Legal ASJ:
+- Regulasi OJK: POJK, SEOJK, peraturan asuransi jiwa
+- Compliance monitoring & reporting ke regulator
+- Review kontrak, perjanjian kerjasama, MoU
+- Dispute resolution, litigasi
+- Anti Pencucian Uang (APU PPT): KYC, CDD, STR
+- Program kepatuhan dan sosialisasi regulasi baru
+- Perizinan produk dan perusahaan`;
+  } else if(dvLow.includes('INVESTMENT')){
+    k+=`Kamu ahli di bidang Investment ASJ:
+- Manajemen portofolio investasi: saham, obligasi, reksa dana, deposito
+- Regulasi investasi asuransi OJK: PMK, POJK investasi
+- Risk management investasi: ALM, duration matching
+- Laporan investasi harian/bulanan/tahunan
+- Unit link: NAV calculation, fund performance
+- DPLK: dana pensiun, investasi jangka panjang`;
+  } else if(dvLow.includes('ACTUARIAL')||dvLow.includes('ACTUARY')){
+    k+=`Kamu ahli di bidang Aktuaria ASJ:
+- Pricing produk asuransi: mortalita, morbidita, asumsi investasi
+- IFRS 17: CSM, RA, BEL, liability calculation
+- Prophet modelling: proyeksi keuangan jangka panjang
+- Valuasi cadangan teknis, laporan aktuarial ke OJK
+- Reasuransi: treaty, facultative, quota share
+- Analisis profitabilitas produk`;
+  } else if(dvLow.includes('OPERATIONS')){
+    k+=`Kamu ahli di bidang Operations ASJ:
+- Proses new business: penerimaan aplikasi, underwriting, penerbitan polis
+- Policy owner service: perubahan polis, endorsement, reinstatement
+- Customer service: keluhan, pertanyaan, informasi produk
+- Document management: pengarsipan, digitalisasi dokumen
+- SLA proses: penerbitan polis 3-5 hari kerja`;
+  } else if(dvLow.includes('OPERATION EXCELLENCE')){
+    k+=`Kamu ahli di bidang Operation Excellence & Business Analyst ASJ:
+- Business process improvement: mapping, analisis, reengineering
+- PMO: project management, milestone tracking, risk register
+- MIS & reporting: dashboard, data analytics
+- Business requirements: BRD, user story, UAT
+- Change management & implementasi sistem baru`;
+  } else if(dvLow.includes('RISK')){
+    k+=`Kamu ahli di bidang Risk Management ASJ:
+- Enterprise Risk Management (ERM): identifikasi, penilaian, mitigasi risiko
+- Risk register, risk appetite, risk tolerance
+- Stress testing, scenario analysis
+- Laporan risk ke Board dan OJK
+- Operational risk, market risk, credit risk, insurance risk`;
+  } else if(dvLow.includes('CORPORATE COMMUNICATION')){
+    k+=`Kamu ahli di bidang Corporate Communication ASJ:
+- Media relations, press release, konferensi pers
+- Internal communication: newsletter, town hall, intranet
+- Social media management, content creation
+- Branding guidelines, corporate identity
+- Event management: gathering, seminar, pameran
+- CSR program`;
+  } else if(dvLow.includes('GA')||dvLow.includes('PROCUREMENT')){
+    k+=`Kamu ahli di bidang GA & Procurement ASJ:
+- Pengadaan barang & jasa: tender, negosiasi, kontrak vendor
+- Pengelolaan aset kantor, inventaris, fasilitas
+- Sekretaris direksi, jadwal rapat, korespondensi
+- Travel management, akomodasi dinas
+- Building management, keamanan, kebersihan`;
+  } else if(dvLow.includes('DPLK')||dvLow.includes('LEMBAGA KEUANGAN')){
+    k+=`Kamu ahli di bidang DPLK (Dana Pensiun Lembaga Keuangan) ASJ:
+- Produk dana pensiun: iuran pasti, manfaat pasti
+- Administrasi peserta DPLK: pendaftaran, iuran, manfaat
+- Investasi dana pensiun sesuai POJK
+- Laporan ke OJK dan peserta
+- Corporate solution: program pensiun karyawan perusahaan`;
+  } else if(dvLow.includes('INTERNAL AUDIT')){
+    k+=`Kamu ahli di bidang Internal Audit ASJ:
+- Audit operasional, keuangan, compliance, IT
+- Perencanaan audit tahunan (RKAT)
+- Audit report, temuan, rekomendasi
+- Follow-up tindak lanjut temuan audit
+- Koordinasi dengan eksternal auditor dan OJK`;
+  } else if(dvLow.includes('BOARD')){
+    k+=`Kamu adalah anggota Direksi ASJ dengan wawasan strategis:
+- Strategi bisnis, ekspansi, dan pertumbuhan perusahaan
+- Hubungan dengan shareholder (Sinar Mas Group), regulator (OJK)
+- Persetujuan kebijakan, anggaran, dan investasi besar
+- Governance: GCG, RUPS, Board meeting
+- Untuk pertanyaan operasional, arahkan ke Division Head terkait`;
+  } else {
+    k+=`Kamu ahli di bidang ${dv} ASJ. Berikan informasi berdasarkan pengetahuan dan pengalamanmu di posisi ${pos}.`;
+  }
+  return k;
+}
+
+function getCustomKnowledge(dv, dt){
+  // Get admin-fed custom knowledge from localStorage
+  try{
+    const kb=JSON.parse(localStorage.getItem('sk4_knowledgeBase')||'{}');
+    const key=dv+(dt&&dt!==dv?'::'+dt:'');
+    return kb[key]||kb[dv]||'';
+  }catch(e){ return ''; }
+}
+
+
 
 function getErrMsg(code, lang){
   const isInformal = lang==='informal';
@@ -1366,7 +1962,26 @@ async function callAPI(sys,msgs,mt=900){
         model:'claude-sonnet-4-5',
         max_tokens:mt,
         system:sys,
-        messages:msgs.map(m=>({role:m.role==='user'?'user':'assistant',content:m.content}))
+        messages:msgs.map((m,i)=>{
+          // Last user message may include file attachments
+          if(m.role==='user'&&i===msgs.length-1&&m.files&&m.files.length){
+            const content=[];
+            m.files.forEach(f=>{
+              if(f.b64&&f.mediaType){
+                if(f.mediaType==='application/pdf'){
+                  content.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:f.b64}});
+                } else if(f.mediaType.startsWith('image/')){
+                  content.push({type:'image',source:{type:'base64',media_type:f.mediaType,data:f.b64}});
+                }
+              } else if(f.text){
+                content.push({type:'text',text:`[File: ${f.name}]\n${f.text.substring(0,8000)}`});
+              }
+            });
+            content.push({type:'text',text:m.content});
+            return {role:'user',content};
+          }
+          return {role:m.role==='user'?'user':'assistant',content:m.content};
+        })
       })
     });
     if(!r.ok){
@@ -1442,57 +2057,82 @@ async function doSend(){
   const s=chats[aId]; if(!s)return;
   inp.value=''; inp.style.height='auto'; G('mac').className='mac';
   if(fCtx){ handleFA(txt); return; }
-  const um={role:'user',content:txt,ts:N()}; s.msgs.push(um); apM(um);
-  // Which bot responds
-  const mm=txt.match(/@([\w.]+)/);
-  let rEmp=s.grp?s.primaryEmp:s.emp;
-  if(mm&&s.grp&&s.members){
-    const mq=mm[1].toLowerCase();
-    const found=s.members.find(m=>fn(m.n).toLowerCase()===mq||m.n.toLowerCase().includes(mq));
-    if(found)rEmp=found;
+  // Build user message with any pending file attachments
+  const msgFiles=[...pendingFiles];
+  const um={role:'user',content:txt,ts:N(),files:msgFiles.length?msgFiles:undefined};
+  s.msgs.push(um);
+  // Show file bubbles in chat
+  if(msgFiles.length){
+    const filePrev=msgFiles.map(f=>`<div class="file-bubble"><span class="file-ic">${getFileIcon(f.type)}</span><div class="file-info"><div class="file-nm">${ESC(f.name)}</div><div class="file-sz">${formatBytes(f.size)}</div></div></div>`).join('');
+    const fmsg={role:'user',content:txt+(txt?'\n\n':'')+filePrev,ts:N()};
+    apM(fmsg,true);
+  } else {
+    apM(um);
   }
+  // Clear pending files
+  pendingFiles=[];
+  renderPendingFiles();
+  // Which bots respond — support multiple @mentions in group chat
+  const allMentions=[...txt.matchAll(/@([\w.]+)/g)].map(m=>m[1].toLowerCase());
+  let respondingBots=[];
+  if(s.grp&&s.members&&allMentions.length>0){
+    allMentions.forEach(mq=>{
+      const found=s.members.find(m=>fn(m.n).toLowerCase()===mq||m.n.toLowerCase().includes(mq)||m.n.toLowerCase().split(' ').some(w=>w.startsWith(mq)));
+      if(found&&!respondingBots.find(b=>b.e===found.e)) respondingBots.push(found);
+    });
+  }
+  if(!respondingBots.length) respondingBots=[s.grp?s.primaryEmp:s.emp];
   const nick=cfg.nick||fn(CU.n);
-  const sys=buildSys(rEmp,s.lang,nick,s.mem,null,s.grp,s.grp?s.members:null);
-  const hist=s.msgs.slice(-14).map(m=>({role:m.role,content:m.content}));
+  // Respond from each mentioned bot in sequence
   showTy(); rCL();
-  const resp=await callAPI(sys,hist);
-  rmTy();
-  if(resp==='__NO_KEY__'){
-    const km={role:'assistant',content:NO_KEY_MSG,snm:tc(rEmp.n),sav:BAV[rEmp.g]||'🤖',ts:N()};
-    s.msgs.push(km); apM(km); rCL(); saveS(); return;
-  }
-  if(resp&&resp.startsWith('__ERR_')){
-    const errMsg=getErrMsg(resp,s.lang);
-    const km={role:'assistant',content:errMsg,snm:tc(rEmp.n),sav:BAV[rEmp.g]||'🤖',ts:N()};
-    s.msgs.push(km); apM(km); rCL(); saveS(); return;
-  }
-  const txt2=resp||fbMsg(s.lang);
-  const bm={role:'assistant',content:txt2,snm:tc(rEmp.n),sav:BAV[rEmp.g]||'🤖',ts:N()};
-  // out-of-scope check
-  const rl=txt2.toLowerCase();
-  if(/di luar bidang|bukan keahlian|lebih tepat ditanyakan|referensikan|rekomendasikan teman/.test(rl)){
-    const recs=getRefRecs(txt,rEmp);
-    if(recs&&recs.length){
-      const sum=s.msgs.slice(-4).map(m=>(m.role==='user'?'User: ':fn(rEmp.n)+': ')+m.content.substring(0,90)).join(' | ');
-      bm.opts=[
-        {l:`💬 Chat dengan ${fn(recs[0].n)}`,fn:`doStartWith('${recs[0].e}','${sum.replace(/'/g,"\'")}')`,cls:''},
-        {l:`👥 Buat Group Chat`,fn:`doCreateRefGrp('${aId}',[${recs.map(r=>`DB.find(x=>x.e==='${r.e}')`).join(',')}].filter(Boolean))`,cls:'grp'}
-      ];
-      bm.recs=recs.slice(0,3); bm.sum=sum;
+  let lastResp=null;
+  for(let bi=0;bi<respondingBots.length;bi++){
+    const rEmp=respondingBots[bi];
+    const sys=buildSys(rEmp,s.lang,nick,s.mem,null,s.grp,s.grp?s.members:null);
+    const hist=s.msgs.slice(-14).map(m=>({role:m.role,content:m.content}));
+    // Add context of previous bot replies in this round
+    if(bi>0&&lastResp) hist.push({role:'assistant',content:lastResp});
+    const resp=await callAPI(sys,hist);
+    rmTy();
+    lastResp=resp;
+    if(resp==='__NO_KEY__'){
+      const km={role:'assistant',content:NO_KEY_MSG,snm:tc(rEmp.n),sav:BAV[rEmp.g]||'🤖',ts:N()};
+      s.msgs.push(km); apM(km); rCL(); saveS(); return;
     }
-  }
-  // form check
-  const lo=txt.toLowerCase();
-  if(/formulir|form|cuti|reimb|reimbursement|training|pelatihan/.test(lo)&&!fCtx){
-    const ft=dtFT(txt); if(ft) setTimeout(()=>startForm(ft),500);
-  }
-  // calendar check
-  if(/meeting|jadwal|rapat|kalender/.test(lo)&&!bm.opts?.length){
-    bm.opts=[{l:'📅 Jadwalkan Meeting',fn:'doOpCal()'}];
-  }
-  s.msgs.push(bm); apM(bm);
-  s.mem=s.mem||[]; s.mem.push({q:txt.substring(0,80),a:txt2.substring(0,150),ts:N()});
-  if(s.mem.length>20)s.mem=s.mem.slice(-20);
+    if(resp&&resp.startsWith('__ERR_')){
+      const errMsg=getErrMsg(resp,s.lang);
+      const km={role:'assistant',content:errMsg,snm:tc(rEmp.n),sav:BAV[rEmp.g]||'🤖',ts:N()};
+      s.msgs.push(km); apM(km); rCL(); saveS(); return;
+    }
+    const txt2=resp||fbMsg(s.lang);
+    const bm={role:'assistant',content:txt2,snm:tc(rEmp.n),sav:BAV[rEmp.g]||'🤖',ts:N()};
+    // out-of-scope check
+    const rl=txt2.toLowerCase();
+    if(/di luar bidang|bukan keahlian|lebih tepat ditanyakan|referensikan|rekomendasikan teman/.test(rl)){
+      const recs=getRefRecs(txt,rEmp);
+      if(recs&&recs.length){
+        const sum=s.msgs.slice(-4).map(m=>(m.role==='user'?'User: ':fn(rEmp.n)+': ')+m.content.substring(0,90)).join(' | ');
+        bm.opts=[
+          {l:`💬 Chat dengan ${fn(recs[0].n)}`,fn:`doStartWith('${recs[0].e}','${sum.replace(/'/g,"\'")}')`,cls:''},
+          {l:`👥 Buat Group Chat`,fn:`doCreateRefGrp('${aId}',[${recs.map(r=>`DB.find(x=>x.e==='${r.e}')`).join(',')}].filter(Boolean))`,cls:'grp'}
+        ];
+        bm.recs=recs.slice(0,3); bm.sum=sum;
+      }
+    }
+    if(bi===0){
+      const lo2=txt.toLowerCase();
+      if(/formulir|form|cuti|reimb|reimbursement|training|pelatihan/.test(lo2)&&!fCtx){
+        const ft=dtFT(txt); if(ft) setTimeout(()=>startForm(ft),500);
+      }
+      if(/meeting|jadwal|rapat|kalender/.test(lo2)&&!bm.opts?.length){
+        bm.opts=[{l:'📅 Jadwalkan Meeting',fn:'doOpCal()'}];
+      }
+    }
+    s.msgs.push(bm); apM(bm);
+    s.mem=s.mem||[]; s.mem.push({q:txt.substring(0,80),a:txt2.substring(0,150),ts:N()});
+    if(s.mem.length>20) s.mem=s.mem.slice(-20);
+    if(bi<respondingBots.length-1){ rCL(); saveS(); await new Promise(r=>setTimeout(r,900)); showTy(); }
+  } // end for(respondingBots)
   rCL(); saveS();
 }
 function getRefRecs(q,ce){
@@ -1578,7 +2218,14 @@ function doSendFormEmail(ft){
 function doOpCal(){
   calPts=[]; calSlot=null;
   const s=chats[aId]; if(s){ const emps=s.grp?s.members:[s.emp]; calPts=[...emps.filter(Boolean)]; }
-  G('cal-topic').value=''; G('cal-sr').value=''; G('cal-slots').style.display='none';
+  // Auto-fill topic from recent conversation
+  let autoTopic='';
+  if(s&&s.msgs.length){
+    const lastUser=s.msgs.filter(m=>m.role==='user').slice(-1)[0];
+    if(lastUser) autoTopic=lastUser.content.substring(0,60).replace(/\n/g,' ');
+  }
+  G('cal-topic').value=autoTopic;
+  G('cal-sr').value=''; G('cal-slots').style.display='none';
   rCalPts(); doOpOv('ov-cal'); doRCalSr('');
   document.querySelectorAll('.dbt').forEach((b,i)=>b.classList.toggle('on',i===0)); calDur=30;
   G('cal-btn').textContent='Cek Ketersediaan'; G('cal-btn').onclick=doFindSlots;
@@ -1598,14 +2245,22 @@ async function doFindSlots(){
 }
 function showSimSlots(topic){
   const today=new Date(); const slots=[];
-  for(let d=1;d<=7&&slots.length<6;d++){
+  // Generate full 2 weeks of business hour slots
+  for(let d=1;d<=14;d++){
     const dt=new Date(today); dt.setDate(today.getDate()+d);
-    if(dt.getDay()===0||dt.getDay()===6)continue;
-    const ds=dt.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'});
-    for(const t of['09:00','10:00','13:00','14:00','15:00']){ if(slots.length<6)slots.push({date:ds,time:t,iso:dt.toISOString().split('T')[0]}); }
+    if(dt.getDay()===0||dt.getDay()===6)continue; // skip weekends
+    const ds=dt.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    const iso=dt.toISOString().split('T')[0];
+    for(const t of['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:00']){
+      slots.push({date:ds,time:t,iso,dateObj:dt.getTime()});
+    }
   }
   G('cal-slots').style.display='block';
-  G('cal-sl').innerHTML=slots.map((sl,i)=>`<div class="cs" onclick="doSelSlot(${i},this)" data-s='${JSON.stringify(sl)}'>📅 <strong>${sl.date}</strong> pukul <strong>${sl.time}</strong> <span style="font-size:.68rem;color:var(--tm)">${calDur} mnt</span></div>`).join('');
+  const slHtml=slots.map((sl,i)=>`<div class="cs" onclick="doSelSlot(${i},this)" data-s='${JSON.stringify({date:sl.date,time:sl.time,iso:sl.iso})}'>📅 <strong>${sl.date}</strong> · <strong>${sl.time}</strong> <span style="font-size:.68rem;color:var(--tm);margin-left:4px">${calDur} mnt</span></div>`).join('');
+  G('cal-sl').innerHTML=slHtml;
+  const p=document.createElement('p');p.style.cssText='font-size:.69rem;color:var(--tm);margin-top:4px;text-align:center';
+  p.textContent='Scroll untuk lihat lebih banyak slot (2 minggu ke depan)';
+  G('cal-sl').after(p);
   G('cal-btn').textContent='Buat Meeting'; G('cal-btn').onclick=()=>doCreateMtg(topic);
 }
 function doSelSlot(i,el){ document.querySelectorAll('.cs').forEach(s=>s.classList.remove('on')); el.classList.add('on'); calSlot=JSON.parse(el.dataset.s); }
@@ -1615,17 +2270,21 @@ async function findRealSlots(topic){
     const r=await fetch(`https://www.googleapis.com/calendar/v3/freeBusy?key=${gAK}`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+gTok},body:JSON.stringify({timeMin:now.toISOString(),timeMax:wl.toISOString(),items:calPts.map(p=>({id:p.e}))})});
     const d=await r.json(); if(d.error){showSimSlots(topic);return;}
     const busy=[]; Object.values(d.calendars||{}).forEach(c=>(c.busy||[]).forEach(b=>busy.push({s:new Date(b.start),e:new Date(b.end)})));
-    const slots=[]; const sd=new Date(now);
-    for(let i=0;i<7&&slots.length<6;i++){
-      sd.setDate(now.getDate()+i+1); if(sd.getDay()===0||sd.getDay()===6)continue;
-      for(let h=9;h<=16&&slots.length<6;h++){
+    const slots=[]; 
+    for(let i=1;i<=14;i++){
+      const sd=new Date(now); sd.setDate(now.getDate()+i);
+      if(sd.getDay()===0||sd.getDay()===6)continue;
+      for(let h=8;h<=16;h++){
         const ss=new Date(sd); ss.setHours(h,0,0,0); const se=new Date(ss.getTime()+calDur*60000);
-        if(!busy.some(b=>ss<b.e&&se>b.s)) slots.push({date:ss.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'}),time:`${String(h).padStart(2,'0')}:00`,iso:ss.toISOString()});
+        if(!busy.some(b=>ss<b.e&&se>b.s)) slots.push({date:ss.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),time:`${String(h).padStart(2,'0')}:00`,iso:ss.toISOString()});
       }
     }
     if(!slots.length){showSimSlots(topic);return;}
     G('cal-slots').style.display='block';
-    G('cal-sl').innerHTML=slots.map((sl,i)=>`<div class="cs" onclick="doSelSlot(${i},this)" data-s='${JSON.stringify(sl)}'>📅 <strong>${sl.date}</strong> pukul <strong>${sl.time}</strong> <span style="font-size:.68rem;color:var(--gr)">✓ Tersedia</span></div>`).join('');
+    G('cal-sl').innerHTML=slots.map((sl,i)=>`<div class="cs" onclick="doSelSlot(${i},this)" data-s='${JSON.stringify(sl)}'>📅 <strong>${sl.date}</strong> · <strong>${sl.time}</strong> <span style="font-size:.68rem;color:var(--gr);margin-left:4px">✓ Semua tersedia</span></div>`).join('');
+    const p=document.createElement('p');p.style.cssText='font-size:.69rem;color:var(--tm);margin-top:4px;text-align:center';
+    p.textContent=`${slots.length} slot tersedia (dari Google Calendar) · Scroll untuk lihat semua`;
+    G('cal-sl').after(p);
     G('cal-btn').textContent='Buat Meeting'; G('cal-btn').onclick=()=>doCreateMtg(topic);
   }catch(err){showSimSlots(topic);}
 }
@@ -1659,6 +2318,45 @@ async function doCreateRealMtg(topic){
 // GMAIL
 // ══════════════════════════════════════════════════════
 function doOpGmail(){ G('gml-to').value=''; G('gml-cc').value=''; G('gml-s').value=''; G('gml-b').value=''; doOpOv('ov-gml'); }
+
+function emlAC(inp, acId){
+  const q=(inp.value||'').trim().toLowerCase();
+  const ac=G(acId);
+  if(!q||q.length<2){ ac.className='eml-ac'; return; }
+  // Search last token after comma/semicolon
+  const parts=q.split(/[,;]/); const last=parts[parts.length-1].trim();
+  if(!last){ ac.className='eml-ac'; return; }
+  const res=DB.filter(e=>
+    e.n.toLowerCase().includes(last)||
+    e.e.toLowerCase().includes(last)||
+    e.p.toLowerCase().includes(last)
+  ).slice(0,8);
+  if(!res.length){ ac.className='eml-ac'; return; }
+  ac.className='eml-ac on';
+  ac.innerHTML=res.map(e=>`
+    <div class="eml-ac-it" onclick="emlPick('${inp.id}','${acId}','${e.e}')">
+      <span>${BAV[e.g]||'👨‍💼'}</span>
+      <span><strong>${tc(e.n)}</strong><br/><span style="font-size:.69rem;color:var(--tm)">${e.e} · ${e.p}</span></span>
+    </div>`).join('');
+}
+
+function emlPick(inpId, acId, email){
+  const inp=G(inpId);
+  // Append to existing (support multiple recipients)
+  const cur=(inp.value||'').trim();
+  const parts=cur.split(/[,;]\s*/);
+  parts[parts.length-1]=email;
+  inp.value=parts.join(', ')+', ';
+  G(acId).className='eml-ac';
+  inp.focus();
+}
+
+// Close autocomplete when clicking outside
+document.addEventListener('click', e=>{
+  ['gml-to-ac','gml-cc-ac'].forEach(id=>{
+    const el=G(id); if(el&&!el.contains(e.target)) el.className='eml-ac';
+  });
+});
 async function doSendEmail(){
   const to=(G('gml-to').value||'').trim(); const cc=(G('gml-cc').value||'').trim();
   const subj=(G('gml-s').value||'').trim(); const body=(G('gml-b').value||'').trim();
