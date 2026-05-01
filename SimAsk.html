@@ -1621,9 +1621,12 @@ function apM(m,sc=true){
   const row=document.createElement('div'); row.className='mr '+(isMe?'me':'other');
   const av=isMe?uAv:(m.sav||'🤖');
   let ex='';
-  if(m.opts&&m.opts.length) ex+=`<div class="oc">${m.opts.map(o=>`<button class="ob2${o.cls?' '+o.cls:''}" onclick="${ESC(o.fn)}">${o.l}</button>`).join('')}</div>`;
-  if(m.recs&&m.recs.length) ex+=`<div class="pc">${m.recs.map(r=>`<button class="pch" onclick="doStartWith('${r.e}','${(m.sum||'').replace(/'/g,"\'")}')">${BAV[r.g]||'👨‍💼'} ${fn(r.n)}</button>`).join('')}</div>`;
-  row.innerHTML=`<div class="mav ${isMe?'me':'th'}">${av}</div><div class="bb ${isMe?'me':'th'}">${m.snm&&!isMe?`<div class="bb-n">${ESC(m.snm)}</div>`:''}<div>${fmt(m.content||'')}</div>${ex}<div class="bb-t">${FT(m.ts||N())}</div></div>`;
+  if(m.opts&&m.opts.length){ let ob=''; m.opts.forEach(o=>{ ob+='<button class="ob2'+(o.cls?' '+o.cls:'')+'" onclick="'+ESC(o.fn)+'">'+o.l+'</button>'; }); ex+='<div class="oc">'+ob+'</div>'; }
+  if(m.recs&&m.recs.length){ let rb=''; m.recs.forEach(r=>{ rb+='<button class="pch" onclick="doStartWith(\''+r.e+'\',\''+((m.sum||'').replace(/'/g,'\'').substring(0,100))+'\')">'+(BAV[r.g]||'👨‍💼')+' '+fn(r.n)+'</button>'; }); ex+='<div class="pc">'+rb+'</div>'; }
+  const mavCls='mav '+(isMe?'me':'th');
+  const bbCls='bb '+(isMe?'me':'th');
+  const snmHtml=m.snm&&!isMe?'<div class="bb-n">'+ESC(m.snm)+'</div>':'';
+  row.innerHTML='<div class="'+mavCls+'">'+av+'</div><div class="'+bbCls+'">'+snmHtml+'<div>'+fmt(m.content||'')+'</div>'+ex+'<div class="bb-t">'+FT(m.ts||N())+'</div></div>';
   c.appendChild(row); if(sc)c.scrollTop=c.scrollHeight;
 }
 function showTy(){
@@ -1728,10 +1731,10 @@ function buildSys(emp,lang,nick,mem,ctxS,isGrp,mems){
   let grpCtx='';
   if(isGrp&&mems){
     const oth=mems.filter(m=>m.e!==emp.e);
-    if(oth.length) grpCtx=`\n\nGROUP CHAT — Anggota lain: ${oth.map(m=>`${tc(m.n)} (${m.p})`).join(', ')}.\nMention @${oth.map(m=>fn(m.n)).join('/@')} jika topik lebih cocok untuk mereka. Koordinasikan jawaban antar bot-person.`;
+    if(oth.length) grpCtx='\n\nGROUP CHAT — Anggota lain: '+oth.map(m=>tc(m.n)+' ('+m.p+')').join(', ')+'.\nMention @'+oth.map(m=>fn(m.n)).join('/@')+' jika topik lebih cocok untuk mereka. Koordinasikan jawaban antar bot-person.';
   }
   let memCtx='';
-  if(mem&&mem.length) memCtx='\n\nRiwayat: '+mem.slice(-5).map(m=>`"${m.q}"→"${m.a}"`).join('; ');
+  if(mem&&mem.length) memCtx='\n\nRiwayat: '+mem.slice(-5).map(m=>'"'+m.q+'"→"'+m.a+'"').join('; ');
 
   return `Kamu adalah ${tc(emp.n)} (${sPfx} ${fn(emp.n)}), usia ${a} tahun, ${emp.p} di ${emp.dv}${emp.dt&&emp.dt!==emp.dv?' — '+emp.dt:''}, Asuransi Simas Jiwa.
 
@@ -2036,7 +2039,7 @@ async function grpIntro(id){
   const nick=cfg.nick||fn(CU.n);
   const oth=s.members.filter(m=>m.e!==emp.e);
   const sys=buildSys(emp,s.lang,nick,s.mem,null,true,s.members);
-  const pr=`Kamu baru bergabung ke group chat bersama ${nick} dan ${oth.map(m=>tc(m.n)).join(', ')}. Ringkas konteks ini dan mention ${oth.map(m=>'@'+fn(m.n)).join(' dan ')} untuk bergabung:\nKONTEKS: ${s.ctxS}`;
+  const pr='Kamu baru bergabung ke group chat bersama '+nick+' dan '+oth.map(m=>tc(m.n)).join(', ')+'. Ringkas konteks ini dan mention '+oth.map(m=>'@'+fn(m.n)).join(' dan ')+' untuk bergabung:\nKONTEKS: '+(s.ctxS||'');
   showTy();
   const resp=await callAPI(sys,[{role:'user',content:pr}]);
   rmTy();
@@ -2114,7 +2117,7 @@ async function doSend(){
         const sum=s.msgs.slice(-4).map(m=>(m.role==='user'?'User: ':fn(rEmp.n)+': ')+m.content.substring(0,90)).join(' | ');
         bm.opts=[
           {l:`💬 Chat dengan ${fn(recs[0].n)}`,fn:`doStartWith('${recs[0].e}','${sum.replace(/'/g,"\'")}')`,cls:''},
-          {l:`👥 Buat Group Chat`,fn:`doCreateRefGrp('${aId}',[${recs.map(r=>`DB.find(x=>x.e==='${r.e}')`).join(',')}].filter(Boolean))`,cls:'grp'}
+          {l:'👥 Buat Group Chat',fn:'doCreateRefGrp(\''+aId+'\',['+ recs.map(r=>'DB.find(x=>x.e===\''+r.e+'\')').join(',') +'].filter(Boolean))',cls:'grp'}
         ];
         bm.recs=recs.slice(0,3); bm.sum=sum;
       }
@@ -2243,24 +2246,116 @@ async function doFindSlots(){
   if(!calPts.length){ toast('Tambahkan peserta terlebih dahulu'); return; }
   if(gTok&&gAK){ await findRealSlots(topic); } else { showSimSlots(topic); }
 }
+
+// ══════════════════════════════════════════════════════
+// INDONESIA PUBLIC HOLIDAYS & CUTI BERSAMA
+// ══════════════════════════════════════════════════════
+const ID_HOLIDAYS = {
+  // Format: 'YYYY-MM-DD': 'Nama Hari'
+  // 2025
+  '2025-01-01': 'Tahun Baru Masehi',
+  '2025-01-27': 'Isra Miraj Nabi Muhammad SAW',
+  '2025-01-28': 'Cuti Bersama Isra Miraj',
+  '2025-01-29': 'Tahun Baru Imlek 2576',
+  '2025-03-29': 'Hari Raya Nyepi',
+  '2025-03-31': 'Cuti Bersama Nyepi',
+  '2025-04-18': 'Wafat Isa Al Masih',
+  '2025-04-20': 'Hari Paskah',
+  '2025-03-27': 'Cuti Bersama Idul Fitri',
+  '2025-03-28': 'Cuti Bersama Idul Fitri',
+  '2025-03-30': 'Idul Fitri 1446 H',
+  '2025-03-31': 'Idul Fitri 1446 H',
+  '2025-04-01': 'Cuti Bersama Idul Fitri',
+  '2025-04-02': 'Cuti Bersama Idul Fitri',
+  '2025-04-03': 'Cuti Bersama Idul Fitri',
+  '2025-05-01': 'Hari Buruh Internasional',
+  '2025-05-12': 'Hari Waisak 2569',
+  '2025-05-13': 'Cuti Bersama Waisak',
+  '2025-05-29': 'Kenaikan Isa Al Masih',
+  '2025-06-01': 'Hari Lahir Pancasila',
+  '2025-06-06': 'Idul Adha 1446 H',
+  '2025-06-07': 'Cuti Bersama Idul Adha',
+  '2025-06-26': 'Cuti Bersama Tahun Baru Islam',
+  '2025-06-27': 'Tahun Baru Islam 1447 H',
+  '2025-08-17': 'Hari Kemerdekaan Indonesia',
+  '2025-08-18': 'Cuti Bersama HUT RI',
+  '2025-09-04': 'Maulid Nabi Muhammad SAW',
+  '2025-09-05': 'Cuti Bersama Maulid Nabi',
+  '2025-12-25': 'Hari Raya Natal',
+  '2025-12-26': 'Cuti Bersama Natal',
+  // 2026
+  '2026-01-01': 'Tahun Baru Masehi',
+  '2026-01-16': 'Isra Miraj Nabi Muhammad SAW',
+  '2026-01-28': 'Tahun Baru Imlek 2577',
+  '2026-02-17': 'Hari Raya Nyepi',
+  '2026-03-19': 'Idul Fitri 1447 H',
+  '2026-03-20': 'Idul Fitri 1447 H',
+  '2026-03-16': 'Cuti Bersama Idul Fitri',
+  '2026-03-17': 'Cuti Bersama Idul Fitri',
+  '2026-03-18': 'Cuti Bersama Idul Fitri',
+  '2026-03-23': 'Cuti Bersama Idul Fitri',
+  '2026-04-03': 'Wafat Isa Al Masih',
+  '2026-05-01': 'Hari Buruh Internasional',
+  '2026-05-14': 'Kenaikan Isa Al Masih',
+  '2026-05-21': 'Cuti Bersama Waisak',
+  '2026-05-24': 'Hari Waisak 2570',
+  '2026-05-27': 'Idul Adha 1447 H',
+  '2026-06-01': 'Hari Lahir Pancasila',
+  '2026-06-16': 'Tahun Baru Islam 1448 H',
+  '2026-08-17': 'Hari Kemerdekaan Indonesia',
+  '2026-08-24': 'Maulid Nabi Muhammad SAW',
+  '2026-12-25': 'Hari Raya Natal',
+};
+
+function isHoliday(dateObj){
+  const iso = dateObj.toISOString().split('T')[0];
+  return ID_HOLIDAYS[iso]||null;
+}
+
+function isWeekendOrHoliday(dateObj){
+  const day = dateObj.getDay();
+  if(day===0||day===6) return {blocked:true, reason:'Weekend'};
+  const h = isHoliday(dateObj);
+  if(h) return {blocked:true, reason:h};
+  return {blocked:false, reason:null};
+}
+
 function showSimSlots(topic){
-  const today=new Date(); const slots=[];
-  // Generate full 2 weeks of business hour slots
-  for(let d=1;d<=14;d++){
+  const today=new Date(); const slots=[]; const blocked=[];
+  // Generate full 2 weeks of business hour slots, skip weekends & holidays
+  for(let d=1;d<=21;d++){
     const dt=new Date(today); dt.setDate(today.getDate()+d);
-    if(dt.getDay()===0||dt.getDay()===6)continue; // skip weekends
+    const chk=isWeekendOrHoliday(dt);
+    if(chk.blocked){
+      // Track blocked days to show info
+      const iso=dt.toISOString().split('T')[0];
+      if(!blocked.find(b=>b.iso===iso)) blocked.push({iso,reason:chk.reason});
+      continue;
+    }
     const ds=dt.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
     const iso=dt.toISOString().split('T')[0];
     for(const t of['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:00']){
-      slots.push({date:ds,time:t,iso,dateObj:dt.getTime()});
+      if(slots.length<160) slots.push({date:ds,time:t,iso});
     }
   }
   G('cal-slots').style.display='block';
-  const slHtml=slots.map((sl,i)=>`<div class="cs" onclick="doSelSlot(${i},this)" data-s='${JSON.stringify({date:sl.date,time:sl.time,iso:sl.iso})}'>📅 <strong>${sl.date}</strong> · <strong>${sl.time}</strong> <span style="font-size:.68rem;color:var(--tm);margin-left:4px">${calDur} mnt</span></div>`).join('');
-  G('cal-sl').innerHTML=slHtml;
-  const p=document.createElement('p');p.style.cssText='font-size:.69rem;color:var(--tm);margin-top:4px;text-align:center';
-  p.textContent='Scroll untuk lihat lebih banyak slot (2 minggu ke depan)';
-  G('cal-sl').after(p);
+  let html='';
+  // Add blocked days notice
+  if(blocked.length){
+    html+='<div style="background:rgba(239,68,68,.08);border-radius:8px;padding:8px 10px;margin-bottom:8px;font-size:.72rem;color:#DC2626"><strong>🚫 Hari tidak tersedia:</strong><br>'+blocked.slice(0,5).map(b=>b.iso.slice(5)+' — '+b.reason).join('<br>')+'</div>';
+  }
+  html+=slots.map((sl,i)=>{
+    const ds=JSON.stringify({date:sl.date,time:sl.time,iso:sl.iso});
+    return '<div class="cs" onclick="doSelSlot('+i+',this)" data-s=''+ds.replace(/'/g,"&#39;")+''>'
+      +'📅 <strong>'+sl.date+'</strong> · <strong>'+sl.time+'</strong>'
+      +' <span style="font-size:.68rem;color:var(--tm);margin-left:4px">'+calDur+' mnt</span></div>';
+  }).join('');
+  G('cal-sl').innerHTML=html;
+  const p=document.createElement('p');
+  p.style.cssText='font-size:.69rem;color:var(--tm);margin-top:4px;text-align:center';
+  p.textContent=slots.length+' slot tersedia · Merah = libur nasional/cuti bersama · Scroll untuk lihat semua';
+  const sl=G('cal-sl'); if(sl.nextSibling&&sl.nextSibling.tagName==='P') sl.nextSibling.remove();
+  sl.after(p);
   G('cal-btn').textContent='Buat Meeting'; G('cal-btn').onclick=()=>doCreateMtg(topic);
 }
 function doSelSlot(i,el){ document.querySelectorAll('.cs').forEach(s=>s.classList.remove('on')); el.classList.add('on'); calSlot=JSON.parse(el.dataset.s); }
@@ -2270,13 +2365,17 @@ async function findRealSlots(topic){
     const r=await fetch(`https://www.googleapis.com/calendar/v3/freeBusy?key=${gAK}`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+gTok},body:JSON.stringify({timeMin:now.toISOString(),timeMax:wl.toISOString(),items:calPts.map(p=>({id:p.e}))})});
     const d=await r.json(); if(d.error){showSimSlots(topic);return;}
     const busy=[]; Object.values(d.calendars||{}).forEach(c=>(c.busy||[]).forEach(b=>busy.push({s:new Date(b.start),e:new Date(b.end)})));
-    const slots=[]; 
-    for(let i=1;i<=14;i++){
+    const slots=[];
+    for(let i=1;i<=21;i++){
       const sd=new Date(now); sd.setDate(now.getDate()+i);
-      if(sd.getDay()===0||sd.getDay()===6)continue;
+      const chk=isWeekendOrHoliday(sd);
+      if(chk.blocked) continue; // skip weekends & holidays
       for(let h=8;h<=16;h++){
         const ss=new Date(sd); ss.setHours(h,0,0,0); const se=new Date(ss.getTime()+calDur*60000);
-        if(!busy.some(b=>ss<b.e&&se>b.s)) slots.push({date:ss.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),time:`${String(h).padStart(2,'0')}:00`,iso:ss.toISOString()});
+        if(!busy.some(b=>ss<b.e&&se>b.s)){
+          const hr=String(h).padStart(2,'0');
+          slots.push({date:ss.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),time:hr+':00',iso:ss.toISOString()});
+        }
       }
     }
     if(!slots.length){showSimSlots(topic);return;}
