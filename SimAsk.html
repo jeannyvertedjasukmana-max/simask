@@ -411,36 +411,46 @@ button{cursor:pointer;font-family:inherit;}
     <p class="sp-sub">AI-powered Internal Assistant · Asuransi Simas Jiwa</p>
     <div class="sp-card">
       <p class="sp-card-title">Masuk dengan akun ASJ kamu</p>
-      <!-- Google Sign-In -->
-      <button class="g-signin-btn" onclick="doGoogleLogin()">
-        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.826.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
-        Masuk dengan Google (@simasjiwa.co.id)
-      </button>
-      <div class="sp-divider">atau</div>
-      <input type="email" id="login-email" class="gi" placeholder="nama@simasjiwa.co.id" oninput="chkAdminEmail(this)"/>
-      <div class="apw-wrap" id="apw-wrap"><input type="password" id="apw-in" class="gi" placeholder="Password Admin" style="margin-top:0"/></div>
-      <p class="lerr" id="lerr"></p>
-      <button class="btn-main" onclick="doEmailLogin()">Masuk →</button>
-      <p class="g-cfg-note">Google Sign-In memerlukan konfigurasi OAuth. <a onclick="showGCfg()">Setup</a></p>
+
+      <!-- STEP 1: Setup OAuth (shown if not configured yet) -->
+      <div id="setup-section">
+        <p style="color:rgba(255,255,255,.55);font-size:.78rem;margin-bottom:10px;line-height:1.5;text-align:center">
+          Sebelum login, setup Google OAuth dulu sekali saja.
+        </p>
+        <div style="margin-bottom:8px">
+          <label style="color:rgba(255,255,255,.6);font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:4px">Google OAuth Client ID</label>
+          <input type="text" id="gclient-id" class="gi" placeholder="xxxxx.apps.googleusercontent.com" style="margin-bottom:0"/>
+        </div>
+        <div style="margin-bottom:12px">
+          <label style="color:rgba(255,255,255,.6);font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:4px">Google API Key</label>
+          <input type="text" id="gapi-key" class="gi" placeholder="AIza..." style="margin-bottom:0"/>
+        </div>
+        <button class="btn-main" style="margin-top:0;margin-bottom:12px" onclick="saveGCfgInline()">Simpan Konfigurasi ✓</button>
+        <div id="gcfg-status" style="display:none;font-size:.75rem;text-align:center;margin-bottom:10px"></div>
+      </div>
+
+      <!-- STEP 2: Login buttons -->
+      <div id="login-section">
+        <!-- Google Sign-In -->
+        <button class="g-signin-btn" onclick="doGoogleLogin()" id="google-login-btn">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.826.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
+          Masuk dengan Google
+        </button>
+        <div class="sp-divider">atau masuk manual</div>
+        <input type="email" id="login-email" class="gi" placeholder="nama@simasjiwa.co.id" oninput="chkAdminEmail(this)"/>
+        <div class="apw-wrap" id="apw-wrap">
+          <input type="password" id="apw-in" class="gi" placeholder="Password Admin" style="margin-bottom:0"/>
+        </div>
+        <p class="lerr" id="lerr"></p>
+        <button class="btn-main" onclick="doEmailLogin()">Masuk →</button>
+        <p style="color:rgba(255,255,255,.3);font-size:.69rem;text-align:center;margin-top:8px;cursor:pointer" onclick="toggleSetup()">⚙️ Ubah konfigurasi OAuth</p>
+      </div>
+
     </div>
   </div>
 </div>
 
-<!-- GOOGLE CONFIG MODAL -->
-<div class="ov hide" id="ov-gcfg">
-  <div class="ov-card" style="max-width:380px">
-    <h3>⚙️ Setup Google OAuth</h3>
-    <p style="font-size:.8rem;color:var(--t2);margin-bottom:14px;line-height:1.6">Masukkan Google OAuth Client ID dari Google Cloud Console. Pastikan domain sudah terdaftar sebagai Authorized JavaScript origin.</p>
-    <label style="font-size:.75rem;font-weight:700;color:var(--tm);text-transform:uppercase">Client ID</label>
-    <input type="text" id="gclient-id" class="ov-srch" placeholder="xxx.apps.googleusercontent.com" style="margin-top:5px"/>
-    <label style="font-size:.75rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-top:10px">API Key (untuk Calendar & Gmail)</label>
-    <input type="text" id="gapi-key" class="ov-srch" placeholder="AIza..." style="margin-top:5px"/>
-    <div class="ov-btns">
-      <button class="btn-cancel" onclick="closeOv('ov-gcfg')">Batal</button>
-      <button class="btn-confirm" onclick="saveGCfg()">Simpan</button>
-    </div>
-  </div>
-</div>
+<!-- Google Config now inline on login page -->
 
 <!-- ONBOARD: Avatar pick (no gender question) -->
 <div id="scr-onboard" class="screen">
@@ -1041,21 +1051,69 @@ function getDiscStyle(discStr){
 // ════════════════════════════════════════════
 // GOOGLE OAUTH
 // ════════════════════════════════════════════
-function showGCfg(){
-  openOv('ov-gcfg');
-  const saved=localStorage.getItem('sak2_gcfg');
-  if(saved){try{const c=JSON.parse(saved);$('gclient-id').value=c.clientId||'';$('gapi-key').value=c.apiKey||'';}catch(e){}}
+function showGCfg(){toggleSetup();}
+
+function saveGCfgInline(){
+  const ci=($('gclient-id').value||'').trim();
+  const ak=($('gapi-key').value||'').trim();
+  const st=$('gcfg-status');
+  if(!ci){
+    if(st){st.style.display='block';st.style.color='#FCA5A5';st.textContent='⚠️ Client ID tidak boleh kosong';}
+    return;
+  }
+  gClientId=ci; gApiKey=ak;
+  localStorage.setItem('sk3_gcfg',JSON.stringify({clientId:ci,apiKey:ak}));
+  if(st){
+    st.style.display='block';
+    st.style.color='#86EFAC';
+    st.textContent='✅ Tersimpan! Sekarang klik Masuk dengan Google.';
+  }
+  // Show login section
+  setTimeout(()=>{
+    const ss=$('setup-section');const ls=$('login-section');
+    if(ss)ss.style.display='none';
+    if(ls)ls.style.display='block';
+  }, 1200);
 }
-function saveGCfg(){
-  gClientId=$('gclient-id').value.trim();
-  gApiKey=$('gapi-key').value.trim();
-  if(!gClientId){toast('Masukkan Client ID terlebih dahulu');return;}
-  localStorage.setItem('sak2_gcfg',JSON.stringify({clientId:gClientId,apiKey:gApiKey}));
-  closeOv('ov-gcfg');toast('Konfigurasi disimpan! ✅ Coba login sekarang.');
+
+function saveGCfg(){saveGCfgInline();}
+
+function toggleSetup(){
+  const ss=$('setup-section');const ls=$('login-section');
+  if(!ss||!ls)return;
+  const showing=ss.style.display!=='none';
+  ss.style.display=showing?'none':'block';
+  ls.style.display=showing?'block':'none';
 }
+
 function loadGCfg(){
-  const saved=localStorage.getItem('sak2_gcfg');
-  if(saved){try{const c=JSON.parse(saved);gClientId=c.clientId||'';gApiKey=c.apiKey||'';}catch(e){}}
+  const saved=localStorage.getItem('sk3_gcfg');
+  if(saved){
+    try{
+      const c=JSON.parse(saved);
+      gClientId=c.clientId||'';
+      gApiKey=c.apiKey||'';
+      // Pre-fill the fields
+      if($('gclient-id'))$('gclient-id').value=gClientId;
+      if($('gapi-key'))$('gapi-key').value=gApiKey;
+    }catch(e){}
+  }
+}
+
+function initLoginPage(){
+  loadGCfg();
+  const ss=$('setup-section');
+  const ls=$('login-section');
+  if(!ss||!ls)return;
+  if(gClientId){
+    // Already configured — hide setup, show login
+    ss.style.display='none';
+    ls.style.display='block';
+  } else {
+    // Not configured — show setup first
+    ss.style.display='block';
+    ls.style.display='none';
+  }
 }
 function doGoogleLogin(){
   loadGCfg();
@@ -2135,6 +2193,7 @@ window.addEventListener('resize',()=>{
 
 // Load Google config on start
 loadGCfg();
+initLoginPage();
 
 function swTab(t){
   curTab=t;
