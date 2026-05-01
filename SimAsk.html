@@ -1,0 +1,2200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SimAsk – Asuransi Simas Jiwa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+/* ══════ CSS RESET & ROOT ══════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --pri:#003D7C;--sec:#0070CD;--acc:#00A8E8;--gold:#F5A623;--gold2:#FFD166;
+  --lt:#E8F4FD;--dk:#001E3C;--green:#22C55E;--red:#EF4444;--amber:#F59E0B;
+  --bg:#F0F6FF;--sb:#FFFFFF;--ct:#EBF5FF;--bme:#003D7C;--bot:#FFFFFF;
+  --t1:#0D1B2A;--t2:#4A6080;--tm:#8BA3BF;--bd:#D4E6F7;
+  --sh:0 4px 24px rgba(0,61,124,.10);--shl:0 8px 40px rgba(0,61,124,.18);
+  --tr:.2s cubic-bezier(.4,0,.2,1);
+}
+[data-theme=dark]{
+  --bg:#08131F;--sb:#0D1E33;--ct:#071019;--bme:#0052A3;--bot:#112240;
+  --t1:#E2EDF8;--t2:#7AA3C4;--tm:#3D6080;--bd:#172D47;
+  --sh:0 4px 24px rgba(0,0,0,.45);--shl:0 8px 40px rgba(0,0,0,.55);
+}
+html{background:#001226;}body{height:100%;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--t1);}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+.hide{display:none!important;}
+button{cursor:pointer;font-family:inherit;}
+
+/* ══════ SCREENS ══════ */
+.screen{display:none;width:100%;height:100vh;position:fixed;inset:0;z-index:1;}
+.screen.active{display:flex;}
+
+/* ══════ SPLASH / LOGIN ══════ */
+#scr-splash{
+  z-index:10;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(145deg,#001226 0%,#003D7C 50%,#005BB5 100%);
+  overflow:hidden;position:relative;
+}
+#scr-splash::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 70% 20%,rgba(0,168,232,.18) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 50% at 20% 80%,rgba(245,166,35,.10) 0%,transparent 60%);
+  pointer-events:none;
+}
+.sp-orb{position:absolute;border-radius:50%;pointer-events:none;}
+.sp-orb1{width:500px;height:500px;top:-150px;right:-100px;background:radial-gradient(circle,rgba(0,112,205,.2),transparent 70%);animation:orbFloat 8s ease-in-out infinite;}
+.sp-orb2{width:350px;height:350px;bottom:-80px;left:-80px;background:radial-gradient(circle,rgba(245,166,35,.12),transparent 70%);animation:orbFloat 11s ease-in-out infinite reverse;}
+@keyframes orbFloat{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-20px) scale(1.04);}}
+.sp-content{z-index:1;display:flex;flex-direction:column;align-items:center;gap:0;}
+.sp-mark{
+  width:82px;height:82px;background:linear-gradient(135deg,#F5A623,#FFD166);
+  border-radius:22px;display:flex;align-items:center;justify-content:center;
+  font-size:38px;box-shadow:0 10px 40px rgba(245,166,35,.45);margin-bottom:18px;
+  animation:markIn .7s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes markIn{from{transform:scale(.4) rotate(-20deg);opacity:0;}to{transform:scale(1) rotate(0);opacity:1;}}
+.sp-title{font-family:'Sora',sans-serif;font-size:2.8rem;font-weight:800;color:#fff;letter-spacing:-1.5px;margin-bottom:6px;animation:fadeUp .5s .2s both;}
+.sp-title span{color:#F5A623;}
+.sp-sub{color:rgba(255,255,255,.55);font-size:.88rem;letter-spacing:.2px;margin-bottom:36px;animation:fadeUp .5s .3s both;}
+@keyframes fadeUp{from{transform:translateY(18px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.sp-card{
+  background:rgba(255,255,255,.07);backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,.13);border-radius:22px;
+  padding:28px 30px;width:340px;max-width:92vw;
+  animation:fadeUp .5s .4s both;
+}
+.sp-card-title{color:rgba(255,255,255,.8);font-size:.85rem;font-weight:600;text-align:center;margin-bottom:18px;}
+/* Google Sign-In Button */
+.g-signin-btn{
+  width:100%;padding:13px 16px;border-radius:12px;
+  background:#fff;border:none;color:#1F2937;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:all var(--tr);box-shadow:0 2px 12px rgba(0,0,0,.15);
+}
+.g-signin-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.2);}
+.g-signin-btn:active{transform:translateY(0);}
+.g-signin-btn svg{flex-shrink:0;}
+.sp-divider{display:flex;align-items:center;gap:10px;margin:16px 0;color:rgba(255,255,255,.3);font-size:.78rem;}
+.sp-divider::before,.sp-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.15);}
+.gi{
+  width:100%;padding:12px 15px;border-radius:11px;
+  border:1.5px solid rgba(255,255,255,.18);background:rgba(255,255,255,.09);
+  color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:.88rem;
+  outline:none;transition:border var(--tr);
+}
+.gi::placeholder{color:rgba(255,255,255,.38);}
+.gi:focus{border-color:rgba(245,166,35,.6);}
+.gi.admin-gi{border-color:rgba(245,166,35,.45);background:rgba(245,166,35,.07);}
+.apw-wrap{margin-top:9px;display:none;}
+.apw-wrap.show{display:block;}
+.btn-main{
+  width:100%;padding:12px;border-radius:11px;
+  background:linear-gradient(135deg,#F5A623,#FFD166);color:#001226;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:.88rem;font-weight:700;
+  border:none;margin-top:12px;transition:all var(--tr);
+}
+.btn-main:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(245,166,35,.5);}
+.lerr{color:#FCA5A5;font-size:.78rem;margin-top:8px;text-align:center;display:none;}
+.g-cfg-note{color:rgba(255,255,255,.35);font-size:.7rem;text-align:center;margin-top:10px;}
+.g-cfg-note a{color:rgba(245,166,35,.7);text-decoration:underline;cursor:pointer;}
+
+/* ══════ ONBOARD ══════ */
+#scr-onboard{flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(145deg,#001226 0%,#003D7C 60%,#005BB5 100%);}
+.ob-card{
+  background:rgba(255,255,255,.08);backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,.13);border-radius:24px;
+  padding:32px 36px;width:420px;max-width:92vw;text-align:center;
+  animation:fadeUp .4s ease-out both;
+}
+.ob-title{font-family:'Sora',sans-serif;font-size:1.45rem;font-weight:700;color:#fff;margin-bottom:6px;}
+.ob-sub{color:rgba(255,255,255,.55);font-size:.84rem;margin-bottom:20px;line-height:1.5;}
+.av-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:22px;}
+.av-opt{
+  width:62px;height:62px;border-radius:50%;cursor:pointer;
+  border:3px solid transparent;display:flex;align-items:center;justify-content:center;
+  font-size:28px;background:rgba(255,255,255,.1);transition:all var(--tr);margin:auto;
+}
+.av-opt:hover{transform:scale(1.12);border-color:rgba(245,166,35,.6);}
+.av-opt.sel{border-color:#F5A623;background:rgba(245,166,35,.15);box-shadow:0 0 0 5px rgba(245,166,35,.18);}
+
+/* ══════ START CHOICE ══════ */
+#scr-start{flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(145deg,#001226 0%,#003D7C 60%,#005BB5 100%);}
+.ob-choices{display:flex;gap:14px;margin-top:6px;}
+.ob-ch{
+  flex:1;padding:16px 10px;border-radius:14px;
+  border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);
+  color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-size:.84rem;font-weight:600;
+  transition:all var(--tr);text-align:center;
+}
+.ob-ch:hover{background:rgba(0,168,232,.2);border-color:rgba(0,168,232,.5);transform:translateY(-2px);}
+.ob-ch-ic{font-size:24px;display:block;margin-bottom:8px;}
+
+/* ══════ MAIN APP ══════ */
+#scr-app{flex-direction:row;}
+
+/* SIDEBAR */
+.sidebar{width:300px;min-width:260px;flex-shrink:0;background:var(--sb);border-right:1px solid var(--bd);display:flex;flex-direction:column;transition:background var(--tr);}
+.sb-hdr{padding:14px 14px 10px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;}
+.sb-logo{font-family:'Sora',sans-serif;font-size:1.35rem;font-weight:800;color:var(--pri);flex:1;}
+[data-theme=dark] .sb-logo{color:var(--acc);}
+.sb-logo span{color:var(--gold);}
+.hdr-acts{display:flex;gap:5px;}
+.ic-btn{
+  width:33px;height:33px;border-radius:9px;border:none;
+  background:var(--lt);color:var(--pri);display:flex;align-items:center;justify-content:center;
+  font-size:15px;flex-shrink:0;transition:all var(--tr);
+}
+[data-theme=dark] .ic-btn{background:rgba(0,112,205,.15);color:var(--acc);}
+.ic-btn:hover{background:var(--pri);color:#fff;transform:scale(1.05);}
+.sb-me{padding:10px 12px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:9px;background:var(--lt);}
+[data-theme=dark] .sb-me{background:rgba(0,61,124,.18);}
+.me-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--pri),var(--acc));display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;border:2px solid var(--acc);}
+.me-info{flex:1;min-width:0;}
+.me-nm{font-weight:700;font-size:.82rem;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.me-ro{font-size:.7rem;color:var(--tm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.g-connected{display:inline-flex;align-items:center;gap:3px;font-size:.68rem;color:#22C55E;font-weight:600;}
+.sb-srch{padding:8px 10px;border-bottom:1px solid var(--bd);}
+.srch-wr{position:relative;}
+.srch-ic{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--tm);font-size:12px;pointer-events:none;}
+.srch-in{width:100%;padding:8px 10px 8px 30px;border-radius:10px;border:1.5px solid var(--bd);background:var(--bg);color:var(--t1);font-family:inherit;font-size:.82rem;outline:none;transition:border var(--tr);}
+.srch-in:focus{border-color:var(--sec);}
+.sb-tabs{display:flex;border-bottom:1px solid var(--bd);flex-shrink:0;}
+.sb-tab{flex:1;padding:8px 4px;border:none;background:none;color:var(--tm);font-size:.74rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:all var(--tr);}
+.sb-tab.active,.sb-tab:hover{color:var(--pri);border-bottom-color:var(--sec);}
+[data-theme=dark] .sb-tab.active{color:var(--acc);border-bottom-color:var(--acc);}
+.chat-list{flex:1;overflow-y:auto;padding:5px 0;}
+.ci{display:flex;align-items:center;gap:9px;padding:10px 12px;cursor:pointer;transition:background var(--tr);position:relative;}
+.ci:hover,.ci.active{background:var(--lt);}
+[data-theme=dark] .ci:hover,[data-theme=dark] .ci.active{background:rgba(0,112,205,.1);}
+.ci.active{border-right:3px solid var(--sec);}
+.ci-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;position:relative;}
+.ci-av.reg{background:linear-gradient(135deg,#E8F4FD,#B3D9F5);}
+.ci-av.grp{background:linear-gradient(135deg,#F5A623,#FFD166);}
+[data-theme=dark] .ci-av.reg{background:linear-gradient(135deg,#112240,#1E3A5F);}
+.od{width:9px;height:9px;border-radius:50%;background:var(--green);border:2px solid var(--sb);position:absolute;bottom:1px;right:1px;}
+.ci-meta{flex:1;min-width:0;}
+.ci-nm{font-weight:600;font-size:.82rem;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px;}
+.ci-pv{font-size:.72rem;color:var(--tm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+.ci-ts{font-size:.68rem;color:var(--tm);flex-shrink:0;}
+.grp-tag{background:rgba(245,166,35,.15);color:#A16207;font-size:.65rem;font-weight:700;padding:1px 6px;border-radius:20px;}
+[data-theme=dark] .grp-tag{color:var(--gold2);}
+.nc-btn{margin:8px 12px;padding:10px;border-radius:10px;background:linear-gradient(135deg,var(--pri),var(--sec));color:#fff;border:none;font-family:inherit;font-size:.82rem;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;transition:all var(--tr);}
+.nc-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,61,124,.3);}
+.empty-chats{text-align:center;padding:28px 12px;color:var(--tm);font-size:.8rem;line-height:1.7;}
+
+/* MAIN AREA */
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.welcome-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--ct);gap:12px;text-align:center;padding:20px;}
+.wl-ic{font-size:64px;animation:float 3s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+.wl-t{font-family:'Sora',sans-serif;font-size:1.6rem;font-weight:700;color:var(--pri);}
+[data-theme=dark] .wl-t{color:var(--acc);}
+.wl-s{color:var(--t2);font-size:.88rem;max-width:320px;line-height:1.65;}
+
+/* CHAT AREA */
+.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.ca-hdr{
+  padding:12px 18px;border-bottom:1px solid var(--bd);background:var(--sb);
+  display:flex;align-items:center;gap:11px;box-shadow:var(--sh);flex-shrink:0;
+}
+.ca-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.ca-av.reg{background:linear-gradient(135deg,var(--pri),var(--sec));}
+.ca-av.grp{background:linear-gradient(135deg,#F5A623,#FFD166);}
+.ca-info{flex:1;min-width:0;}
+.ca-nm{font-family:'Sora',sans-serif;font-weight:700;font-size:.92rem;color:var(--t1);}
+.ca-st{font-size:.72rem;color:var(--tm);}
+.ca-st .dot{color:var(--green);}
+.ca-acts{display:flex;gap:5px;}
+.msgs{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:9px;background:var(--ct);}
+.msgs-bg{
+  background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cpath fill='%230070CD' fill-opacity='0.03' d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
+}
+.msg-row{display:flex;gap:7px;align-items:flex-end;animation:msgIn .2s ease-out both;}
+@keyframes msgIn{from{transform:translateY(8px);opacity:0;}to{opacity:1;}}
+.msg-row.me{flex-direction:row-reverse;}
+.msg-av{width:28px;height:28px;border-radius:50%;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.msg-av.them{background:linear-gradient(135deg,var(--pri),var(--acc));}
+.msg-av.me{background:linear-gradient(135deg,var(--gold),var(--gold2));}
+.bubble{max-width:64%;padding:9px 13px;border-radius:15px;font-size:.84rem;line-height:1.6;word-break:break-word;}
+.bubble.them{background:var(--bot);color:var(--t1);border-bottom-left-radius:4px;box-shadow:0 2px 8px rgba(0,61,124,.07);}
+.bubble.me{background:var(--bme);color:#fff;border-bottom-right-radius:4px;}
+.bub-snm{font-size:.68rem;font-weight:700;color:var(--sec);margin-bottom:3px;}
+.bub-ts{font-size:.63rem;opacity:.55;margin-top:4px;text-align:right;}
+.bubble.me .bub-ts{color:rgba(255,255,255,.65);}
+/* Typing indicator */
+.typing-bub{display:flex;gap:4px;align-items:center;padding:10px 13px;}
+.td{width:6px;height:6px;border-radius:50%;background:var(--tm);animation:tdot 1.2s infinite;}
+.td:nth-child(2){animation-delay:.18s;}.td:nth-child(3){animation-delay:.36s;}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-7px);}}
+/* System messages */
+.sys-msg{text-align:center;margin:8px 0;}
+.sys-msg span{background:var(--lt);color:var(--tm);font-size:.72rem;padding:4px 12px;border-radius:20px;}
+[data-theme=dark] .sys-msg span{background:rgba(0,61,124,.2);}
+/* Mention */
+.mention{color:var(--acc);font-weight:700;cursor:pointer;}
+.mention:hover{text-decoration:underline;}
+/* Input */
+.inp-area{padding:10px 14px;background:var(--sb);border-top:1px solid var(--bd);display:flex;gap:8px;align-items:flex-end;flex-shrink:0;}
+.chat-in{flex:1;padding:10px 13px;border-radius:18px;border:1.5px solid var(--bd);background:var(--bg);color:var(--t1);font-family:inherit;font-size:.84rem;outline:none;resize:none;max-height:110px;min-height:40px;transition:border var(--tr);}
+.chat-in:focus{border-color:var(--sec);}
+.send-btn{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--pri),var(--sec));color:#fff;border:none;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:all var(--tr);}
+.send-btn:hover{transform:scale(1.08);box-shadow:0 4px 14px rgba(0,61,124,.3);}
+.send-btn:active{transform:scale(.95);}
+
+/* OPTION CARDS (for referral) */
+.opt-cards{display:flex;gap:9px;flex-wrap:wrap;margin-top:8px;}
+.opt-card{padding:10px 14px;border-radius:12px;background:var(--lt);border:1.5px solid var(--bd);font-size:.8rem;font-weight:600;color:var(--pri);cursor:pointer;transition:all var(--tr);}
+[data-theme=dark] .opt-card{background:rgba(0,61,124,.2);color:var(--acc);border-color:rgba(0,112,205,.25);}
+.opt-card:hover{background:var(--pri);color:#fff;border-color:var(--pri);}
+/* Person chips */
+.person-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px;}
+.pchip{padding:6px 11px;border-radius:20px;background:rgba(0,61,124,.08);color:var(--pri);border:1.5px solid rgba(0,61,124,.15);font-size:.76rem;font-weight:600;cursor:pointer;transition:all var(--tr);display:inline-flex;align-items:center;gap:5px;}
+[data-theme=dark] .pchip{background:rgba(0,168,232,.1);color:var(--acc);border-color:rgba(0,168,232,.2);}
+.pchip:hover{background:var(--pri);color:#fff;border-color:var(--pri);}
+/* Form bubble */
+.form-card{background:var(--lt);border:1.5px solid var(--bd);border-radius:12px;padding:12px 15px;margin-top:8px;font-size:.8rem;}
+[data-theme=dark] .form-card{background:rgba(0,61,124,.15);border-color:rgba(0,112,205,.2);}
+.form-card .form-title{font-weight:700;color:var(--pri);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.form-fields{display:flex;flex-direction:column;gap:4px;}
+.form-field{display:flex;gap:8px;align-items:flex-start;}
+.ff-label{color:var(--tm);min-width:110px;font-size:.75rem;}
+.ff-val{color:var(--t1);font-weight:500;font-size:.78rem;}
+/* Calendar card */
+.cal-card{background:var(--lt);border:1.5px solid var(--bd);border-radius:12px;padding:12px 15px;margin-top:8px;}
+[data-theme=dark] .cal-card{background:rgba(0,61,124,.15);border-color:rgba(0,112,205,.2);}
+.cal-slot{padding:8px 10px;border-radius:9px;background:var(--sb);border:1.5px solid var(--bd);margin-top:6px;cursor:pointer;transition:all var(--tr);}
+.cal-slot:hover{border-color:var(--sec);background:var(--lt);}
+.cal-slot.sel{border-color:var(--sec);background:rgba(0,112,205,.08);}
+/* Email draft */
+.email-draft{background:var(--lt);border:1.5px solid var(--bd);border-radius:12px;padding:12px 15px;margin-top:8px;font-size:.79rem;}
+[data-theme=dark] .email-draft{background:rgba(0,61,124,.15);}
+.ed-row{display:flex;gap:8px;margin-bottom:5px;align-items:flex-start;}
+.ed-label{color:var(--tm);font-weight:700;min-width:30px;font-size:.75rem;}
+.ed-val{color:var(--t1);flex:1;}
+.ed-body{border-top:1px solid var(--bd);padding-top:9px;margin-top:6px;line-height:1.6;color:var(--t1);}
+
+/* OVERLAYS */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:100;padding:14px;backdrop-filter:blur(3px);}
+.ov-card{background:var(--sb);border-radius:20px;padding:22px;width:100%;max-width:420px;max-height:88vh;display:flex;flex-direction:column;box-shadow:var(--shl);overflow:hidden;}
+.ov-card h3{font-family:'Sora',sans-serif;font-size:.98rem;font-weight:700;color:var(--t1);margin-bottom:12px;}
+.ov-srch{width:100%;padding:9px 12px;border-radius:10px;border:1.5px solid var(--bd);background:var(--bg);color:var(--t1);font-family:inherit;font-size:.82rem;outline:none;margin-bottom:10px;}
+.ov-srch:focus{border-color:var(--sec);}
+.ppl-list{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:2px;}
+.pi{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:10px;cursor:pointer;transition:background var(--tr);}
+.pi:hover{background:var(--lt);}
+[data-theme=dark] .pi:hover{background:rgba(0,112,205,.1);}
+.pi-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--pri),var(--acc));display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.pi-av.sel-av{border:3px solid var(--gold);}
+.pi-info{flex:1;min-width:0;}
+.pi-nm{font-weight:600;font-size:.82rem;color:var(--t1);}
+.pi-ps{font-size:.71rem;color:var(--tm);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pi-chk{width:19px;height:19px;border-radius:50%;border:2px solid var(--bd);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px;transition:all var(--tr);}
+.pi-chk.on{background:var(--sec);border-color:var(--sec);color:#fff;}
+.ov-btns{display:flex;gap:9px;margin-top:12px;}
+.btn-cancel{flex:1;padding:9px;border-radius:10px;background:var(--bg);border:1.5px solid var(--bd);color:var(--t2);font-family:inherit;font-size:.82rem;transition:all var(--tr);}
+.btn-cancel:hover{background:var(--lt);border-color:var(--sec);}
+.btn-confirm{flex:1;padding:9px;border-radius:10px;background:linear-gradient(135deg,var(--pri),var(--sec));color:#fff;border:none;font-family:inherit;font-size:.82rem;font-weight:600;transition:all var(--tr);}
+.btn-confirm:hover{opacity:.9;}
+
+/* LANG SELECT */
+.lang-opts{display:flex;gap:11px;margin:6px 0 4px;}
+.lang-b{
+  flex:1;padding:14px 10px;border-radius:12px;border:1.5px solid var(--bd);
+  background:var(--bg);color:var(--t1);font-family:inherit;font-size:.82rem;font-weight:600;
+  transition:all var(--tr);text-align:center;line-height:1.6;
+}
+.lang-b:hover{background:var(--lt);border-color:var(--sec);}
+.lang-b.sel{background:var(--pri);color:#fff;border-color:var(--pri);}
+
+/* TOPIC CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:7px;}
+.chip{padding:6px 12px;border-radius:18px;background:var(--lt);color:var(--pri);border:1.5px solid var(--bd);font-family:inherit;font-size:.77rem;font-weight:600;cursor:pointer;transition:all var(--tr);}
+[data-theme=dark] .chip{background:rgba(0,61,124,.2);color:var(--acc);border-color:rgba(0,112,205,.25);}
+.chip:hover,.chip.sel{background:var(--pri);color:#fff;border-color:var(--pri);}
+
+/* GROUP SELECTED CHIPS */
+.grp-sel-area{display:flex;flex-wrap:wrap;gap:5px;min-height:24px;margin:7px 0;}
+.gsc{background:var(--lt);color:var(--pri);padding:3px 9px;border-radius:18px;font-size:.74rem;font-weight:600;cursor:pointer;border:1.5px solid var(--bd);}
+[data-theme=dark] .gsc{background:rgba(0,61,124,.2);color:var(--acc);}
+
+/* SETTINGS PANEL */
+.set-pan{
+  position:fixed;right:0;top:0;bottom:0;width:280px;background:var(--sb);
+  border-left:1px solid var(--bd);box-shadow:var(--shl);z-index:50;
+  transform:translateX(110%);transition:transform var(--tr);
+  padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;
+}
+.set-pan.open{transform:translateX(0);}
+.set-pan h3{font-family:'Sora',sans-serif;font-weight:700;font-size:.95rem;color:var(--t1);}
+.sl{font-size:.7rem;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+.si{width:100%;padding:9px 12px;border-radius:9px;border:1.5px solid var(--bd);background:var(--bg);color:var(--t1);font-family:inherit;font-size:.82rem;outline:none;}
+.si:focus{border-color:var(--sec);}
+.th-btns{display:flex;gap:7px;}
+.th-b{flex:1;padding:8px;border-radius:9px;border:1.5px solid var(--bd);background:var(--bg);color:var(--t1);font-family:inherit;font-size:.8rem;font-weight:600;transition:all var(--tr);}
+.th-b.act{background:var(--pri);color:#fff;border-color:var(--pri);}
+.set-close{width:100%;padding:9px;border-radius:9px;background:var(--lt);border:none;color:var(--pri);font-family:inherit;font-size:.82rem;font-weight:600;transition:all var(--tr);}
+.set-close:hover{background:var(--pri);color:#fff;}
+
+/* ADMIN PANEL */
+.adm-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.adm-hdr{padding:16px 20px;background:linear-gradient(135deg,var(--dk),var(--pri));color:#fff;display:flex;align-items:center;gap:11px;flex-shrink:0;}
+.adm-hdr h2{font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:700;flex:1;}
+.adm-badge{background:var(--gold);color:var(--dk);padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;}
+.adm-body{flex:1;overflow-y:auto;padding:18px;}
+.adm-ctl{display:flex;gap:8px;margin-bottom:14px;align-items:center;}
+.adm-si{padding:9px 12px;border-radius:9px;border:1.5px solid var(--bd);background:var(--bg);color:var(--t1);font-family:inherit;font-size:.82rem;outline:none;flex:1;}
+.adm-si:focus{border-color:var(--sec);}
+.ab{padding:8px 14px;border-radius:8px;border:none;font-family:inherit;font-size:.79rem;font-weight:600;transition:all var(--tr);white-space:nowrap;}
+.ab.add{background:var(--sec);color:#fff;}
+.ab.add:hover{background:var(--pri);}
+.ab.edit{background:#DBEAFE;color:#1D4ED8;padding:5px 9px;font-size:.73rem;}
+[data-theme=dark] .ab.edit{background:rgba(29,78,216,.2);color:#93C5FD;}
+.ab.edit:hover{background:#1D4ED8;color:#fff;}
+.ab.del{background:#FEE2E2;color:#DC2626;padding:5px 9px;font-size:.73rem;}
+[data-theme=dark] .ab.del{background:rgba(220,38,38,.15);color:#FCA5A5;}
+.ab.del:hover{background:#DC2626;color:#fff;}
+.tbl-wrap{overflow-x:auto;}
+.adm-tbl{width:100%;border-collapse:collapse;font-size:.77rem;}
+.adm-tbl th{text-align:left;padding:8px 9px;background:var(--lt);color:var(--pri);font-weight:700;border-bottom:2px solid var(--bd);position:sticky;top:0;white-space:nowrap;}
+[data-theme=dark] .adm-tbl th{background:rgba(0,61,124,.2);}
+.adm-tbl td{padding:8px 9px;border-bottom:1px solid var(--bd);color:var(--t1);vertical-align:middle;}
+.adm-tbl tr:hover td{background:var(--lt);}
+[data-theme=dark] .adm-tbl tr:hover td{background:rgba(0,112,205,.06);}
+.disc-tag{display:inline-block;padding:2px 5px;border-radius:4px;font-size:.65rem;font-weight:700;background:rgba(0,112,205,.1);color:var(--sec);}
+
+/* EDIT MODAL */
+.edit-modal{background:var(--sb);border-radius:18px;padding:22px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:var(--shl);}
+.edit-modal h3{font-family:'Sora',sans-serif;font-size:.95rem;font-weight:700;color:var(--t1);margin-bottom:16px;}
+.ef{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.ef-full{grid-column:1/-1;}
+.ef label{font-size:.72rem;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:3px;}
+.ef input,.ef select{width:100%;padding:8px 11px;border-radius:8px;border:1.5px solid var(--bd);background:var(--bg);color:var(--t1);font-family:inherit;font-size:.82rem;outline:none;}
+.ef input:focus,.ef select:focus{border-color:var(--sec);}
+
+/* TOAST */
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--dk);color:#fff;padding:10px 20px;border-radius:10px;font-size:.82rem;font-weight:600;z-index:300;transition:transform .3s ease;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.3);}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+/* GOOGLE OAUTH STATUS */
+.gauth-bar{background:rgba(0,112,205,.08);border-bottom:1px solid var(--bd);padding:7px 14px;display:flex;align-items:center;gap:8px;font-size:.75rem;color:var(--t2);flex-shrink:0;}
+[data-theme=dark] .gauth-bar{background:rgba(0,112,205,.12);}
+.gauth-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.gauth-dot.ok{background:var(--green);}
+.gauth-dot.no{background:var(--amber);}
+.gauth-btn{margin-left:auto;padding:4px 10px;border-radius:6px;background:var(--sec);color:#fff;border:none;font-family:inherit;font-size:.72rem;font-weight:600;cursor:pointer;transition:all var(--tr);}
+.gauth-btn:hover{background:var(--pri);}
+
+/* MOBILE */
+@media(max-width:680px){
+  .sidebar{position:absolute;z-index:20;height:100vh;transition:transform var(--tr);}
+  .sidebar.mob-hide{transform:translateX(-100%);}
+  #back-btn{display:flex!important;}
+}
+</style>
+</head>
+<body>
+<!-- ══════ SPLASH / LOGIN ══════ -->
+<div id="scr-splash" class="screen active">
+  <div class="sp-orb sp-orb1"></div>
+  <div class="sp-orb sp-orb2"></div>
+  <div class="sp-content">
+    <div class="sp-mark">🛡️</div>
+    <h1 class="sp-title">Sim<span>Ask</span></h1>
+    <p class="sp-sub">AI-powered Internal Assistant · Asuransi Simas Jiwa</p>
+    <div class="sp-card">
+      <p class="sp-card-title">Masuk dengan akun ASJ kamu</p>
+      <!-- Google Sign-In -->
+      <button class="g-signin-btn" onclick="doGoogleLogin()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.826.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
+        Masuk dengan Google (@simasjiwa.co.id)
+      </button>
+      <div class="sp-divider">atau</div>
+      <input type="email" id="login-email" class="gi" placeholder="nama@simasjiwa.co.id" oninput="chkAdminEmail(this)"/>
+      <div class="apw-wrap" id="apw-wrap"><input type="password" id="apw-in" class="gi" placeholder="Password Admin" style="margin-top:0"/></div>
+      <p class="lerr" id="lerr"></p>
+      <button class="btn-main" onclick="doEmailLogin()">Masuk →</button>
+      <p class="g-cfg-note">Google Sign-In memerlukan konfigurasi OAuth. <a onclick="showGCfg()">Setup</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- GOOGLE CONFIG MODAL -->
+<div class="ov hide" id="ov-gcfg">
+  <div class="ov-card" style="max-width:380px">
+    <h3>⚙️ Setup Google OAuth</h3>
+    <p style="font-size:.8rem;color:var(--t2);margin-bottom:14px;line-height:1.6">Masukkan Google OAuth Client ID dari Google Cloud Console. Pastikan domain sudah terdaftar sebagai Authorized JavaScript origin.</p>
+    <label style="font-size:.75rem;font-weight:700;color:var(--tm);text-transform:uppercase">Client ID</label>
+    <input type="text" id="gclient-id" class="ov-srch" placeholder="xxx.apps.googleusercontent.com" style="margin-top:5px"/>
+    <label style="font-size:.75rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-top:10px">API Key (untuk Calendar & Gmail)</label>
+    <input type="text" id="gapi-key" class="ov-srch" placeholder="AIza..." style="margin-top:5px"/>
+    <div class="ov-btns">
+      <button class="btn-cancel" onclick="closeOv('ov-gcfg')">Batal</button>
+      <button class="btn-confirm" onclick="saveGCfg()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ONBOARD: Avatar pick (no gender question) -->
+<div id="scr-onboard" class="screen">
+  <div class="ob-card">
+    <h2 class="ob-title" id="ob-title">Hei! 👋 Selamat datang</h2>
+    <p class="ob-sub" id="ob-sub">Pilih foto profil kamu:</p>
+    <div class="av-grid" id="av-grid"></div>
+    <button class="btn-main" style="margin-top:0" onclick="confAvatar()">Lanjut ✨</button>
+  </div>
+</div>
+
+<!-- ONBOARD: Start choice -->
+<div id="scr-start" class="screen">
+  <div class="ob-card">
+    <h2 class="ob-title">Mau mulai dari mana? 🚀</h2>
+    <p class="ob-sub">Pilih cara kamu mau pakai SimAsk.</p>
+    <div class="ob-choices">
+      <button class="ob-ch" onclick="startDirect()">
+        <span class="ob-ch-ic">💬</span>Start Chat
+        <div style="font-size:.73rem;opacity:.6;margin-top:4px">Langsung cari kolega</div>
+      </button>
+      <button class="ob-ch" onclick="startHelp()">
+        <span class="ob-ch-ic">🤔</span>Bantu Saya
+        <div style="font-size:.73rem;opacity:.6;margin-top:4px">Belum tahu mau tanya siapa</div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="scr-app" class="screen">
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sb-hdr">
+      <div class="sb-logo">Sim<span>Ask</span></div>
+      <div class="hdr-acts">
+        <button class="ic-btn" onclick="openSettings()" title="Pengaturan">⚙️</button>
+        <button class="ic-btn" onclick="openNewChat()" title="Chat Baru">✏️</button>
+        <button class="ic-btn" onclick="openGroupCreate()" title="Grup Baru">👥</button>
+        <button class="ic-btn" onclick="doLogout()" title="Keluar">🚪</button>
+      </div>
+    </div>
+    <div class="sb-me">
+      <div class="me-av" id="sb-av">😊</div>
+      <div class="me-info">
+        <div class="me-nm" id="sb-name">—</div>
+        <div class="me-ro" id="sb-role">—</div>
+        <div id="g-status" class="g-connected hide">✅ Google terhubung</div>
+      </div>
+    </div>
+    <div class="sb-srch">
+      <div class="srch-wr">
+        <span class="srch-ic">🔍</span>
+        <input type="text" class="srch-in" placeholder="Cari chat..." oninput="filterChats(this.value)"/>
+      </div>
+    </div>
+    <div class="sb-tabs">
+  <button class="sb-tab active" id="tab-all" onclick="swTab('all')">Semua</button>
+  <button class="sb-tab" id="tab-cf" onclick="swTab('cf')">⭐ Close Friends</button>
+</div>
+<div class="chat-list" id="chat-list"></div>
+    <button class="nc-btn" onclick="openNewChat()">✉️ Chat Baru</button>
+  </div>
+
+  <!-- MAIN AREA -->
+  <div class="main-area" id="main-area">
+    <!-- Welcome -->
+    <div id="ca-welcome" class="welcome-screen">
+      <div class="wl-ic">💬</div>
+      <h2 class="wl-t">Selamat datang di SimAsk!</h2>
+      <p class="wl-s">Pilih kontak di sidebar atau klik "Chat Baru" untuk mulai ngobrol dengan kolega AI.</p>
+    </div>
+
+    <!-- Chat -->
+    <div id="ca-chat" class="chat-area hide">
+      <div class="ca-hdr" id="ca-hdr">
+        <button class="ic-btn hide" id="back-btn" onclick="goBack()">←</button>
+        <div class="ca-av reg" id="ca-hdr-av">🤖</div>
+        <div class="ca-info">
+          <div class="ca-nm" id="ca-hdr-name">—</div>
+          <div class="ca-st" id="ca-hdr-st"><span class="dot">●</span> Online</div>
+        </div>
+        <div class="ca-acts">
+          <button class="ic-btn" onclick="openCalScheduler()" title="Set Meeting">📅</button>
+          <button class="ic-btn" onclick="openGmailCompose()" title="Email">📧</button>
+        </div>
+      </div>
+      <div class="msgs msgs-bg" id="msgs"></div>
+      <div class="inp-area">
+        <textarea class="chat-in" id="chat-in" placeholder="Ketik pesan... (gunakan @nama untuk mention)" rows="1" onkeydown="onKey(event)" oninput="onChatInput(this)"></textarea>
+        <button class="send-btn" onclick="sendMsg()">➤</button>
+      </div>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="ca-admin" class="adm-area hide">
+      <div class="adm-hdr">
+        <span style="font-size:20px">🔐</span>
+        <h2>Admin Panel <span class="adm-badge">MASTER ADMIN</span></h2>
+        <span style="font-size:.75rem;opacity:.65">Total: <span id="adm-count">251</span> karyawan</span>
+      </div>
+      <div class="adm-body">
+        <div class="adm-ctl">
+          <input type="text" class="adm-si" id="adm-srch" placeholder="🔍 Cari nama, divisi, posisi..." oninput="renderAdm(this.value)"/>
+          <button class="ab add" onclick="showAddEmp()">+ Tambah</button>
+        </div>
+        <div class="tbl-wrap">
+          <table class="adm-tbl">
+            <thead><tr><th>Nama</th><th>Divisi</th><th>Posisi</th><th>Thn</th><th>Email</th><th>DISC</th><th>Gender</th><th>Aksi</th></tr></thead>
+            <tbody id="adm-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY: New Chat -->
+<div class="ov hide" id="ov-newchat">
+  <div class="ov-card">
+    <h3>💬 Mulai Chat Baru</h3>
+    <input type="text" class="ov-srch" id="nc-srch" placeholder="Cari nama, posisi, atau divisi..." oninput="renderNC(this.value)" autofocus/>
+    <div class="ppl-list" id="nc-list"></div>
+    <div class="ov-btns"><button class="btn-cancel" style="flex:1" onclick="closeOv('ov-newchat')">Tutup</button></div>
+  </div>
+</div>
+
+<!-- OVERLAY: Language Select -->
+<div class="ov hide" id="ov-lang">
+  <div class="ov-card" style="max-width:320px">
+    <h3>Pilih Gaya Bahasa 💬</h3>
+    <p style="color:var(--tm);font-size:.82rem;margin-bottom:12px">Bagaimana kamu mau ngobrol dengan <span id="lang-emp-name" style="font-weight:700;color:var(--t1)">—</span>?</p>
+    <div class="lang-opts">
+      <button class="lang-b" onclick="selLang('formal')">👔<br/><strong>Formal</strong><br/><span style="font-size:.73rem;color:var(--tm)">Profesional & sopan</span></button>
+      <button class="lang-b" onclick="selLang('informal')">😎<br/><strong>Santai</strong><br/><span style="font-size:.73rem;color:var(--tm)">Gen-Z & gaul</span></button>
+    </div>
+    <div class="ov-btns"><button class="btn-cancel" style="flex:1" onclick="closeOv('ov-lang')">Batal</button></div>
+  </div>
+</div>
+
+<!-- OVERLAY: Help (topic picker) -->
+<div class="ov hide" id="ov-help">
+  <div class="ov-card" style="max-width:460px">
+    <h3>🤔 Mau tanya topik apa?</h3>
+    <p style="color:var(--tm);font-size:.82rem;margin-bottom:11px">Pilih topik atau ketik sendiri:</p>
+    <div class="chips" id="help-chips" style="margin-bottom:10px"></div>
+    <input type="text" class="ov-srch" id="help-custom" placeholder="Atau ketik topik kamu..." style="margin-bottom:10px"/>
+    <div id="help-recs" style="display:none">
+      <p style="font-size:.8rem;font-weight:700;color:var(--t2);margin-bottom:7px">Kolega yang bisa membantu:</p>
+      <div class="ppl-list" id="help-recs-list" style="max-height:180px"></div>
+    </div>
+    <div class="ov-btns">
+      <button class="btn-cancel" style="flex:1" onclick="closeOv('ov-help')">Batal</button>
+      <button class="btn-confirm" style="flex:1" onclick="findTopicRecs()">Cari Kolega</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY: Group Chat Create -->
+<div class="ov hide" id="ov-group">
+  <div class="ov-card">
+    <h3>👥 Buat Group Chat</h3>
+    <input type="text" class="ov-srch" id="grp-name-in" placeholder="Nama grup..." style="margin-bottom:9px"/>
+    <input type="text" class="ov-srch" id="grp-srch" placeholder="Cari anggota..." oninput="renderGrpSearch(this.value)"/>
+    <div class="grp-sel-area" id="grp-sel"></div>
+    <div class="ppl-list" id="grp-list"></div>
+    <div class="ov-btns">
+      <button class="btn-cancel" style="flex:1" onclick="closeOv('ov-group')">Batal</button>
+      <button class="btn-confirm" style="flex:1" onclick="createGroup()">Buat Grup</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY: Edit Employee -->
+<div class="ov hide" id="ov-edit">
+  <div class="edit-modal">
+    <h3 id="ov-edit-title">✏️ Edit Karyawan</h3>
+    <div class="ef">
+      <div class="ef-full"><label>Nama Lengkap</label><input type="text" id="ef-name"/></div>
+      <div class="ef-full">
+          <label>Divisi</label>
+          <select id="ef-div" onchange="onDvChange()"></select>
+          <input type="text" id="ef-div-oth" style="margin-top:5px;width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid var(--bd);background:var(--bg);color:var(--t1);font-size:.82rem;outline:none;display:none" placeholder="Ketik nama divisi..."/>
+        </div>
+      <div class="ef-full">
+          <label>Departemen</label>
+          <select id="ef-dt" onchange="onDtChange()"></select>
+          <input type="text" id="ef-dt-oth" style="margin-top:5px;width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid var(--bd);background:var(--bg);color:var(--t1);font-size:.82rem;outline:none;display:none" placeholder="Ketik nama departemen..."/>
+        </div>
+      <div class="ef-full"><label>Posisi</label><input type="text" id="ef-pos"/></div>
+      <div><label>Tahun Lahir</label><input type="number" id="ef-yr" min="1940" max="2010"/></div>
+      <div><label>Email</label><input type="email" id="ef-email"/></div>
+      <div><label>DISC</label><input type="text" id="ef-disc" maxlength="4"/></div>
+      <div><label>Gender</label><select id="ef-gender"><option>Pria</option><option>Wanita</option></select></div>
+    </div>
+    <div class="ov-btns">
+      <button class="btn-cancel" style="flex:1" onclick="closeOv('ov-edit')">Batal</button>
+      <button class="btn-confirm" style="flex:1" id="ef-save-btn" onclick="saveEdit()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY: Calendar Scheduler -->
+<div class="ov hide" id="ov-cal">
+  <div class="ov-card" style="max-width:460px">
+    <h3>📅 Jadwalkan Meeting</h3>
+    <input type="text" class="ov-srch" id="cal-topic" placeholder="Topik meeting..." style="margin-bottom:8px"/>
+    <p style="font-size:.77rem;color:var(--tm);margin-bottom:6px">Peserta yang ditambahkan:</p>
+    <div class="grp-sel-area" id="cal-participants"></div>
+    <input type="text" class="ov-srch" id="cal-add-srch" placeholder="Tambah peserta..." oninput="renderCalSearch(this.value)" style="margin-bottom:8px"/>
+    <div class="ppl-list" id="cal-ppl-list" style="max-height:140px;margin-bottom:8px"></div>
+    <p style="font-size:.77rem;color:var(--tm);margin-bottom:6px">Durasi meeting:</p>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button class="opt-card" onclick="selDuration(30,this)">30 menit</button>
+      <button class="opt-card" onclick="selDuration(60,this)">1 jam</button>
+      <button class="opt-card" onclick="selDuration(90,this)">1.5 jam</button>
+      <button class="opt-card" onclick="selDuration(120,this)">2 jam</button>
+    </div>
+    <div id="cal-slots" style="display:none">
+      <p style="font-size:.77rem;font-weight:700;color:var(--t2);margin-bottom:6px">Pilih slot waktu:</p>
+      <div id="cal-slots-list"></div>
+    </div>
+    <div class="ov-btns">
+      <button class="btn-cancel" style="flex:1" onclick="closeOv('ov-cal')">Batal</button>
+      <button class="btn-confirm" style="flex:1" onclick="findCalSlots()">Cek Ketersediaan</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY: Gmail Compose -->
+<div class="ov hide" id="ov-gmail">
+  <div class="ov-card" style="max-width:500px">
+    <h3>📧 Compose Email</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+      <div><label style="font-size:.72rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Kepada (To)</label>
+        <input type="text" class="ov-srch" id="gm-to" placeholder="email@simasjiwa.co.id" style="margin:0"/></div>
+      <div><label style="font-size:.72rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">CC</label>
+        <input type="text" class="ov-srch" id="gm-cc" placeholder="cc@simasjiwa.co.id (opsional)" style="margin:0"/></div>
+      <div><label style="font-size:.72rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Subjek</label>
+        <input type="text" class="ov-srch" id="gm-subj" placeholder="Subjek email..." style="margin:0"/></div>
+      <div><label style="font-size:.72rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Isi Email</label>
+        <textarea class="ov-srch" id="gm-body" rows="6" placeholder="Isi email..." style="margin:0;resize:vertical;min-height:100px"></textarea></div>
+    </div>
+    <div class="ov-btns">
+      <button class="btn-cancel" style="flex:1" onclick="closeOv('ov-gmail')">Batal</button>
+      <button class="btn-confirm" style="flex:1" onclick="sendGmail()">Kirim 📤</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Panel -->
+<div class="set-pan" id="set-pan">
+  <h3>⚙️ Pengaturan</h3>
+  <div><div class="sl">Tema</div><div class="th-btns"><button class="th-b act" id="th-lt" onclick="setTheme('light')">☀️ Light</button><button class="th-b" id="th-dk" onclick="setTheme('dark')">🌙 Dark</button></div></div>
+  <div><div class="sl">Nama Panggilan</div><input type="text" class="si" id="si-nick" placeholder="Panggil saya..." oninput="saveSetting('nickname',this.value)"/></div>
+  <div><div class="sl">Nickname Close Friend</div><input type="text" class="si" id="si-cfnick" placeholder="Panggilan bestie..." oninput="saveSetting('cfNick',this.value)"/></div>
+  <div id="g-panel">
+    <div class="sl">Google Account</div>
+    <div id="gp-status" style="font-size:.8rem;color:var(--tm)">Belum terhubung</div>
+    <button class="btn-confirm" style="margin-top:7px;width:100%;padding:8px;border-radius:9px;font-size:.8rem" onclick="doGoogleLogin()">Hubungkan Google</button>
+  </div>
+  <button class="set-close" onclick="closeSettings()">Tutup</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════
+// SIMASK v2 — COMPLETE JS
+// ════════════════════════════════════════════════════
+
+// ══════ EMPLOYEE DATABASE (251) ══════
+const DB=[
+  {n:'DEWI LISTYANINGTYAS',dv:'BOARD OF DIRECTORS',dt:'BOARD OF DIRECTORS',p:'Direktur Utama',y:1960,e:'dewi.listyaningtyas@simasjiwa.co.id',d:'D',g:'Wanita'},
+  {n:'GATOT HERLIYANTO',dv:'BOARD OF DIRECTORS',dt:'BOARD OF DIRECTORS',p:'Direktur Teknik',y:1964,e:'gatot.herliyanto@simasjiwa.co.id',d:'D',g:'Pria'},
+  {n:'RUDY HERMAWAN',dv:'BOARD OF DIRECTORS',dt:'BOARD OF DIRECTORS',p:'Direktur IT & Operations',y:1982,e:'rudy.hermawan@simasjiwa.co.id',d:'D',g:'Pria'},
+  {n:'JANTY SUMIRKAN',dv:'BOARD OF DIRECTORS',dt:'BOARD OF DIRECTORS',p:'Direktur Pemasaran',y:1974,e:'janty.sumirkan@simasjiwa.co.id',d:'D',g:'Wanita'},
+  {n:'NASIB PARULIAN SIMAMORA, SH',dv:'BOARD OF DIRECTORS',dt:'BOARD OF DIRECTORS',p:'Direktur Kepatuhan',y:1976,e:'parulian.simamora@simasjiwa.co.id',d:'C',g:'Pria'},
+  {n:'CHRISTINA DEWI OEI',dv:'BOARD OF DIRECTORS',dt:'BOARD OF DIRECTORS',p:'Deputi Direktur Pemasaran',y:1967,e:'dewi.wijaya@simasjiwa.co.id',d:'D',g:'Wanita'},
+  {n:'WIDODO SEPTIADI',dv:'UNIT USAHA SYARIAH',dt:'UNIT USAHA SYARIAH',p:'Pimpinan Unit Usaha Syariah',y:1965,e:'widodo.septiadi@simasjiwa.co.id',d:'D',g:'Pria'},
+  {n:'BUDI SETYAWAN',dv:'ACTUARIAL PRICING',dt:'ACTUARIAL PRICING',p:'Actuarial Pricing Division Head',y:1987,e:'budi.setyawan@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'ICHSAN AMARTYADI',dv:'ACTUARIAL PRICING',dt:'ACTUARIAL PRICING (GROUP PRODUCT)',p:'Actuarial Pricing Officer',y:1998,e:'ichsan.amartyadi@simasjiwa.co.id',d:'CD',g:'Pria'},
+  {n:'CLAUDIA AMARANANTIA',dv:'ACTUARIAL PRICING',dt:'ACTUARIAL PRICING (GROUP PRODUCT)',p:'Actuarial Pricing Officer',y:2000,e:'claudia.amaranantia@simasjiwa.co.id',d:'SC',g:'Wanita'},
+  {n:'YESSY NOVIYANTI KAWI',dv:'ACTUARIAL PRICING',dt:'ACTUARIAL PRICING (INDIVIDUAL PRODUCT)',p:'Actuarial Pricing Section Head',y:1995,e:'yessy.kawi@simasjiwa.co.id',d:'CS',g:'Wanita'},
+  {n:'GEMMA PRADITYA PRATAMA',dv:'ACTUARIAL PRICING',dt:'ACTUARIAL PRICING (INDIVIDUAL PRODUCT)',p:'Actuarial Pricing Officer',y:2004,e:'gemma.pratama@simasjiwa.co.id',d:'C',g:'Pria'},
+  {n:'VIERI KOERNIAWAN',dv:'ACTUARIAL PRICING',dt:'ACTUARIAL PRICING (INDIVIDUAL PRODUCT)',p:'Actuarial Pricing Officer',y:1999,e:'vieri.koerniawan@simasjiwa.co.id',d:'SCD',g:'Pria'},
+  {n:'RIDHO',dv:'ACTUARY',dt:'ACTUARIAL IFRS 17 MODELLING',p:'Actuarial IFRS 17 Modelling Department Head',y:1990,e:'ridho.junaidi@simasjiwa.co.id',d:'IS',g:'Pria'},
+  {n:'BAGUS RIZKY RAHARTANTYO',dv:'ACTUARY',dt:'ACTUARIAL IFRS 17 MODELLING',p:'Actuarial IFRS 17 Modelling Officer',y:2002,e:'bagus.rahartantyo@simasjiwa.co.id',d:'C',g:'Pria'},
+  {n:'NUGROHOADI',dv:'ACTUARY',dt:'ACTUARY',p:'Actuary Division Head',y:1972,e:'nugrohoadi@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'GULLIT WIDARTA',dv:'ACTUARY',dt:'PROPHET MODELLING & VALUATION',p:'Prophet Modelling & Valuation Department Head',y:1988,e:'gullit.widarta@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'MUHAMMAD IMANUDIN S',dv:'ACTUARY',dt:'PROPHET MODELLING & VALUATION',p:'Prophet Modelling & Valuation Specialist',y:1999,e:'muhammad.imanudin@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'MARCELLA RENATA',dv:'ACTUARY',dt:'PROPHET MODELLING & VALUATION',p:'Prophet Modelling & Valuation Officer',y:2001,e:'marcella.renata@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'CATHERINE SONIA DEWANTARA',dv:'ACTUARY',dt:'PROPHET MODELLING & VALUATION',p:'Prophet Modelling & Valuation Officer',y:2002,e:'catherine.dewantara@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'AUFA SHAHNAZDIZA SALSABILA',dv:'ACTUARY',dt:'REINSURANCE',p:'Reinsurance Officer',y:2002,e:'aufa.salsabila@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'BAHRUL ANUAR',dv:'AGENCY',dt:'AGENCY AREA 1',p:'Agency Area 1 Department Head',y:1973,e:'bahrul.anuar@simasjiwa.co.id',d:'DSI',g:'Pria'},
+  {n:'RICKY SULISTYO',dv:'AGENCY',dt:'AGENCY AREA 2',p:'Agency Area 2 Department Head',y:1983,e:'ricky.sulistyo@simasjiwa.co.id',d:'SD',g:'Pria'},
+  {n:'JULIO LEONARDO LEBA',dv:'AGENCY',dt:'AGENCY AREA 3',p:'Agency Area 3 Department Head',y:1987,e:'julio.leba@simasjiwa.co.id',d:'I',g:'Pria'},
+  {n:'ZULFIKAR',dv:'AGENCY SHARIA',dt:'AGENCY SHARIA',p:'Agency Sharia Division Head',y:1972,e:'zulfikar@simasjiwa.co.id',d:'I',g:'Pria'},
+  {n:'LILIK NURUL WAHIDAH',dv:'AGENCY SHARIA',dt:'AGENCY SHARIA',p:'Agency Sharia Officer',y:2000,e:'lilik.wahidah@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'SASKIA AZ ZAHRA PUTRI',dv:'AGENCY SHARIA',dt:'AGENCY SHARIA',p:'Agency Sharia Officer',y:2002,e:'saskia.putri@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'HENKY KUSNO',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 1',dt:'BANCASSURANCE NON-PILLAR 1',p:'Bancassurance Non-Pillar 1 Division Head',y:1978,e:'henky.kusno@simasjiwa.co.id',d:'D',g:'Pria'},
+  {n:'REINA RETNOWATY',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 1',dt:'BANCASSURANCE NON-PILLAR 1',p:'Bancassurance Non-Pillar 1 Department Head',y:1984,e:'reina.retnowaty@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'HENDRY SANTOSO',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 1',dt:'BANCASSURANCE NON-PILLAR 1',p:'Bancassurance Non-Pillar 1 Department Head',y:1981,e:'hendry.santoso@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'MARVEL AGUSTINUS OMPI',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 1',dt:'BANCASSURANCE NON-PILLAR 1',p:'Bancassurance Non-Pillar 1 Section Head',y:1982,e:'marvel.ompi@simasjiwa.co.id',d:'I',g:'Pria'},
+  {n:'ARIESTY',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 1',dt:'BANCASSURANCE NON-PILLAR 1',p:'Bancassurance Non-Pillar 1 Section Head',y:1984,e:'ariesty@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'TARA NOVALITA LEWERISSA',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 1',dt:'BANCASSURANCE NON-PILLAR 1',p:'Bancassurance Non-Pillar 1 Section Head',y:1986,e:'tara.lewerissa@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'HERDA LIDYA LONDONG ALLO',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 1',dt:'BANCASSURANCE NON-PILLAR 1',p:'Bancassurance Non-Pillar 1 Section Head',y:1989,e:'herda.allo@simasjiwa.co.id',d:'SC',g:'Wanita'},
+  {n:'CHARINA ANGANDARA',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 1',dt:'BANCASSURANCE NON-PILLAR 1',p:'Bancassurance Non-Pillar 1 Section Head',y:1995,e:'charina.angandara@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'TRIWIYANTI PERWITA DEWI',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 1',dt:'BANCASSURANCE NON-PILLAR 1',p:'Bancassurance Non-Pillar 1 Officer',y:1988,e:'triwiyanti.dewi@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'YULIYA WINGSIH',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 1',dt:'BANCASSURANCE NON-PILLAR 1',p:'Bancassurance Non-Pillar 1 Officer',y:1990,e:'yuliya.wingsih@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'LUTFIANA KUSUMAWARDANI',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 1',dt:'BANCASSURANCE NON-PILLAR 1',p:'Bancassurance Non-Pillar 1 Officer',y:1991,e:'lutfiana.kusumawardani@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'PUTRI AYU APRILIA',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 1',dt:'BANCASSURANCE NON-PILLAR 1',p:'Bancassurance Non-Pillar 1 Officer',y:1992,e:'putri.aprilia@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'RESTU MAULANA',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 1',dt:'BANCASSURANCE NON-PILLAR 1',p:'Bancassurance Non-Pillar 1 Officer',y:1992,e:'restu.maulana@simasjiwa.co.id',d:'I',g:'Pria'},
+  {n:'DINDA SETIYA NUGRAHANIE',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 1',dt:'BANCASSURANCE NON-PILLAR 1',p:'Bancassurance Non-Pillar 1 Officer',y:1994,e:'dinda.nugrahanie@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'KADEK YANI ARTIKA SARI',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 1',dt:'BANCASSURANCE NON-PILLAR 1',p:'Bancassurance Non-Pillar 1 Officer',y:1998,e:'kadek.sari@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'FENI SETIAWATI',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 1',dt:'BANCASSURANCE NON-PILLAR 1',p:'Bancassurance Non-Pillar 1 Officer',y:2000,e:'feni.setiawati@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'MIKO FEBRIANTO OBAJA',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 2',dt:'BANCASSURANCE NON-PILLAR 2',p:'Bancassurance Non-Pillar 2 Department Head',y:1989,e:'miko.obaja@simasjiwa.co.id',d:'SI',g:'Pria'},
+  {n:'CHRISTINE',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 2',dt:'BANCASSURANCE NON-PILLAR 2',p:'Bancassurance Non-Pillar 2 Section Head',y:1980,e:'christine@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'ANITA AULIA',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 2',dt:'BANCASSURANCE NON-PILLAR 2',p:'Bancassurance Non-Pillar 2 Section Head',y:1988,e:'anita.aulia@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'TIURLAN MEYLINDA MANURUNG',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 2',dt:'BANCASSURANCE NON-PILLAR 2',p:'Bancassurance Non-Pillar 2 Officer',y:2000,e:'tiurlan.manurung@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'PUSPITA SARI',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 2',dt:'BANCASSURANCE NON-PILLAR 2',p:'Bancassurance Non-Pillar 2 Officer',y:1990,e:'puspita.sari@simasjiwa.co.id',d:'I',g:'Pria'},
+  {n:'NILA NITAMI',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 2',dt:'BANCASSURANCE NON-PILLAR 2',p:'Bancassurance Non-Pillar 2 Officer',y:1996,e:'nila.nitami@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'SITI RAHMA ANDINA',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 2',dt:'BANCASSURANCE NON-PILLAR 2',p:'Bancassurance Non-Pillar 2 Officer',y:1997,e:'siti.andina@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'NADILLA ARISANDI',dv:'BANCASSURANCE NON-PILLAR & ALTERNATE DISTR. 2',dt:'BANCASSURANCE NON-PILLAR 2',p:'Bancassurance Non-Pillar 2 Officer',y:1999,e:'nadilla.arisandi@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'ANTHONIUS HERMAN T',dv:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',dt:'ALTERNATE DISTRIBUTION',p:'Alternate Distribution Department Head',y:1983,e:'anthonius.herman@simasjiwa.co.id',d:'D',g:'Pria'},
+  {n:'CICI MARCHIALASTY .SE',dv:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',dt:'ALTERNATE DISTRIBUTION',p:'Alternate Distribution Section Head',y:1988,e:'cici.marchialasty@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'HISKIA PANDAPOTAN',dv:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',dt:'ALTERNATE DISTRIBUTION',p:'Alternate Distribution Officer',y:1993,e:'hiskia.pandapotan@simasjiwa.co.id',d:'CSD',g:'Pria'},
+  {n:'SINDI RISKA MAULINA',dv:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',dt:'ALTERNATE DISTRIBUTION',p:'Alternate Distribution Officer',y:1993,e:'sindi.maulina@simasjiwa.co.id',d:'SCI',g:'Wanita'},
+  {n:'MIKHA SETIAWAN WIRIANTO',dv:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',dt:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',p:'Bancassurance Pillar & Alternate Distribution Division Head',y:1983,e:'mikha.wirianto@simasjiwa.co.id',d:'CDS',g:'Pria'},
+  {n:'YUNITA ELYAWATI',dv:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',dt:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',p:'Bancassurance Pillar & Alternate Distribution Section Head',y:1976,e:'yunita.elyawati@simasjiwa.co.id',d:'D',g:'Wanita'},
+  {n:'NURMAHENDRA HARDYTIA',dv:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',dt:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',p:'Bancassurance Pillar & Alternate Distribution Section Head',y:1988,e:'nurmahendra.hardytia@simasjiwa.co.id',d:'DC',g:'Pria'},
+  {n:'REKI SETIAWAN',dv:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',dt:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',p:'Bancassurance Pillar & Alternate Distribution Department Head',y:1987,e:'reki.setiawan@simasjiwa.co.id',d:'CD',g:'Pria'},
+  {n:'HARDI REZALI',dv:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',dt:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',p:'Bancassurance Pillar & Alternate Distribution Section Head',y:1989,e:'hardi.rezali@simasjiwa.co.id',d:'DI',g:'Pria'},
+  {n:'VANESSA PRISCILLA SOEJANTO',dv:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',dt:'BANCASSURANCE SHARIA PILLAR',p:'Bancassurance Sharia Pillar Department Head',y:1989,e:'vanessa.soejanto@simasjiwa.co.id',d:'SD',g:'Wanita'},
+  {n:'RIZKI DARMAWAN',dv:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',dt:'BANCASSURANCE SHARIA PILLAR',p:'Bancassurance Sharia Pillar Section Head',y:1988,e:'rizki.darmawan@simasjiwa.co.id',d:'CD',g:'Pria'},
+  {n:'RANJI PRIMARIANDA',dv:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',dt:'SALES RECRUITMENT',p:'Sales Recruitment Officer',y:1994,e:'ranji.primarianda@simasjiwa.co.id',d:'D',g:'Pria'},
+  {n:'M. ARIE IRFANDY',dv:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',dt:'SALES TRAINING BANCASSURANCE',p:'Sales Training Bancassurance Division Head',y:1986,e:'arie.irfandy@simasjiwa.co.id',d:'DC',g:'Pria'},
+  {n:'RIZKI SEKAR ARUM',dv:'BANCASSURANCE PILLAR & ALTERNATE DISTRIBUTION',dt:'SALES TRAINING BANCASSURANCE',p:'Sales Training Bancassurance Officer',y:1995,e:'rizki.arum@simasjiwa.co.id',d:'CD',g:'Wanita'},
+  {n:'FENNY HARSONO',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS DEVELOPMENT (NON-PILLAR)',p:'Business Development (Non-Pillar) Department Head',y:1974,e:'fenny.harsono@simasjiwa.co.id',d:'CS',g:'Wanita'},
+  {n:'OLIVIA PUTRI RAMADHANI',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS DEVELOPMENT (NON-PILLAR)',p:'Business Development (Non-Pillar) Officer',y:2001,e:'olivia.ramadhani@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'NAOMI ADITHIA',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS DEVELOPMENT (PILLAR)',p:'Business Development (Pillar) Officer',y:1997,e:'naomi.adithia@simasjiwa.co.id',d:'SC',g:'Wanita'},
+  {n:'INDIANA RENA DAHLIANA YASYA',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS DEVELOPMENT (PILLAR)',p:'Business Development (Pillar) Officer',y:1997,e:'indiana.yasya@simasjiwa.co.id',d:'SC',g:'Wanita'},
+  {n:'STELLA ANASTASIA AMANDA SASELA',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS DEVELOPMENT (PILLAR)',p:'Business Development (Pillar) Officer',y:1998,e:'stella.sasela@simasjiwa.co.id',d:'CS',g:'Wanita'},
+  {n:'ROBBY ROYKE LOING',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Section Head',y:1971,e:'robby.loing@simasjiwa.co.id',d:'SIC',g:'Pria'},
+  {n:'ARIS EKO SAPUTRO',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Department Head',y:1983,e:'aris.saputro@simasjiwa.co.id',d:'SC',g:'Pria'},
+  {n:'MARIA DELVIANA PEBRIANA BARIMBING',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:1977,e:'maria.barimbing@simasjiwa.co.id',d:'CD',g:'Wanita'},
+  {n:'MARTINO WULANDORO',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:1977,e:'martino.wulandoro@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'JIMMY SUGANDA',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:1982,e:'jimmy.suganda@simasjiwa.co.id',d:'CD',g:'Pria'},
+  {n:'MUHAMAD IHSAN HADZAMI',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:1990,e:'muhamad.hadzami@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'RISMA ANDRIYANI',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:1992,e:'risma.andriyani@simasjiwa.co.id',d:'CS',g:'Wanita'},
+  {n:'VIVI RAHAYU',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:1993,e:'vivi.rahayu@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'ANDI INDERA WATY',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:1975,e:'makasar.so@simasjiwa.co.id',d:'CS',g:'Wanita'},
+  {n:'ASIMA HERAWATI DOLOK S',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:1978,e:'asima.herawati@simasjiwa.co.id',d:'SC',g:'Wanita'},
+  {n:'ELSA AGUSTINA MAHAWATI',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:1988,e:'bandung.so@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'CHRISTINE NATALIA',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:1992,e:'christine.natalia@simasjiwa.co.id',d:'CS',g:'Wanita'},
+  {n:'JULITA',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:1994,e:'medan.so@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'YESSIKA ARTHA MARIANA NAPITUPULU',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:1996,e:'surabaya.so@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'NI MADE REIKA PRAMITA',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:1998,e:'bali.so@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'NOVELLA SPANIA PUTRI ANGGRAENI',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:1999,e:'novella.anggraeni@simasjiwa.co.id',d:'CSI',g:'Wanita'},
+  {n:'LUSIANA PURNAMA SARI TUMANGGER',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:1999,e:'Jakarta.so@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'AYU NABILA WIDARTI',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:1999,e:'semarang.so@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'TRISNA TRENGGANU SARI',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:1999,e:'trisna.sari@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'ABIGAIL YOCHEBED WILLIAM',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:2001,e:'manado.so@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'ANDREA GINA MUNTUAN',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:2002,e:'andrea.muntuan@simasjiwa.co.id',d:'CS',g:'Wanita'},
+  {n:'KHAELA NURJANAH',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT',p:'Business Support Officer',y:2002,e:'bogor.so@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'STEPHANUS ANIS KURNIAWAN',dv:'BUSINESS SUPPORT & DEVELOPMENT',dt:'BUSINESS SUPPORT & DEVELOPMENT',p:'Business Support & Development Division Head',y:1977,e:'stefanus.kurniawan@simasjiwa.co.id',d:'CD',g:'Pria'},
+  {n:'BETANIA ROSA PERBAWANTO',dv:'CLAIM & UNDERWRITING',dt:'CLAIM',p:'Claim Department Head',y:1979,e:'betania.perbawanto@simasjiwa.co.id',d:'C',g:'Pria'},
+  {n:'ZAINULLOH BATU JAWA',dv:'CLAIM & UNDERWRITING',dt:'CLAIM',p:'Claim Officer',y:1986,e:'zainul.batujawa@simasjiwa.co.id',d:'SC',g:'Pria'},
+  {n:'FANISSA TAFTIANI',dv:'CLAIM & UNDERWRITING',dt:'CLAIM',p:'Claim Officer',y:1993,e:'fanissa.taftiani@simasjiwa.co.id',d:'SI',g:'Wanita'},
+  {n:'ANNISA INDIRA',dv:'CLAIM & UNDERWRITING',dt:'CLAIM',p:'Claim Officer',y:1990,e:'annisa.indira@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'NURHALIZA DWI NINGRUM',dv:'CLAIM & UNDERWRITING',dt:'CLAIM',p:'Claim Officer',y:1998,e:'nurhaliza.ningrum@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'INGRID TRISNAWATI KURNIAWAN',dv:'CLAIM & UNDERWRITING',dt:'CLAIM & UNDERWRITING',p:'Claim & Underwriting Division Head',y:1959,e:'ingrid.kurniawan@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'ARIANI TITI LESTARI',dv:'CLAIM & UNDERWRITING',dt:'UNDERWRITING',p:'Underwriting Department Head',y:1979,e:'ariani.lestari@simasjiwa.co.id',d:'CS',g:'Wanita'},
+  {n:'EUNIKE UTAMI SOETADI',dv:'CLAIM & UNDERWRITING',dt:'UNDERWRITING',p:'Underwriting Specialist',y:1987,e:'eunike.soetadi@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'DESSLYN RAFFLY',dv:'CLAIM & UNDERWRITING',dt:'UNDERWRITING',p:'Underwriting Specialist',y:1991,e:'desslyn.raffly@simasjiwa.co.id',d:'D',g:'Wanita'},
+  {n:'NINI AINI MELANE',dv:'CLAIM & UNDERWRITING',dt:'UNDERWRITING',p:'Underwriting Section Head',y:1989,e:'nini.melane@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'DAVID TANDJUNG',dv:'CLAIM & UNDERWRITING',dt:'UNDERWRITING',p:'Underwriting Officer',y:1995,e:'david.tandjung@simasjiwa.co.id',d:'CD',g:'Pria'},
+  {n:'ZULQARNAIN TRIO UTOMO',dv:'CLAIM & UNDERWRITING',dt:'UNDERWRITING',p:'Underwriting Officer',y:1986,e:'zulqarnain.utomo@simasjiwa.co.id',d:'C',g:'Pria'},
+  {n:'DINI SEPTIANINGSIH',dv:'CLAIM & UNDERWRITING',dt:'UNDERWRITING',p:'Underwriting Officer',y:1988,e:'dini.septianingsih@simasjiwa.co.id',d:'CS',g:'Wanita'},
+  {n:'SHOPIAH LAURA MARGARET',dv:'CLAIM & UNDERWRITING',dt:'UNDERWRITING',p:'Underwriting Officer',y:1989,e:'shopiah.margaret@simasjiwa.co.id',d:'SC',g:'Wanita'},
+  {n:'RAMADANTI RIANINGTYAS',dv:'CLAIM & UNDERWRITING',dt:'UNDERWRITING',p:'Underwriting Officer',y:1989,e:'ramadanti.rianingtyas@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'AJENG OKTIWIJAYA',dv:'CLAIM & UNDERWRITING',dt:'UNDERWRITING',p:'Underwriting Officer',y:1992,e:'ajeng.oktiwijaya@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'GILANG ADIAKSO',dv:'CLAIM & UNDERWRITING',dt:'UNDERWRITING',p:'Underwriting Officer',y:1993,e:'gilang.adiakso@simasjiwa.co.id',d:'S',g:'Pria'},
+  {n:'MARIA FRANSISCA SIMBOLON',dv:'CLAIM & UNDERWRITING',dt:'UNDERWRITING',p:'Underwriting Officer',y:1993,e:'maria.simbolon@simasjiwa.co.id',d:'CDS',g:'Wanita'},
+  {n:'RIDHO MAKSUDI',dv:'CLAIM & UNDERWRITING',dt:'UNDERWRITING',p:'Underwriting Officer',y:1994,e:'ridho.maksudi@simasjiwa.co.id',d:'S',g:'Pria'},
+  {n:'FILDZA MARHA',dv:'CLAIM & UNDERWRITING',dt:'UNDERWRITING',p:'Underwriting Officer',y:1996,e:'fildza.marha@simasjiwa.co.id',d:'SIC',g:'Wanita'},
+  {n:'ONGKY SETIA NUGRAHA',dv:'CLAIM & UNDERWRITING',dt:'UNDERWRITING',p:'Underwriting Officer',y:2002,e:'ongky.nugraha@simasjiwa.co.id',d:'S',g:'Pria'},
+  {n:'KRISTIAN DANIEL ADHYAKSA HUTAGAOL',dv:'COMPLIANCE',dt:'COMPLIANCE',p:'Compliance Specialist',y:1994,e:'kristian.hutagaol@simasjiwa.co.id',d:'C',g:'Pria'},
+  {n:'ASTRID TETA PUTRI WIYONO',dv:'COMPLIANCE',dt:'COMPLIANCE',p:'Compliance Officer',y:2002,e:'astrid.wiyono@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'NANCY MARTHARIA',dv:'CORPORATE COMMUNICATION',dt:'CORPORATE COMMUNICATION',p:'Corporate Communication Department Head',y:1988,e:'nancy.martharia@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'WELSEN TIONALDO',dv:'CORPORATE COMMUNICATION',dt:'CORPORATE COMMUNICATION',p:'Corporate Communication Specialist',y:1996,e:'welsen.tionaldo@simasjiwa.co.id',d:'SDC',g:'Pria'},
+  {n:'HENDRA SANTOSO',dv:'CORPORATE COMMUNICATION',dt:'CORPORATE COMMUNICATION',p:'Corporate Communication Officer',y:1985,e:'hendra.santoso@simasjiwa.co.id',d:'IC',g:'Pria'},
+  {n:'FACHRI WIDI PARTYADI',dv:'CORPORATE COMMUNICATION',dt:'CORPORATE COMMUNICATION',p:'Corporate Communication Officer',y:1997,e:'fachri.partyadi@simasjipr.co.id',d:'C',g:'Pria'},
+  {n:'CINDY BENITA WIJADI',dv:'CORPORATE COMMUNICATION',dt:'CORPORATE COMMUNICATION',p:'Corporate Communication Officer',y:2002,e:'cindy.wijadi@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'BERTHO RAFITYA IWASURYA',dv:'DIGITAL TECHNOLOGY',dt:'DIGITAL TECHNOLOGY',p:'Digital Technology Division Head',y:1984,e:'bertho.iwasurya@simasjiwa.co.id',d:'CSD',g:'Pria'},
+  {n:'LUFI MARDIANSAH',dv:'DIGITAL TECHNOLOGY',dt:'IT APPLICATION DEVELOPER',p:'IT Application Developer Department Head',y:1988,e:'lufi.mardiansah@simasjiwa.co.id',d:'C',g:'Pria'},
+  {n:'PENGKY',dv:'DIGITAL TECHNOLOGY',dt:'IT APPLICATION DEVELOPER',p:'IT Application Developer Section Head',y:1985,e:'pengky@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'DIMAS RADITYO BUDI',dv:'DIGITAL TECHNOLOGY',dt:'IT APPLICATION DEVELOPER',p:'IT Application Developer Section Head',y:1986,e:'dimas.radityo@simasjiwa.co.id',d:'IS',g:'Pria'},
+  {n:'REZA ZULFARHAN',dv:'DIGITAL TECHNOLOGY',dt:'IT APPLICATION DEVELOPER',p:'IT Application Developer Section Head',y:1989,e:'reza.zulfarhan@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'FRANSISCA SUGIHARTI',dv:'DIGITAL TECHNOLOGY',dt:'IT APPLICATION DEVELOPER',p:'IT Application Developer Section Head',y:1989,e:'fransisca.sugiharti@simasjiwa.co.id',d:'CS',g:'Wanita'},
+  {n:'ROY RIZMAN SYAHIED',dv:'DIGITAL TECHNOLOGY',dt:'IT APPLICATION DEVELOPER',p:'IT Application Developer Specialist',y:1990,e:'roy.syahied@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'CLAUDIO OSVALDO',dv:'DIGITAL TECHNOLOGY',dt:'IT APPLICATION DEVELOPER',p:'IT Application Developer Section Head',y:1991,e:'claudio.osvaldo@simasjiwa.co.id',d:'IS',g:'Pria'},
+  {n:'RIZQI UNTUNG PERMADI',dv:'DIGITAL TECHNOLOGY',dt:'IT APPLICATION DEVELOPER',p:'IT Application Developer Section Head',y:1994,e:'rizqi.permadi@simasjiwa.co.id',d:'SI',g:'Pria'},
+  {n:'ALDO ADRIAN',dv:'DIGITAL TECHNOLOGY',dt:'IT APPLICATION DEVELOPER',p:'IT Application Developer Officer',y:1995,e:'aldo.adrian@simasjiwa.co.id',d:'C',g:'Pria'},
+  {n:'PASCARIO TRI YUDANTO',dv:'DIGITAL TECHNOLOGY',dt:'IT APPLICATION DEVELOPER',p:'IT Application Developer Officer',y:1995,e:'pascario.yudanto@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'IRSALINA LAYALIA SHABRINA',dv:'DIGITAL TECHNOLOGY',dt:'IT APPLICATION DEVELOPER',p:'IT Application Developer Officer',y:1996,e:'irsalina.shabrina@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'ZIANA MEGA DEVI',dv:'DIGITAL TECHNOLOGY',dt:'IT APPLICATION DEVELOPER',p:'IT Application Developer Officer',y:1999,e:'ziana.devi@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'SILVIANA RANI HASNA PUTRI',dv:'DIGITAL TECHNOLOGY',dt:'IT APPLICATION DEVELOPER',p:'IT Application Developer Officer',y:1999,e:'silviana.putri@simasjiwa.co.id',d:'CS',g:'Wanita'},
+  {n:'NIQMA ROZALIA',dv:'DIGITAL TECHNOLOGY',dt:'IT APPLICATION DEVELOPER',p:'IT Application Developer Officer',y:1999,e:'niqma.rozalia@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'ZEFANYA FLORENTINE',dv:'DIGITAL TECHNOLOGY',dt:'IT APPLICATION DEVELOPER',p:'IT Application Developer Officer',y:1998,e:'zefanya.florentine@simasjiwa.co.id',d:'SIC',g:'Wanita'},
+  {n:'WILLIAM ANTONY',dv:'DIGITAL TECHNOLOGY',dt:'IT APPLICATION DEVELOPER',p:'IT Application Developer Officer',y:2000,e:'william.antony@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'NUGROHO DIMAS ARDIYANTO',dv:'DIGITAL TECHNOLOGY',dt:'IT APPLICATION DEVELOPER',p:'IT Application Developer Officer',y:2000,e:'nugroho.ardiyanto@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'MUHAMAD HIDAYAT',dv:'DIGITAL TECHNOLOGY',dt:'IT ARCHITECTURE & SERVICE QUALITY',p:'IT Architecture & Service Quality Section Head',y:1982,e:'muhamad.hidayat@simasjiwa.co.id',d:'CSD',g:'Pria'},
+  {n:'YUGI SAFARI NURHAKIM',dv:'DIGITAL TECHNOLOGY',dt:'IT ARCHITECTURE & SERVICE QUALITY',p:'IT Architecture & Service Quality Specialist',y:1989,e:'yugi.nurhakim@simasjiwa.co.id',d:'CD',g:'Pria'},
+  {n:'ABDUR RASYID',dv:'DIGITAL TECHNOLOGY',dt:'IT ARCHITECTURE & SERVICE QUALITY',p:'IT Architecture & Service Quality Officer',y:1992,e:'abdur.rasyid@simasjiwa.co.id',d:'SCD',g:'Pria'},
+  {n:'RIYAN IVANDY',dv:'DIGITAL TECHNOLOGY',dt:'IT ARCHITECTURE & SERVICE QUALITY',p:'IT Architecture & Service Quality Officer',y:1995,e:'riyan.ivandy@simasjiwa.co.id',d:'CSI',g:'Pria'},
+  {n:'DEMON PANJI AGUNG FRIHANDONO',dv:'DIGITAL TECHNOLOGY',dt:'IT INFRASTRUCTURE',p:'IT Infrastructure Department Head',y:1974,e:'demon.panji@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'SIGIT PAMUNGKAS',dv:'DIGITAL TECHNOLOGY',dt:'IT INFRASTRUCTURE',p:'IT Infrastructure Section Head',y:1989,e:'sigit.pamungkas@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'RONNY KURNIAWAN HERMINTO',dv:'DIGITAL TECHNOLOGY',dt:'IT INFRASTRUCTURE',p:'IT Infrastructure Officer',y:1984,e:'ronny.kurniawan@simasjiwa.co.id',d:'SI',g:'Pria'},
+  {n:'CHANDRA EDISON',dv:'DIGITAL TECHNOLOGY',dt:'IT INFRASTRUCTURE',p:'IT Infrastructure Officer',y:1985,e:'chandra.edison@simasjiwa.co.id',d:'CD',g:'Pria'},
+  {n:'VIETA PERTIWI',dv:'DIGITAL TECHNOLOGY',dt:'IT INFRASTRUCTURE',p:'IT Infrastructure Officer',y:1995,e:'vieta.pertiwi@simasjiwa.co.id',d:'CD',g:'Wanita'},
+  {n:'RINO SAPUTRA',dv:'DIGITAL TECHNOLOGY',dt:'IT INFRASTRUCTURE',p:'IT Infrastructure Officer',y:1987,e:'rino.saputra@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'YESTY SUNASRI',dv:'DIGITAL TECHNOLOGY',dt:'IT INFRASTRUCTURE',p:'IT Infrastructure Officer',y:1990,e:'yesti.sunasri@simasjiwa.co.id',d:'CS',g:'Wanita'},
+  {n:'NADRIEL UKADIN',dv:'EXECUTIVE PROJECT MANAGEMENT OFFICE (EPMO)',dt:'EXECUTIVE PROJECT MANAGEMENT OFFICE (EPMO)',p:'Executive Project Management Office (EPMO) Section Head',y:1994,e:'nadriel.ukadin@simasjiwa.co.id',d:'D',g:'Pria'},
+  {n:'JEANNYVER TEDJASUKMANA',dv:'EXECUTIVE PROJECT MANAGEMENT OFFICE (EPMO)',dt:'EXECUTIVE PROJECT MANAGEMENT OFFICE (EPMO)',p:'Executive Project Management Office (EPMO) Specialist',y:1996,e:'jeannyver.tedjasukmana@simasjiwa.co.id',d:'CD',g:'Wanita'},
+  {n:'PRICILLA ANESTHA',dv:'EXECUTIVE PROJECT MANAGEMENT OFFICE (EPMO)',dt:'SALES ANALYST',p:'Sales Analyst Officer',y:1998,e:'pricilla.anestha@simasjiwa.co.id',d:'D',g:'Wanita'},
+  {n:'IG NURDIANSAH',dv:'FINANCE & ACCOUNTING',dt:'ACCOUNTING',p:'Accounting Department Head',y:1980,e:'ig.nurdiansah@simasjiwa.co.id',d:'SDC',g:'Pria'},
+  {n:'SAFWAN',dv:'FINANCE & ACCOUNTING',dt:'ACCOUNTING',p:'Accounting Section Head',y:1987,e:'safwan@simasjiwa.co.id',d:'C',g:'Pria'},
+  {n:'TRI NUGROHO SETIAWAN, SE',dv:'FINANCE & ACCOUNTING',dt:'ACCOUNTING',p:'Accounting Senior Officer',y:1989,e:'tri.setiawan@simasjiwa.co.id',d:'C',g:'Pria'},
+  {n:'HENRY KURNIAWAN NOVA PUTRA',dv:'FINANCE & ACCOUNTING',dt:'ACCOUNTING',p:'Accounting Officer',y:1975,e:'henry.putra@simasjiwa.co.id',d:'S',g:'Pria'},
+  {n:'HANNIE NOVIANTY KURNIA',dv:'FINANCE & ACCOUNTING',dt:'ACCOUNTING',p:'Accounting Officer',y:1991,e:'hannie.novianty@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'VERONIKA HESTI KUSUMANINGSIH SUGIANTO',dv:'FINANCE & ACCOUNTING',dt:'ACCOUNTING',p:'Accounting Officer',y:1991,e:'veronika.sugianto@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'ERNESTINE KUSASIH',dv:'FINANCE & ACCOUNTING',dt:'ACCOUNTING',p:'Accounting Officer',y:1997,e:'ernestine.kusasih@simasjiwa.co.id',d:'CI',g:'Wanita'},
+  {n:'RANGGA DWI PUTRO',dv:'FINANCE & ACCOUNTING',dt:'ACCOUNTING',p:'Accounting Officer',y:1986,e:'rangga.putro@simasjiwa.co.id',d:'SIC',g:'Pria'},
+  {n:'RONALDO',dv:'FINANCE & ACCOUNTING',dt:'ACCOUNTING',p:'Accounting Officer',y:1998,e:'ronaldo@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'LOUISA',dv:'FINANCE & ACCOUNTING',dt:'FINANCE',p:'Finance Department Head',y:1990,e:'Louisa@simasjiwa.co.id',d:'DC',g:'Wanita'},
+  {n:'KATHIERINA MEIDRI',dv:'FINANCE & ACCOUNTING',dt:'FINANCE',p:'Finance Section Head',y:1992,e:'kathierina.meidri@simasjiwa.co.id',d:'SIC',g:'Wanita'},
+  {n:'NINDYA ASTUTI',dv:'FINANCE & ACCOUNTING',dt:'FINANCE',p:'Finance Officer',y:1989,e:'nindya.astuti@simasjiwa.co.id',d:'CD',g:'Wanita'},
+  {n:'REFFIEN FEBRIANO',dv:'FINANCE & ACCOUNTING',dt:'FINANCE',p:'Finance Officer',y:1996,e:'reffien.febriano@simasjiwa.co.id',d:'CI',g:'Pria'},
+  {n:'YOHANES',dv:'FINANCE & ACCOUNTING',dt:'FINANCE',p:'Finance Officer',y:1998,e:'yohanes@simasjiwa.co.id',d:'IC',g:'Pria'},
+  {n:'HELEN VERONICA SATRIA',dv:'FINANCE & ACCOUNTING',dt:'FINANCE',p:'Finance Officer',y:1998,e:'helen.satria@simasjiwa.co.id',d:'DC',g:'Wanita'},
+  {n:'NEVY FITRIYANI SANADI',dv:'FINANCE & ACCOUNTING',dt:'FINANCE',p:'Finance Officer',y:1982,e:'nevy.sanadi@simasjiwa.co.id',d:'SCI',g:'Wanita'},
+  {n:'SEPTIANI',dv:'FINANCE & ACCOUNTING',dt:'FINANCE',p:'Finance Officer',y:1985,e:'septiani@simasjiwa.co.id',d:'CS',g:'Wanita'},
+  {n:'HALIMATUN ROHMAH',dv:'FINANCE & ACCOUNTING',dt:'FINANCE',p:'Finance Officer',y:1999,e:'halimatun.rohmah@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'MUARA TAGOR H SITORUS',dv:'FINANCE & ACCOUNTING',dt:'FINANCE & ACCOUNTING',p:'Finance & Accounting Division Head',y:1982,e:'muara.sitorus@simasjiwa.co.id',d:'DC',g:'Pria'},
+  {n:'MARLIANA',dv:'GA & PROCUREMENT',dt:'GA & PROCUREMENT',p:'GA & Procurement Division Head',y:1961,e:'marliana@simasjiwa.co.id',d:'D',g:'Wanita'},
+  {n:'SOBRINA FUADIYAH',dv:'GA & PROCUREMENT',dt:'GA & PROCUREMENT',p:'GA & Procurement Officer',y:1995,e:'sobrina.fuadiyah@simasjiwa.co.id',d:'IS',g:'Wanita'},
+  {n:'ADHYTATESSA PRIMA LOGIKA',dv:'GA & PROCUREMENT',dt:'SECRETARY',p:'Secretary Officer',y:1994,e:'adhytatessa.logika@simasjiwa.co.id',d:'SC',g:'Wanita'},
+  {n:'FILLY MARIA WATURANDANG',dv:'GA & PROCUREMENT',dt:'SECRETARY',p:'Secretary Officer',y:1994,e:'filly.waturandang@simasjiwa.co.id',d:'DC',g:'Wanita'},
+  {n:'RISA PUTRI ANREINA',dv:'GA & PROCUREMENT',dt:'SECRETARY',p:'Secretary Officer',y:1994,e:'risa.anreina@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'INNEKE TANUDJAYA',dv:'HUMAN CAPITAL',dt:'HC OPERATIONS & ACQUISITION',p:'HC Operations & Acquisition Department Head',y:1981,e:'inneke.tanudjaya@simasjiwa.co.id',d:'CD',g:'Wanita'},
+  {n:'AMELIA AEPRIEL MELINDA',dv:'HUMAN CAPITAL',dt:'HC OPERATIONS & ACQUISITION',p:'HC Operations & Acquisition Officer',y:1995,e:'amelia.melinda@simasjiwa.co.id',d:'CD',g:'Wanita'},
+  {n:'IRENE PRICILLA IMANUEL BUDIMAN',dv:'HUMAN CAPITAL',dt:'HC OPERATIONS & ACQUISITION',p:'HC Organization & Talent Development Officer',y:1996,e:'irene.budiman@simasjiwa.co.id',d:'DI',g:'Wanita'},
+  {n:'FIOREN ANDIKA VERDIAN',dv:'HUMAN CAPITAL',dt:'HC OPERATIONS & ACQUISITION',p:'HC Operations & Acquisition Officer',y:2000,e:'fioren.verdian@simasjiwa.co.id',d:'S',g:'Pria'},
+  {n:'BUNGA PRAMESWARI PUTRI HELMADINI',dv:'HUMAN CAPITAL',dt:'HC OPERATIONS & ACQUISITION',p:'HC Operations & Acquisition Officer',y:2002,e:'bunga.helmadini@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'FITRI ZAKIYAH',dv:'HUMAN CAPITAL',dt:'HC ORGANIZATION & TALENT DEVELOPMENT',p:'HC Organization & Talent Development Department Head',y:1984,e:'fitri.zakiyah@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'DAVID NICHOLAS FRANZTIUS',dv:'HUMAN CAPITAL',dt:'HC ORGANIZATION & TALENT DEVELOPMENT',p:'HC Organization & Talent Development Officer',y:1999,e:'david.franztius@simasjipr.co.id',d:'C',g:'Pria'},
+  {n:'PAJAR PRATAMA YONATAN',dv:'HUMAN CAPITAL',dt:'HUMAN CAPITAL',p:'Human Capital Division Head',y:1983,e:'pajar.yonatan@simasjiwa.co.id',d:'I',g:'Pria'},
+  {n:'FITRAH IMAM AKBAR',dv:'INVESTMENT',dt:'INVESTMENT',p:'Investment Department Head',y:1977,e:'fitrah.akbar@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'SONI SATRIA GUNAWAN',dv:'INVESTMENT',dt:'INVESTMENT',p:'Investment Specialist',y:1998,e:'soni.gunawan@simasjiwa.co.id',d:'C',g:'Pria'},
+  {n:'EMMI ROSSELA BR GINTING',dv:'INVESTMENT',dt:'INVESTMENT',p:'Investment Senior Officer',y:1981,e:'emmi.ginting@simasjiwa.co.id',d:'CD',g:'Wanita'},
+  {n:'ALBERT JAYA',dv:'INVESTMENT',dt:'INVESTMENT',p:'Investment Officer',y:1992,e:'albert.jaya@simasjiwa.co.id',d:'SD',g:'Pria'},
+  {n:'NUR ALIFYANASARI HARAHAP',dv:'INVESTMENT',dt:'INVESTMENT',p:'Investment Officer',y:1997,e:'nur.harahap@simasjiwa.co.id',d:'SC',g:'Wanita'},
+  {n:'JON SUGIANTO TURNIP',dv:'LEGAL',dt:'LEGAL',p:'Legal Department Head',y:1989,e:'jon.turnip@simasjiwa.co.id',d:'SCD',g:'Pria'},
+  {n:'MIKA ANABELLE',dv:'LEGAL',dt:'LEGAL',p:'Legal Officer',y:1998,e:'mika.anabelle@simasjiwa.co.id',d:'CS',g:'Wanita'},
+  {n:'QATRUNNADA ERNANTI',dv:'LEMBAGA KEUANGAN DPLK SIMAS JIWA',dt:'CORPORATE SOLUTION',p:'Corporate Solution Section Head',y:1994,e:'qatrunnada.ernanti@simasjiwa.co.id',d:'ISC',g:'Wanita'},
+  {n:'DERI SAGITA SUBAHTERA',dv:'LEMBAGA KEUANGAN DPLK SIMAS JIWA',dt:'CORPORATE SOLUTION',p:'Corporate Solution Specialist',y:1985,e:'deri.subahtera@simasjiwa.co.id',d:'SIC',g:'Pria'},
+  {n:'AMRU FERNANDO JANFRIED RITONGA',dv:'LEMBAGA KEUANGAN DPLK SIMAS JIWA',dt:'DPLK INVESTASI & KEUANGAN',p:'DPLK Investasi & Keuangan Department Head',y:1986,e:'amru.ritonga@simasjiwa.co.id',d:'IS',g:'Pria'},
+  {n:'CHRISTABELLA ADLYN',dv:'LEMBAGA KEUANGAN DPLK SIMAS JIWA',dt:'DPLK INVESTASI & KEUANGAN',p:'DPLK Investasi & Keuangan Officer',y:2001,e:'christabella.adlyn@simasjiwa.co.id',d:'CSD',g:'Wanita'},
+  {n:'RAHEL VIDYARINI',dv:'LEMBAGA KEUANGAN DPLK SIMAS JIWA',dt:'DPLK INVESTASI & KEUANGAN',p:'DPLK Investasi & Keuangan Officer',y:2003,e:'rahel.vidyarini@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'ALVIN GINARDI',dv:'LEMBAGA KEUANGAN DPLK SIMAS JIWA',dt:'DPLK KEPATUHAN & MANAJEMEN RISIKO',p:'DPLK Kepatuhan & Manajemen Risiko Department Head',y:1987,e:'alvin.ginardi@simasjiwa.co.id',d:'IS',g:'Pria'},
+  {n:'SILVIA FIRMANSYAH',dv:'LEMBAGA KEUANGAN DPLK SIMAS JIWA',dt:'DPLK KEPATUHAN & MANAJEMEN RISIKO',p:'DPLK Kepatuhan & Manajemen Risiko Officer',y:2000,e:'silvia.firmansyah@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'TIRTHABRATA',dv:'OPERATION EXCELLENCE',dt:'BUSINESS ANALYST',p:'Business Analyst Department Head',y:1987,e:'tirthabrata@simasjiwa.co.id',d:'C',g:'Pria'},
+  {n:'JULIESY TAMBUNAN',dv:'OPERATION EXCELLENCE',dt:'BUSINESS ANALYST',p:'Business Analyst Specialist',y:1990,e:'juliesy.tambunan@simasjiwa.co.id',d:'SC',g:'Wanita'},
+  {n:'TRI YULIANTI',dv:'OPERATION EXCELLENCE',dt:'BUSINESS ANALYST',p:'Business Analyst Section Head',y:1994,e:'tri.yulianti@simasjiwa.co.id',d:'CD',g:'Wanita'},
+  {n:'JESSEN YAPUTRA SETIAWAN',dv:'OPERATION EXCELLENCE',dt:'BUSINESS ANALYST',p:'Business Analyst Officer',y:1997,e:'jessen.setiawan@simasjiwa.co.id',d:'C',g:'Pria'},
+  {n:'ZAENAL ANSHORY',dv:'OPERATION EXCELLENCE',dt:'BUSINESS ANALYST',p:'Business Analyst Section Head',y:1997,e:'zaenal.anshory@simasjiwa.co.id',d:'ID',g:'Pria'},
+  {n:'MORA GILBERT MANIK',dv:'OPERATION EXCELLENCE',dt:'BUSINESS ANALYST',p:'Business Analyst Officer',y:1999,e:'mora.manik@simasjiwa.co.id',d:'C',g:'Pria'},
+  {n:'RAIHANA SYAHRANI CITRA DEWI',dv:'OPERATION EXCELLENCE',dt:'BUSINESS ANALYST',p:'Business Analyst Officer',y:2000,e:'raihana.dewi@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'INDRA KRISTIAWAN',dv:'OPERATION EXCELLENCE',dt:'BUSINESS ANALYST',p:'Business Analyst Officer',y:2000,e:'indra.kristiawan@simasjiwa.co.id',d:'CD',g:'Pria'},
+  {n:'FREDERIC GABRIEL',dv:'OPERATION EXCELLENCE',dt:'BUSINESS ANALYST',p:'Business Analyst Officer',y:2003,e:'frederic.gabriel@simasjiwa.co.id',d:'C',g:'Pria'},
+  {n:'YOSEP KURNIA SIMON',dv:'OPERATION EXCELLENCE',dt:'OPERATION EXCELLENCE',p:'Operation Excellence Division Head',y:1983,e:'yosep.kurnia@simasjiwa.co.id',d:'CS',g:'Pria'},
+  {n:'ANDRESEN MAYTHIUS',dv:'OPERATION EXCELLENCE',dt:'PMO & MIS',p:'PMO & MIS Department Head',y:1980,e:'andresen.maythius@simasjiwa.co.id',d:'CSD',g:'Pria'},
+  {n:'DERY AGISTYA VALIANT',dv:'OPERATION EXCELLENCE',dt:'PMO & MIS',p:'PMO & MIS Officer',y:1993,e:'dery.valiant@simasjiwa.co.id',d:'SC',g:'Pria'},
+  {n:'ADHELIA JODY AL SHARA',dv:'OPERATION EXCELLENCE',dt:'PMO & MIS',p:'PMO & MIS Officer',y:1999,e:'adhelia.shara@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'SALMA LAILATUL ALIFAH',dv:'OPERATION EXCELLENCE',dt:'PMO & MIS',p:'PMO & MIS Officer',y:1999,e:'salma.alifah@simasjiwa.co.id',d:'SC',g:'Wanita'},
+  {n:'RIYANTI',dv:'OPERATIONS',dt:'CUSTOMER SERVICES',p:'Customer Services, New Business, & Printing Department Head',y:1978,e:'riyanti@simasjiwa.co.id',d:'SC',g:'Wanita'},
+  {n:'LIA AGUSTINE',dv:'OPERATIONS',dt:'CUSTOMER SERVICES',p:'Customer Services Section Head',y:1986,e:'lia.agustine@simasjiwa.co.id',d:'SC',g:'Wanita'},
+  {n:'ATRI HARTINI',dv:'OPERATIONS',dt:'CUSTOMER SERVICES',p:'Customer Services Officer',y:1993,e:'atri.hartini@simasjiwa.co.id',d:'IS',g:'Wanita'},
+  {n:'TRIANA IRAWATI',dv:'OPERATIONS',dt:'CUSTOMER SERVICES',p:'Customer Services Officer',y:1971,e:'triana.irawati@simasjiwa.co.id',d:'CS',g:'Wanita'},
+  {n:'YUSTINA SILITONGA',dv:'OPERATIONS',dt:'CUSTOMER SERVICES',p:'Customer Services Officer',y:1997,e:'yustina.silitonga@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'GRACE KEZIA JOSEPHINE',dv:'OPERATIONS',dt:'CUSTOMER SERVICES',p:'Customer Services Officer',y:1999,e:'grace.josephine@simasjiwa.co.id',d:'SCI',g:'Wanita'},
+  {n:'NAJLA APRIANTI',dv:'OPERATIONS',dt:'DOCUMENT MANAGEMENT',p:'Document Management Officer',y:1997,e:'najla.aprianti@simasjiwa.co.id',d:'CS',g:'Wanita'},
+  {n:'SINTA SYAHTIA',dv:'OPERATIONS',dt:'DOCUMENT MANAGEMENT',p:'Document Management Officer',y:2000,e:'sinta.syahtia@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'ARIS SETYO LAKSONO',dv:'OPERATIONS',dt:'NEW BUSINESS & PRINTING',p:'New Business & Printing Officer',y:1974,e:'aris.laksono@simasjiwa.co.id',d:'C',g:'Pria'},
+  {n:'FEBRI ANUGRAH',dv:'OPERATIONS',dt:'NEW BUSINESS & PRINTING',p:'New Business & Printing Officer',y:1991,e:'febri.anugrah@simasjiwa.co.id',d:'SC',g:'Pria'},
+  {n:'WIDYASARI PASARIBU',dv:'OPERATIONS',dt:'NEW BUSINESS & PRINTING',p:'New Business & Printing Officer',y:1995,e:'widyasari.pasaribu@simasjiwa.co.id',d:'CD',g:'Wanita'},
+  {n:'RAHMASARI WIDYA AULIA',dv:'OPERATIONS',dt:'NEW BUSINESS & PRINTING',p:'New Business & Printing Officer',y:2000,e:'rahmasari.aulia@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'MINAH ISKANTO',dv:'OPERATIONS',dt:'OPERATIONS',p:'Operations Division Head',y:1972,e:'minah.iskanto@simasjiwa.co.id',d:'IS',g:'Wanita'},
+  {n:'YUNITA',dv:'OPERATIONS',dt:'POLICY OWNER SERVICE',p:'Policy Owner Service Department Head',y:1965,e:'yunita@simasjiwa.co.id',d:'S',g:'Wanita'},
+  {n:'SISCA RACHMAWATI, SE',dv:'OPERATIONS',dt:'POLICY OWNER SERVICE',p:'Policy Owner Service, & Document Management Department Head',y:1980,e:'sisca.rachmawati@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'HAERUDIN',dv:'OPERATIONS',dt:'POLICY OWNER SERVICE',p:'Policy Owner Service Senior Officer',y:1986,e:'haerudin@simasjiwa.co.id',d:'CDS',g:'Pria'},
+  {n:'WINDYA LESTARI',dv:'OPERATIONS',dt:'POLICY OWNER SERVICE',p:'Policy Owner Service Senior Officer',y:1991,e:'windya.lestari@simasjiwa.co.id',d:'SC',g:'Wanita'},
+  {n:'WIDYASTANTI',dv:'OPERATIONS',dt:'POLICY OWNER SERVICE',p:'Policy Owner Service Officer',y:1989,e:'widyastanti@simasjiwa.co.id',d:'CS',g:'Wanita'},
+  {n:'RIZALDY SIGIT SUARSANA',dv:'OPERATIONS',dt:'POLICY OWNER SERVICE',p:'Policy Owner Service Officer',y:1985,e:'rizaldy.suarsana@simasjiwa.co.id',d:'CSD',g:'Pria'},
+  {n:'DENIS FADRIANA',dv:'OPERATIONS',dt:'POLICY OWNER SERVICE',p:'Policy Owner Service Officer',y:1990,e:'denis.fadriana@simasjiwa.co.id',d:'CD',g:'Pria'},
+  {n:'ANDI BASKORO',dv:'OPERATIONS',dt:'POLICY OWNER SERVICE',p:'Policy Owner Service Officer',y:1991,e:'andi.baskoro@simasjiwa.co.id',d:'IS',g:'Pria'},
+  {n:'PUTRI PARAMITHA',dv:'OPERATIONS',dt:'POLICY OWNER SERVICE',p:'Policy Owner Service Officer',y:1997,e:'putri.paramitha@simasjiwa.co.id',d:'SC',g:'Wanita'},
+  {n:'RONNY WINARKO TASLIM',dv:'PARTNERSHIP DISTRIBUTION',dt:'PARTNERSHIP DISTRIBUTION (DIGITAL)',p:'Partnership Distribution (Digital) Senior Officer',y:1991,e:'ronny.taslim@simasjiwa.co.id',d:'SID',g:'Pria'},
+  {n:'ASTRI WIKO AUDREYANI',dv:'PARTNERSHIP DISTRIBUTION',dt:'PARTNERSHIP DISTRIBUTION (DIGITAL)',p:'Partnership Distribution (Digital) Officer',y:2001,e:'astri.audreyani@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'VITO SHADIQ',dv:'PRODUCT & MARKETING INTELLIGENCE',dt:'PRODUCT & MARKETING INTELLIGENCE',p:'Product & Marketing Intelligence Division Head',y:1986,e:'vito.shadiq@simasjiwa.co.id',d:'IS',g:'Pria'},
+  {n:'AULIA FAHREZA TRISNADI',dv:'PRODUCT & MARKETING INTELLIGENCE',dt:'PRODUCT DEVELOPMENT',p:'Product Development Officer',y:1998,e:'aulia.trisnadi@simasjiwa.co.id',d:'SC',g:'Pria'},
+  {n:'NICOLE ORLEANS ARVIANI',dv:'PRODUCT & MARKETING INTELLIGENCE',dt:'PRODUCT DEVELOPMENT',p:'Product Development Officer',y:2002,e:'nicole.arviani@simasjiwa.co.id',d:'C',g:'Wanita'},
+  {n:'YOGI CITRA NUGRAHA SEMBIRING',dv:'RISK MANAGEMENT',dt:'RISK MANAGEMENT',p:'Risk Management Department Head',y:1986,e:'yogi.sembiring@simasjiwa.co.id',d:'DC',g:'Pria'},
+  {n:'SANDRA LAURA GUNAWAN',dv:'RISK MANAGEMENT',dt:'RISK MANAGEMENT',p:'Risk Management Officer',y:1999,e:'sandra.gunawan@simasjiwa.co.id',d:'CS',g:'Wanita'},
+  {n:'RAY RYAN',dv:'SATUAN KERJA INTERNAL AUDIT',dt:'SATUAN KERJA INTERNAL AUDIT',p:'Satuan Kerja Internal Audit Department Head',y:1995,e:'ray.ryan@simasjiwa.co.id',d:'C',g:'Pria'},
+  {n:'DINI ASMALIA TALAOHU',dv:'SHARIA DISTRIBUTION',dt:'BANCASSURANCE SHARIA NON-PILLAR',p:'Bancassurance Sharia Non-Pillar Department Head',y:1980,e:'dini.talaohu@simasjiwa.co.id',d:'CD',g:'Wanita'},
+  {n:'WISHNU ARIADHARMA',dv:'SHARIA DISTRIBUTION',dt:'BANCASSURANCE SHARIA NON-PILLAR',p:'Bancassurance Sharia Non-Pillar Department Head',y:1975,e:'wishnu.ariadharma@simasjiwa.co.id',d:'C',g:'Pria'},
+  {n:'RIYANTI RIZKI',dv:'SHARIA DISTRIBUTION',dt:'BANCASSURANCE SHARIA NON-PILLAR',p:'Bancassurance Sharia Non-Pillar Officer',y:1987,e:'riyanti.rizki@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'IKA PRATIWI MAHANANI',dv:'SHARIA DISTRIBUTION',dt:'BANCASSURANCE SHARIA NON-PILLAR',p:'Bancassurance Sharia Non-Pillar Officer',y:1990,e:'ika.mahanani@simasjiwa.co.id',d:'ID',g:'Wanita'},
+  {n:'NUR FIFI SUSANTI',dv:'SHARIA DISTRIBUTION',dt:'BANCASSURANCE SHARIA NON-PILLAR',p:'Bancassurance Sharia Non-Pillar Officer',y:1993,e:'nur.susanti@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'NOVITA',dv:'SHARIA DISTRIBUTION',dt:'BANCASSURANCE SHARIA NON-PILLAR',p:'Bancassurance Sharia Non-Pillar Officer',y:1997,e:'novita@simasjiwa.co.id',d:'I',g:'Wanita'},
+  {n:'INA MUCHTAR',dv:'SHARIA DISTRIBUTION',dt:'SHARIA DISTRIBUTION',p:'Sharia Distribution Division Head',y:1966,e:'ina.muchtar@simasjiwa.co.id',d:'DC',g:'Wanita'},
+  {n:'IXORA LUCIANTIWY SIBARANI',dv:'UNIT KERJA KHUSUS APU PPT & PPPSPM',dt:'UNIT KERJA KHUSUS APU PPT & PPPSPM',p:'Unit Kerja Khusus APU PPT & PPPSPM Officer',y:1995,e:'ixora.sibarani@simasjiwa.co.id',d:'IS',g:'Wanita'}
+];
+console.log('DB loaded:',DB.length,'employees');
+
+// ════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════
+let CU=null,isAdm=false,uAv='😊';
+let chats={},activeId=null,pendEmp=null,grpSel=[],calParts=[],calDur=60,editIdx=-1;
+let cfg={theme:'light',nickname:'',cfNick:''};
+let gToken=null,gUser=null,gClientId='',gApiKey='';
+// form filling state
+let formCtx=null; // {type,fields,answers,step}
+
+const CY=new Date().getFullYear();
+const AVF=['👩','🙋‍♀️','👩‍💻','👩‍🎓','🙆‍♀️','👩‍🦱','🤩','👸'];
+const AVM=['🧑','👨','🧔','🙋‍♂️','😎','🤓','👨‍💻','🧑‍💼'];
+const BAV={Pria:'👨‍💼',Wanita:'👩‍💼'};
+const TOPICS=['Proses Bisnis ASJ','Formulir & Dokumen','Human Capital / HR','IT & Teknologi','Klaim & Underwriting','Finance & Akuntansi','Produk Asuransi','Pemasaran & Sales','Compliance & Legal','Investasi','AI & Digitalisasi','Penggunaan Sistem','Sekadar Ngobrol'];
+
+// DISC personality descriptions
+const DISC_DESC={
+  D:'dominan, langsung to the point, tegas, berorientasi hasil, tidak suka basa-basi, cepat memutuskan',
+  I:'ekspresif, antusias, hangat, suka bersosialisasi, optimis, sering pakai cerita dan humor',
+  S:'sabar, kooperatif, pendengar yang baik, menghindari konfrontasi, konsisten, setia',
+  C:'analitis, teliti, berbasis data dan bukti, metodis, perlu detail dan akurasi tinggi'
+};
+
+// ════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════
+const $=id=>document.getElementById(id);
+const tc=s=>(s||'').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+const fn=s=>{const w=(s||'').split(' ');return tc(w[0]);};
+const NOW=()=>Date.now();
+const FT=t=>{const d=new Date(t);return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;};
+const ESC=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+function toast(m,dur=3000){
+  const t=$('toast');t.textContent=m;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),dur);
+}
+function showScr(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+function openOv(id){$(id).classList.remove('hide');}
+function closeOv(id){$(id).classList.add('hide');}
+
+function saveSession(){
+  if(!CU)return;
+  try{localStorage.setItem('sak2_'+CU.e,JSON.stringify({av:uAv,cfg,chats}));}catch(e){}
+}
+
+function fmtMsg(t){
+  return ESC(t)
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g,'<em>$1</em>')
+    .replace(/@([\w.]+)/g,'<span class="mention" onclick="mentionClick(\'$1\')">@$1</span>')
+    .replace(/\n/g,'<br/>');
+}
+
+function getEmpAge(emp){return CY-(emp.y||1990);}
+function getDiscStyle(discStr){
+  const primary=(discStr||'C')[0].toUpperCase();
+  return DISC_DESC[primary]||DISC_DESC.C;
+}
+
+// ════════════════════════════════════════════
+// GOOGLE OAUTH
+// ════════════════════════════════════════════
+function showGCfg(){
+  openOv('ov-gcfg');
+  const saved=localStorage.getItem('sak2_gcfg');
+  if(saved){try{const c=JSON.parse(saved);$('gclient-id').value=c.clientId||'';$('gapi-key').value=c.apiKey||'';}catch(e){}}
+}
+function saveGCfg(){
+  gClientId=$('gclient-id').value.trim();
+  gApiKey=$('gapi-key').value.trim();
+  if(!gClientId){toast('Masukkan Client ID terlebih dahulu');return;}
+  localStorage.setItem('sak2_gcfg',JSON.stringify({clientId:gClientId,apiKey:gApiKey}));
+  closeOv('ov-gcfg');toast('Konfigurasi disimpan! ✅ Coba login sekarang.');
+}
+function loadGCfg(){
+  const saved=localStorage.getItem('sak2_gcfg');
+  if(saved){try{const c=JSON.parse(saved);gClientId=c.clientId||'';gApiKey=c.apiKey||'';}catch(e){}}
+}
+function doGoogleLogin(){
+  loadGCfg();
+  if(!gClientId){toast('Setup Google OAuth terlebih dahulu.');showGCfg();return;}
+  // Use Google Identity Services
+  if(typeof google==='undefined'){toast('Google Script belum termuat. Refresh halaman.');return;}
+  try{
+    const tokenClient=google.accounts.oauth2.initTokenClient({
+      client_id:gClientId,
+      scope:'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/calendar',
+      callback:(resp)=>{
+        if(resp.access_token){
+          gToken=resp.access_token;
+          fetchGoogleUserInfo();
+        }else{
+          toast('Login Google gagal. Coba lagi.');
+        }
+      }
+    });
+    tokenClient.requestAccessToken();
+  }catch(err){
+    console.error('Google login error:',err);
+    toast('Error: '+err.message);
+  }
+}
+async function fetchGoogleUserInfo(){
+  try{
+    const r=await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+gToken}});
+    const u=await r.json();
+    if(!u.email){toast('Gagal mendapatkan info akun Google.');return;}
+    if(!u.email.endsWith('@simasjiwa.co.id')&&!u.email.endsWith('@simasjipr.co.id')){
+      toast('Hanya email @simasjiwa.co.id yang diizinkan!');gToken=null;return;
+    }
+    gUser=u;
+    const emp=DB.find(x=>x.e.toLowerCase()===u.email.toLowerCase());
+    if(emp){CU={...emp};}
+    else{CU={n:(u.name||u.email.split('@')[0]).toUpperCase(),p:'Karyawan',e:u.email,dv:'',dt:'',g:'Pria',d:'S',y:1990};}
+    afterLogin();
+  }catch(err){toast('Error fetching user info: '+err.message);}
+}
+
+// ════════════════════════════════════════════
+// EMAIL/FALLBACK LOGIN
+// ════════════════════════════════════════════
+function chkAdminEmail(el){
+  const v=el.value.trim().toLowerCase();
+  if(v==='master.admin@simasjiwa.co.id'){el.classList.add('admin-gi');$('apw-wrap').classList.add('show');}
+  else{el.classList.remove('admin-gi');$('apw-wrap').classList.remove('show');}
+}
+function doEmailLogin(){
+  const email=$('login-email').value.trim().toLowerCase();
+  const err=$('lerr');err.style.display='none';
+  if(email==='master.admin@simasjiwa.co.id'){
+    if($('apw-in').value!=='Master.ASJ'){err.textContent='Password salah.';err.style.display='block';return;}
+    isAdm=true;CU={n:'MASTER ADMIN',p:'Administrator',e:email,dv:'System',dt:'System',g:'Pria',d:'D',y:1990};
+    goApp();return;
+  }
+  if(!email.endsWith('@simasjiwa.co.id')&&!email.endsWith('@simasjipr.co.id')){
+    err.textContent='Gunakan email domain @simasjiwa.co.id';err.style.display='block';return;
+  }
+  const emp=DB.find(x=>x.e.toLowerCase()===email);
+  if(emp){CU={...emp};}
+  else{CU={n:email.split('@')[0].replace(/\./g,' ').toUpperCase(),p:'Karyawan',e:email,dv:'',dt:'',g:'Pria',d:'S',y:1990};}
+  afterLogin();
+}
+function afterLogin(){
+  const saved=localStorage.getItem('sak2_'+CU.e);
+  if(saved){
+    try{const s=JSON.parse(saved);uAv=s.av||'😊';cfg=s.cfg||cfg;chats=s.chats||{};applyTheme(cfg.theme);goApp();return;}
+    catch(e){}
+  }
+  // Show onboard - skip gender, directly show avatar based on DB gender
+  const g=CU.g||'Pria';
+  const avArr=g==='Wanita'?AVF:AVM;
+  $('ob-title').textContent=`Hei ${fn(CU.n)}! 👋`;
+  $('ob-sub').textContent='Pilih foto profil kamu:';
+  const grid=$('av-grid');grid.innerHTML='';
+  avArr.forEach(a=>{
+    const d=document.createElement('div');d.className='av-opt';d.textContent=a;
+    d.onclick=()=>{document.querySelectorAll('.av-opt').forEach(x=>x.classList.remove('sel'));d.classList.add('sel');uAv=a;};
+    grid.appendChild(d);
+  });
+  showScr('scr-onboard');
+}
+
+// ════════════════════════════════════════════
+// ONBOARD
+// ════════════════════════════════════════════
+function confAvatar(){
+  if(!document.querySelector('.av-opt.sel')){toast('Pilih foto profil dulu ya!');return;}
+  showScr('scr-start');
+}
+function startDirect(){showScr('scr-app');goApp();setTimeout(()=>openNewChat(),300);}
+function startHelp(){showScr('scr-app');goApp();setTimeout(()=>openOv('ov-help'),300);}
+
+// ════════════════════════════════════════════
+// APP INIT
+// ════════════════════════════════════════════
+function goApp(){
+  showScr('scr-app');applyTheme(cfg.theme);
+  $('sb-av').textContent=uAv;
+  $('sb-name').textContent=cfg.nickname||fn(CU.n);
+  $('sb-role').textContent=CU.p||'Karyawan';
+  $('si-nick').value=cfg.nickname||'';
+  const savedKey=localStorage.getItem('sk3_apikey')||cfg.apiKey||'';
+  if($('si-apikey'))$('si-apikey').value=savedKey;
+  if(savedKey)cfg.apiKey=savedKey;
+  $('si-cfnick').value=cfg.cfNick||'';
+  if(gToken){$('g-status').classList.remove('hide');$('gp-status').textContent='Terhubung sebagai '+((gUser&&gUser.email)||CU.e);}
+  else{$('g-status').classList.add('hide');}
+  if(isAdm){
+    $('ca-welcome').classList.add('hide');$('ca-chat').classList.add('hide');
+    $('ca-admin').classList.remove('hide');renderAdm('');
+  } else {
+    $('ca-welcome').classList.remove('hide');$('ca-chat').classList.add('hide');
+    $('ca-admin').classList.add('hide');rCL_list();
+  }
+  // Init help chips
+  const hc=$('help-chips');hc.innerHTML='';
+  TOPICS.forEach(t=>{
+    const c=document.createElement('button');c.className='chip';c.textContent=t;
+    c.onclick=()=>c.classList.toggle('sel');
+    hc.appendChild(c);
+  });
+}
+
+// ════════════════════════════════════════════
+// CHAT LIST
+// ════════════════════════════════════════════
+var curTab='all';
+function rCL_list(f=''){
+  const list=$('chat-list');list.innerHTML='';
+  const keys=Object.keys(chats);
+  if(!keys.length){list.innerHTML='<div class="empty-chats">Belum ada chat.<br/>Klik ✏️ untuk mulai!</div>';return;}
+  const fKeys=keys.filter(k=>{
+    const s=chats[k];const nm=s.grp?s.grpName:(s.emp&&s.emp.n)||'';
+    return !f||nm.toLowerCase().includes(f.toLowerCase());
+  });
+  fKeys.forEach(k=>{
+    const s=chats[k];const lm=s.msgs[s.msgs.length-1];
+    const item=document.createElement('div');item.className='ci'+(activeId===k?' active':'');
+    const avTxt=s.grp?'👥':(BAV[s.emp&&s.emp.g]||'👨‍💼');
+    const nm=s.grp?s.grpName:fn((s.emp&&s.emp.n)||'Bot');
+    const tag=s.grp?'<span class="grp-tag">GRUP</span>':'';
+    const prev=lm?(lm.role==='user'?'Kamu: ':'')+lm.content.substring(0,36)+'...':'Mulai percakapan';
+    item.innerHTML=`<div class="ci-av ${s.grp?'grp':'reg'}">${avTxt}<div class="od"></div></div>
+      <div class="ci-meta"><div class="ci-nm">${ESC(nm)}${tag}</div><div class="ci-pv">${ESC(prev)}</div></div>
+      <div class="ci-ts">${lm?FT(lm.ts||NOW()):''}</div>`;
+    item.onclick=()=>openChat(k);
+    list.appendChild(item);
+  });
+}
+function filterChats(q){rCL_list(q);}
+
+// ════════════════════════════════════════════
+// PEOPLE SEARCH
+// ════════════════════════════════════════════
+function openNewChat(){
+  openOv('ov-newchat');renderNC('');
+  setTimeout(()=>{const s=$('nc-srch');if(s){s.value='';s.focus();}},100);
+}
+function renderNC(q){
+  const list=$('nc-list');
+  const res=DB.filter(e=>!q||
+    e.n.toLowerCase().includes(q.toLowerCase())||
+    e.p.toLowerCase().includes(q.toLowerCase())||
+    e.dv.toLowerCase().includes(q.toLowerCase())||
+    e.dt.toLowerCase().includes(q.toLowerCase())
+  ).slice(0,35);
+  list.innerHTML=res.map(e=>`
+    <div class="pi" onclick="startWith('${e.e}')">
+      <div class="pi-av">${BAV[e.g]||'👨‍💼'}</div>
+      <div class="pi-info">
+        <div class="pi-nm">${tc(e.n)}</div>
+        <div class="pi-ps">${ESC(e.p)} · ${ESC(e.dv)} <span class="disc-tag">${e.d}</span></div>
+      </div>
+    </div>`).join('');
+}
+function startWith(email,ctxSummary){
+  const emp=DB.find(x=>x.e===email);if(!emp)return;
+  closeOv('ov-newchat');closeOv('ov-help');
+  // Check existing chat
+  const ex=Object.keys(chats).find(k=>!chats[k].grp&&chats[k].emp&&chats[k].emp.e===email);
+  if(ex&&!ctxSummary){openChat(ex);return;}
+  pendEmp=emp;pendCtx=ctxSummary||null;
+  $('lang-emp-name').textContent=fn(emp.n);
+  openOv('ov-lang');
+}
+let pendCtx=null;
+function selLang(lang){
+  closeOv('ov-lang');if(!pendEmp)return;
+  const id='c'+NOW();
+  const age=getEmpAge(pendEmp);
+  chats[id]={emp:pendEmp,lang,msgs:[],mem:[],grp:false,age,ctxSummary:pendCtx||null};
+  pendEmp=null;saveSession();rCL_list();openChat(id,pendCtx);pendCtx=null;
+}
+
+// ════════════════════════════════════════════
+// HELP ME START
+// ════════════════════════════════════════════
+function findTopicRecs(){
+  const selChips=Array.from($('help-chips').querySelectorAll('.chip.sel')).map(c=>c.textContent);
+  const custom=$('help-custom').value.trim();
+  const topics=[...selChips,custom].filter(Boolean).join(' ').toLowerCase();
+  if(!topics.trim()){toast('Pilih atau ketik topik dulu!');return;}
+  let recs=[];
+  if(/hc|human capital|hr|cuti|gaji|kontrak|rekrut|karyawan/.test(topics)) recs=DB.filter(e=>e.dv.includes('HUMAN CAPITAL'));
+  else if(/it|teknologi|digital|sistem|aplikasi|software|server/.test(topics)) recs=DB.filter(e=>e.dv.includes('DIGITAL TECHNOLOGY'));
+  else if(/klaim|claim|underwriting/.test(topics)) recs=DB.filter(e=>e.dv.includes('CLAIM'));
+  else if(/finance|keuangan|akuntansi|pajak|anggaran/.test(topics)) recs=DB.filter(e=>e.dv.includes('FINANCE'));
+  else if(/produk|asuransi|marketing|pemasaran/.test(topics)) recs=DB.filter(e=>e.dv.includes('PRODUCT')||e.dv.includes('BANCASSURANCE'));
+  else if(/compliance|legal|hukum|regulasi|ojk/.test(topics)) recs=DB.filter(e=>e.dv.includes('COMPLIANCE')||e.dv.includes('LEGAL'));
+  else if(/investasi/.test(topics)) recs=DB.filter(e=>e.dv.includes('INVESTMENT'));
+  else if(/operasional|operations|polis|nasabah/.test(topics)) recs=DB.filter(e=>e.dv.includes('OPERATIONS'));
+  else if(/bisnis|proses|formulir|dokumen/.test(topics)) recs=DB.filter(e=>e.dv.includes('OPERATION EXCELLENCE')||e.dv.includes('BUSINESS'));
+  else if(/syariah/.test(topics)) recs=DB.filter(e=>e.dv.includes('SHARIA')||e.dv.includes('SYARIAH'));
+  else recs=DB.filter(e=>e.p.includes('Division Head')||e.p.includes('Direktur')).slice(0,5);
+  const heads=recs.filter(e=>e.p.includes('Head')||e.p.includes('Direktur')||e.p.includes('Spesialis'));
+  const show=(heads.length?heads:recs).slice(0,4);
+  if(!show.length){toast('Tidak ada rekomendasi. Coba topik lain.');return;}
+  $('help-recs').style.display='block';
+  $('help-recs-list').innerHTML=show.map(e=>`
+    <div class="pi" onclick="startWith('${e.e}')">
+      <div class="pi-av">${BAV[e.g]||'👨‍💼'}</div>
+      <div class="pi-info"><div class="pi-nm">${tc(e.n)}</div><div class="pi-ps">${ESC(e.p)} · ${ESC(e.dv)}</div></div>
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════
+// GROUP CHAT
+// ════════════════════════════════════════════
+function openGroupCreate(){grpSel=[];openOv('ov-group');$('grp-name-in').value='';$('grp-srch').value='';renderGrpSearch('');renderGrpSelChips();}
+function renderGrpSearch(q){
+  const list=$('grp-list');
+  const res=DB.filter(e=>(!q||e.n.toLowerCase().includes(q.toLowerCase())||e.p.toLowerCase().includes(q.toLowerCase()))&&!grpSel.find(s=>s.e===e.e)).slice(0,25);
+  list.innerHTML=res.map(e=>`
+    <div class="pi" onclick="toggleGrpMember('${e.e}')">
+      <div class="pi-av">${BAV[e.g]||'👨‍💼'}</div>
+      <div class="pi-info"><div class="pi-nm">${tc(e.n)}</div><div class="pi-ps">${ESC(e.p)}</div></div>
+      <div class="pi-chk">+</div>
+    </div>`).join('');
+}
+function toggleGrpMember(email){
+  const emp=DB.find(x=>x.e===email);if(!emp)return;
+  grpSel=grpSel.find(s=>s.e===email)?grpSel.filter(s=>s.e!==email):[...grpSel,emp];
+  renderGrpSearch($('grp-srch').value);renderGrpSelChips();
+}
+function renderGrpSelChips(){
+  $('grp-sel').innerHTML=grpSel.map(e=>`<span class="gsc" onclick="toggleGrpMember('${e.e}')">${fn(e.n)} ✕</span>`).join('');
+}
+function createGroup(){
+  if(!grpSel.length){toast('Tambahkan minimal 1 anggota');return;}
+  const name=$('grp-name-in').value.trim()||'Grup Chat';
+  const id='g'+NOW();
+  chats[id]={grp:true,grpName:name,members:[...grpSel],lang:'formal',msgs:[],mem:[],primaryEmp:grpSel[0]};
+  grpSel=[];closeOv('ov-group');saveSession();rCL_list();openChat(id);
+}
+// Create group from referral (with context)
+function createReferralGroup(curChatId,recEmps){
+  const s=chats[curChatId];if(!s)return;
+  const curEmp=s.grp?s.primaryEmp:s.emp;
+  const members=[curEmp,...recEmps];
+  const summary=s.msgs.slice(-6).map(m=>(m.role==='user'?'User: ':fn(curEmp.n)+': ')+m.content.substring(0,120)).join('\n');
+  const name='Diskusi: '+s.msgs[s.msgs.length-1]?.content.substring(0,30)||'Topik Baru';
+  const id='g'+NOW();
+  chats[id]={grp:true,grpName:name,members,lang:s.lang,msgs:[],mem:[],primaryEmp:curEmp,contextSummary:summary};
+  closeOv('ov-newchat');saveSession();rCL_list();openChat(id);
+}
+
+// ════════════════════════════════════════════
+// OPEN CHAT
+// ════════════════════════════════════════════
+function openChat(id,ctxSummary){
+  activeId=id;const s=chats[id];if(!s)return;
+  formCtx=null; // reset form context
+  $('ca-welcome').classList.add('hide');$('ca-chat').classList.remove('hide');
+  const emp=s.grp?s.primaryEmp:s.emp;
+  const av=s.grp?'👥':(BAV[emp&&emp.g]||'👨‍💼');
+  const nm=s.grp?s.grpName:tc(emp&&emp.n||'Bot');
+  const age=emp?getEmpAge(emp):0;
+  const sub=s.grp?`Grup · ${s.members.length} anggota · ${s.lang==='informal'?'Santai':'Formal'}`:`${ESC(emp&&emp.p||'')} · ${ESC(emp&&emp.dv||'')} · ${age} tahun`;
+  $('ca-hdr-av').textContent=av;
+  $('ca-hdr-av').className='ca-av '+(s.grp?'grp':'reg');
+  $('ca-hdr-name').textContent=nm;
+  $('ca-hdr-st').innerHTML=`<span class="dot">●</span> Online · ${sub}`;
+  renderMsgs();rCL_list();
+  if(!s.msgs.length){
+    if(s.grp&&s.contextSummary){
+      // Group created from referral - primary bot explains context first
+      setTimeout(()=>groupContextIntro(id),400);
+    } else {
+      setTimeout(()=>botWelcome(id),400);
+    }
+  }
+  if(window.innerWidth<=680){$('sidebar').classList.add('mob-hide');$('back-btn').classList.remove('hide');}
+}
+function goBack(){$('sidebar').classList.remove('mob-hide');$('ca-chat').classList.add('hide');$('ca-welcome').classList.remove('hide');$('back-btn').classList.add('hide');}
+
+// ════════════════════════════════════════════
+// RENDER MESSAGES
+// ════════════════════════════════════════════
+function renderMsgs(){
+  const c=$('msgs');const s=chats[activeId];if(!s)return;
+  c.innerHTML='';
+  s.msgs.forEach(m=>appendMsg(m,false));
+  c.scrollTop=c.scrollHeight;
+}
+function appendMsg(m,scroll=true){
+  const c=$('msgs');
+  const isMe=m.role==='user';
+  const row=document.createElement('div');row.className='msg-row '+(isMe?'me':'other');
+  const av=isMe?uAv:(m.sav||'🤖');
+  let extra='';
+  // Option cards (referral options)
+  if(m.opts&&m.opts.length){
+    extra+=`<div class="opt-cards">${m.opts.map(o=>`<button class="opt-card" onclick="${o.fn}">${o.label}</button>`).join('')}</div>`;
+  }
+  // Person chips (recommended people)
+  if(m.recs&&m.recs.length){
+    extra+=`<div class="person-chips">${m.recs.map(r=>`<button class="pchip" onclick="startWith('${r.e}','${ESC(m.summary||'')}')">${BAV[r.g]||'👨‍💼'} ${fn(r.n)}</button>`).join('')}</div>`;
+  }
+  row.innerHTML=`
+    <div class="msg-av ${isMe?'me':'them'}">${av}</div>
+    <div class="bubble ${isMe?'me':'them'}">
+      ${m.snm&&!isMe?`<div class="bub-snm">${ESC(m.snm)}</div>`:''}
+      <div>${fmtMsg(m.content||'')}</div>
+      ${extra}
+      <div class="bub-ts">${FT(m.ts||NOW())}</div>
+    </div>`;
+  c.appendChild(row);
+  if(scroll)c.scrollTop=c.scrollHeight;
+}
+function showTyping(){
+  const c=$('msgs');const s=chats[activeId];
+  const av=s?.grp?'👥':(BAV[s?.emp?.g]||'🤖');
+  const row=document.createElement('div');row.className='msg-row other';row.id='typing-row';
+  row.innerHTML=`<div class="msg-av them">${av}</div><div class="bubble them"><div class="typing-bub"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>`;
+  c.appendChild(row);c.scrollTop=c.scrollHeight;
+}
+function removeTyping(){$('typing-row')?.remove();}
+function sysMsg(txt){
+  const c=$('msgs');const d=document.createElement('div');d.className='sys-msg';
+  d.innerHTML=`<span>${ESC(txt)}</span>`;c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+
+// ════════════════════════════════════════════
+// MENTION HANDLER
+// ════════════════════════════════════════════
+function mentionClick(username){
+  // Find employee by first name match
+  const emp=DB.find(e=>fn(e.n).toLowerCase()===username.toLowerCase()||e.n.toLowerCase().includes(username.toLowerCase()));
+  if(emp&&activeId){
+    const s=chats[activeId];
+    if(s&&s.grp){
+      // Pre-fill input with @mention
+      const inp=$('chat-in');inp.value=`@${fn(emp.n)} `;inp.focus();
+    }
+  }
+}
+
+// ════════════════════════════════════════════
+// BOT SYSTEM PROMPT BUILDER
+// ════════════════════════════════════════════
+function buildSys(emp,lang,nick,mem,ctxSummary,isGroup,grpMembers){
+  const age=getEmpAge(emp);
+  const discP=getDiscStyle(emp.d);
+  const discLetters=(emp.d||'C').split('').map(l=>DISC_DESC[l]||'').join('; ');
+  const langGuide=lang==='informal'
+    ?'Gunakan bahasa santai khas Gen-Z Indonesia: pakai "btw", "sih", "dong", "ngl", "wkwk", "bro", "sis", "tau nggak", "gitu loh", "asli", "nggak", dsb. Tetap profesional, jangan vulgar atau tidak sopan.'
+    :'Gunakan bahasa Indonesia formal dan sopan, layaknya komunikasi profesional antar rekan kerja.';
+
+  let grpCtx='';
+  if(isGroup&&grpMembers){
+    const others=grpMembers.filter(m=>m.e!==emp.e);
+    grpCtx=`\n\nIni adalah GROUP CHAT. Anggota lain: ${others.map(m=>`${tc(m.n)} (${m.p}, ${m.dv})`).join(', ')}.
+Ketika topik menyentuh keahlian anggota lain, mention mereka dengan @${others.map(m=>fn(m.n)).join(' atau @')} dan minta mereka menjawab.`;
+  }
+
+  let ctxCtx='';
+  if(ctxSummary){ctxCtx=`\n\nKONTEKS dari percakapan sebelumnya:\n${ctxSummary}\n`;}
+
+  let memCtx='';
+  if(mem&&mem.length){memCtx='\n\nRiwayat topik yang sudah dibahas:\n'+mem.slice(-4).map(m=>`- "${m.q}" → "${m.a}"`).join('\n');}
+
+  return `Kamu adalah ${tc(emp.n)}, berusia ${age} tahun (lahir ${emp.y}), bekerja sebagai ${emp.p} di divisi ${emp.dv}, departemen ${emp.dt}, Asuransi Simas Jiwa (ASJ).
+
+KEPRIBADIAN berdasarkan DISC ${emp.d}:
+${discLetters}
+Karakter utama: ${discP}
+
+Gender: ${emp.g}
+Gaya bahasa: ${langGuide}
+
+Kamu sedang berbicara dengan ${nick} (${CU.p}${CU.dv?' di '+CU.dv:''}).
+
+KEAHLIAN & PENGETAHUAN:
+- Kamu ahli di bidang: ${emp.dv} / ${emp.dt}
+- Kamu tahu proses bisnis ASJ, produk asuransi jiwa, regulasi OJK, dan industri asuransi Indonesia secara umum
+- Jawab berdasarkan posisi dan level jabatanmu
+
+SAAT DI LUAR KEAHLIANMU:
+- Sampaikan dengan jelas bahwa topik ini di luar bidangmu
+- Berikan 2 opsi: (1) Rekomendasikan bot-person lain yang tepat, atau (2) buat group chat bersama
+
+FORM & PROSES:
+- Jika user tanya tentang proses yang butuh formulir, jelaskan langkah-langkahnya dan tawarkan bantuan mengisi form secara interaktif
+- Ketika membantu mengisi form, tanya satu-persatu field yang dibutuhkan
+
+ATURAN:
+- JANGAN pernah bahas SARA, politik, atau topik tidak etis
+- Jawab RINGKAS (3-4 kalimat) kecuali diminta detail
+- Tunjukkan kepribadianmu yang konsisten di setiap balasan${grpCtx}${ctxCtx}${memCtx}`;
+}
+
+// ════════════════════════════════════════════
+// CLAUDE API CALL
+// ════════════════════════════════════════════
+async function callAPI(sys,msgs,maxTokens=900){
+  const apiKey=cfg.apiKey||(typeof localStorage!=='undefined'&&localStorage.getItem('sk3_apikey'))||'';
+  if(!apiKey){return '__NO_KEY__';}
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':apiKey,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:maxTokens,
+        system:sys,
+        messages:msgs.map(m=>({role:m.role==='user'?'user':'assistant',content:m.content}))
+      })
+    });
+    if(!resp.ok){
+      const errText=await resp.text();
+      console.error('API error:',resp.status,errText);
+      return null;
+    }
+    const data=await resp.json();
+    if(data.content&&data.content[0]&&data.content[0].text){return data.content[0].text;}
+    return null;
+  }catch(err){
+    console.error('API fetch error:',err);
+    return null;
+  }
+}
+function fallbackMsg(lang){
+  if(lang==='informal')return 'Eh maaf, kayaknya lagi ada gangguan teknis nih 😅 Coba tanya lagi bentar ya!';
+  return 'Mohon maaf, sedang ada kendala teknis. Silakan ulangi pertanyaan Anda sebentar lagi.';
+}
+
+// ════════════════════════════════════════════
+// BOT WELCOME
+// ════════════════════════════════════════════
+async function botWelcome(id){
+  const s=chats[id];if(!s)return;
+  const emp=s.grp?s.primaryEmp:s.emp;if(!emp)return;
+  const nick=cfg.nickname||fn(CU.n);
+  const sys=buildSys(emp,s.lang,nick,s.mem,s.ctxSummary,s.grp,s.grp?s.members:null);
+  const prompt=s.ctxSummary
+    ?`Kamu baru dimasukkan ke chat ini dengan konteks: "${s.ctxSummary.substring(0,200)}". Perkenalkan diri dan sampaikan kamu siap membantu melanjutkan diskusi ini.`
+    :(s.lang==='informal'
+      ?`Sapa ${nick} (${CU.p}) dengan gaya santaimu. Perkenalkan diri singkat dan tanya apa yang bisa kamu bantu hari ini.`
+      :`Ucapkan salam profesional kepada ${nick} (${CU.p}). Perkenalkan diri singkat dan tanyakan apa yang bisa Anda bantu.`);
+  showTyping();
+  const resp=await callAPI(sys,[{role:'user',content:prompt}]);
+  removeTyping();
+  let content;
+  if(resp==='__NO_KEY__'){content='⚠️ API Key belum diatur. Masukkan Anthropic API Key di Pengaturan (⚙️) untuk mulai chat.';}
+  else{content=resp||fallbackMsg(s.lang);}
+  const msg={role:'assistant',content,snm:tc(emp.n),sav:BAV[emp.g]||'🤖',ts:NOW()};
+  s.msgs.push(msg);appendMsg(msg);rCL_list();saveSession();
+}
+
+async function groupContextIntro(id){
+  const s=chats[id];if(!s||!s.contextSummary)return;
+  const emp=s.primaryEmp;if(!emp)return;
+  const nick=cfg.nickname||fn(CU.n);
+  const sys=buildSys(emp,s.lang,nick,s.mem,null,true,s.members);
+  const others=s.members.filter(m=>m.e!==emp.e);
+  const prompt=`Kamu baru bergabung ke group chat baru bersama ${nick} dan ${others.map(m=>tc(m.n)).join(', ')}. 
+Rangkum konteks berikut kepada semua peserta, lalu mention ${others.map(m=>'@'+fn(m.n)).join(' dan ')} untuk bergabung:
+KONTEKS: ${s.contextSummary}`;
+  showTyping();
+  const resp=await callAPI(sys,[{role:'user',content:prompt}]);
+  removeTyping();
+  let content;
+  if(resp==='__NO_KEY__'){content='⚠️ API Key belum diatur. Masukkan Anthropic API Key di Pengaturan (⚙️) untuk mulai chat.';}
+  else{content=resp||fallbackMsg(s.lang);}
+  const msg={role:'assistant',content,snm:tc(emp.n),sav:BAV[emp.g]||'🤖',ts:NOW()};
+  s.msgs.push(msg);appendMsg(msg);rCL_list();saveSession();
+}
+
+// ════════════════════════════════════════════
+// SEND MESSAGE
+// ════════════════════════════════════════════
+async function sendMsg(){
+  const inp=$('chat-in');const txt=inp.value.trim();
+  if(!txt||!activeId)return;
+  const s=chats[activeId];if(!s)return;
+  inp.value='';inp.style.height='auto';
+
+  // SARA guard
+  const lo=txt.toLowerCase();
+  if(['benci','hina','kafir','anjing','bangsat'].some(w=>lo.includes(w))&&
+     ['suku','agama','ras','antargolongan','pribumi'].some(w=>lo.includes(w))){
+    const wm={role:'assistant',content:'Maaf, saya tidak bisa membahas topik SARA. Ada hal lain yang bisa saya bantu? 😊',
+      snm:tc((s.grp?s.primaryEmp:s.emp)?.n||'Bot'),sav:BAV[(s.grp?s.primaryEmp:s.emp)?.g]||'🤖',ts:NOW()};
+    s.msgs.push(wm);appendMsg(wm);return;
+  }
+
+  // If in form-filling context, handle form answers
+  if(formCtx){
+    handleFormAnswer(txt);return;
+  }
+
+  const um={role:'user',content:txt,ts:NOW()};s.msgs.push(um);appendMsg(um);
+
+  // Determine which bot responds (for group, check for @mention)
+  const mentionMatch=txt.match(/@([\w.]+)/);
+  let respondingEmp=s.grp?s.primaryEmp:s.emp;
+  if(mentionMatch&&s.grp&&s.members){
+    const mName=mentionMatch[1].toLowerCase();
+    const found=s.members.find(m=>fn(m.n).toLowerCase()===mName||m.n.toLowerCase().includes(mName));
+    if(found)respondingEmp=found;
+  }
+
+  const nick=cfg.nickname||fn(CU.n);
+  const sys=buildSys(respondingEmp,s.lang,nick,s.mem,null,s.grp,s.grp?s.members:null);
+  const hist=s.msgs.slice(-12).map(m=>({role:m.role,content:m.content}));
+
+  showTyping();rCL_list();
+
+  // Check if it's a form-related request
+  const isFormReq=/formulir|form|cuti|reimbursement|pengajuan|isi form/.test(lo);
+  const isCalReq=/meeting|jadwal|rapat|kalender|calendar|jadwalkan/.test(lo);
+
+  let resp=await callAPI(sys,hist);
+  removeTyping();
+
+  if(resp==='__NO_KEY__'){
+    const km={role:'assistant',content:'⚠️ API Key belum diatur. Masukkan Anthropic API Key di Pengaturan (⚙️) untuk mulai chat.',snm:tc(respondingEmp.n),sav:BAV[respondingEmp.g]||'🤖',ts:NOW()};
+    s.msgs.push(km);appendMsg(km);rCL_list();saveSession();return;
+  }
+  if(!resp){resp=fallbackMsg(s.lang);}
+
+  // Check if response signals out-of-scope
+  const needsReferral=resp&&(
+    resp.toLowerCase().includes('di luar bidang')|| 
+    resp.toLowerCase().includes('bukan keahlian saya')||
+    resp.toLowerCase().includes('lebih tepat ditanyakan')||
+    resp.toLowerCase().includes('rekomendasi')&&resp.toLowerCase().includes('teman')
+  );
+
+  const bm={role:'assistant',content:resp,snm:tc(respondingEmp.n),sav:BAV[respondingEmp.g]||'🤖',ts:NOW()};
+
+  if(needsReferral){
+    const recs=findRecsForQuery(txt,respondingEmp);
+    if(recs&&recs.length){
+      const summary=s.msgs.slice(-4).map(m=>(m.role==='user'?'User: ':fn(respondingEmp.n)+': ')+m.content.substring(0,100)).join(' | ');
+      bm.opts=[
+        {label:`💬 Chat dengan ${fn(recs[0].n)}`,fn:`startWith('${recs[0].e}','${ESC(summary)}')`},
+        {label:`👥 Buat Group Chat`,fn:`createReferralGroup('${activeId}',[DB.find(x=>x.e==='${recs[0].e}')`+(recs[1]?`,DB.find(x=>x.e==='${recs[1].e}')`:'')+`].filter(Boolean))`}
+      ];
+      bm.recs=recs.slice(0,3);
+      bm.summary=summary;
+    }
+  }
+
+  // Check for form offering
+  if(isFormReq&&!formCtx){
+    const formType=detectFormType(txt);
+    if(formType){
+      setTimeout(()=>startFormFilling(formType),500);
+    }
+  }
+
+  // Check for calendar request  
+  if(isCalReq){
+    bm.opts=[...(bm.opts||[]),{label:'📅 Jadwalkan Meeting',fn:`openCalScheduler()`}];
+  }
+
+  s.msgs.push(bm);appendMsg(bm);
+
+  // Update memory
+  s.mem=s.mem||[];
+  s.mem.push({q:txt.substring(0,80),a:resp.substring(0,150),ts:NOW()});
+  if(s.mem.length>20)s.mem=s.mem.slice(-20);
+
+  rCL_list();saveSession();
+}
+
+function findRecsForQuery(q,curEmp){
+  const lo=q.toLowerCase();let r=[];
+  if(/cuti|hc|gaji|kontrak|rekrut/.test(lo))r=DB.filter(e=>e.dv.includes('HUMAN CAPITAL'));
+  else if(/klaim|claim/.test(lo))r=DB.filter(e=>e.dv.includes('CLAIM'));
+  else if(/it|sistem|aplikasi/.test(lo))r=DB.filter(e=>e.dv.includes('DIGITAL TECHNOLOGY'));
+  else if(/finance|keuangan/.test(lo))r=DB.filter(e=>e.dv.includes('FINANCE'));
+  else if(/legal|hukum|compliance/.test(lo))r=DB.filter(e=>e.dv.includes('COMPLIANCE')||e.dv.includes('LEGAL'));
+  else if(/investasi/.test(lo))r=DB.filter(e=>e.dv.includes('INVESTMENT'));
+  else return null;
+  return r.filter(e=>e.e!==curEmp.e&&(e.p.includes('Head')||e.p.includes('Spesialis'))).slice(0,3);
+}
+
+// ════════════════════════════════════════════
+// FORM FILLING
+// ════════════════════════════════════════════
+const FORMS={
+  cuti:{
+    title:'Form Pengajuan Cuti',
+    fields:[
+      {key:'nama',label:'Nama Lengkap',auto:()=>tc(CU.n)},
+      {key:'jabatan',label:'Jabatan',auto:()=>CU.p},
+      {key:'divisi',label:'Divisi',auto:()=>CU.dv},
+      {key:'jenis',label:'Jenis Cuti (Tahunan/Sakit/Melahirkan/Lainnya)',ask:true},
+      {key:'tgl_mulai',label:'Tanggal Mulai',ask:true},
+      {key:'tgl_selesai',label:'Tanggal Selesai',ask:true},
+      {key:'jumlah_hari',label:'Jumlah Hari Kerja',ask:true},
+      {key:'alasan',label:'Alasan',ask:true},
+      {key:'delegasi',label:'Nama Penerima Delegasi',ask:true},
+    ],
+    approver:'pajar.yonatan@simasjiwa.co.id',
+    approverName:'Pajar Pratama Yonatan (HC Division Head)',
+    cc:['inneke.tanudjaya@simasjiwa.co.id']
+  },
+  reimbursement:{
+    title:'Form Reimbursement',
+    fields:[
+      {key:'nama',label:'Nama',auto:()=>tc(CU.n)},
+      {key:'divisi',label:'Divisi',auto:()=>CU.dv},
+      {key:'tanggal',label:'Tanggal Transaksi',ask:true},
+      {key:'jenis',label:'Jenis Pengeluaran',ask:true},
+      {key:'jumlah',label:'Jumlah (Rp)',ask:true},
+      {key:'keterangan',label:'Keterangan / Tujuan',ask:true},
+      {key:'no_rekening',label:'No. Rekening',ask:true},
+    ],
+    approver:'muara.sitorus@simasjiwa.co.id',
+    approverName:'Muara Tagor H Sitorus (Finance & Accounting Division Head)',
+    cc:['kathierina.meidri@simasjiwa.co.id','nindya.astuti@simasjiwa.co.id']
+  },
+  training:{
+    title:'Form Pengajuan Training',
+    fields:[
+      {key:'nama',label:'Nama',auto:()=>tc(CU.n)},
+      {key:'divisi',label:'Divisi',auto:()=>CU.dv},
+      {key:'nama_training',label:'Nama Training / Program',ask:true},
+      {key:'penyelenggara',label:'Penyelenggara',ask:true},
+      {key:'tanggal',label:'Tanggal Pelaksanaan',ask:true},
+      {key:'biaya',label:'Estimasi Biaya (Rp)',ask:true},
+      {key:'tujuan',label:'Tujuan / Manfaat',ask:true},
+    ],
+    approver:'fitri.zakiyah@simasjiwa.co.id',
+    approverName:'Fitri Zakiyah (HC Org & Talent Dev Dept Head)',
+    cc:['pajar.yonatan@simasjiwa.co.id']
+  }
+};
+function detectFormType(txt){
+  const lo=txt.toLowerCase();
+  if(/cuti|izin/.test(lo))return'cuti';
+  if(/reimb|reimbursement|klaim biaya|laporan biaya/.test(lo))return'reimbursement';
+  if(/training|pelatihan/.test(lo))return'training';
+  return null;
+}
+function startFormFilling(formType){
+  if(!activeId)return;
+  const s=chats[activeId];if(!s)return;
+  const form=FORMS[formType];if(!form)return;
+  formCtx={type:formType,fields:form.fields,answers:{},step:0};
+  // Auto-fill auto fields
+  form.fields.forEach(f=>{if(f.auto)formCtx.answers[f.key]=f.auto();});
+  // Find first ask field
+  formCtx.step=form.fields.findIndex(f=>f.ask);
+  if(formCtx.step<0){showFilledForm();return;}
+  const emp=s.grp?s.primaryEmp:s.emp;
+  const firstField=form.fields[formCtx.step];
+  const intro=s.lang==='informal'
+    ?`Oke, aku bantu isi **${form.title}** ya! 📄\n\nSebagian data udah auto-terisi dari profilmu. Sekarang aku mau tanya beberapa hal.\n\n**${firstField.label}:**`
+    :`Baik, saya akan membantu mengisi **${form.title}** 📄\n\nBeberapa data sudah otomatis terisi dari profil Anda. Mari kita lanjutkan.\n\n**${firstField.label}:**`;
+  const msg={role:'assistant',content:intro,snm:tc(emp.n),sav:BAV[emp.g]||'🤖',ts:NOW()};
+  s.msgs.push(msg);appendMsg(msg);rCL_list();saveSession();
+}
+function handleFormAnswer(answer){
+  if(!formCtx||!activeId)return;
+  const s=chats[activeId];if(!s)return;
+  const emp=s.grp?s.primaryEmp:s.emp;
+  const form=FORMS[formCtx.type];
+  const um={role:'user',content:answer,ts:NOW()};s.msgs.push(um);appendMsg(um);
+  // Save answer
+  const curField=formCtx.fields[formCtx.step];
+  formCtx.answers[curField.key]=answer;
+  // Next ask field
+  let next=formCtx.fields.findIndex((f,i)=>i>formCtx.step&&f.ask);
+  if(next>=0){
+    formCtx.step=next;
+    const nf=formCtx.fields[next];
+    const msg={role:'assistant',content:`**${nf.label}:**`,snm:tc(emp.n),sav:BAV[emp.g]||'🤖',ts:NOW()};
+    s.msgs.push(msg);appendMsg(msg);
+  } else {
+    // Done - show filled form
+    showFilledForm();
+  }
+  rCL_list();saveSession();
+}
+function showFilledForm(){
+  if(!formCtx||!activeId)return;
+  const s=chats[activeId];if(!s)return;
+  const emp=s.grp?s.primaryEmp:s.emp;
+  const form=FORMS[formCtx.type];
+  let fieldRows=formCtx.fields.map(f=>`<div class="form-field"><span class="ff-label">${ESC(f.label)}:</span><span class="ff-val">${ESC(formCtx.answers[f.key]||'—')}</span></div>`).join('');
+  const formHtml=`<div class="form-card"><div class="form-title">📋 ${form.title}</div><div class="form-fields">${fieldRows}</div></div>`;
+  const txt=s.lang==='informal'
+    ?`Oke, ini hasil pengisian formnya! Cek dulu ya:\n${formHtml}\n\nMau revisi sesuatu atau langsung kirim ke ${form.approverName}?`
+    :`Berikut ringkasan formulir yang telah diisi:\n${formHtml}\n\nApakah ada yang ingin direvisi, atau langsung dikirimkan ke ${form.approverName}?`;
+  const msg={
+    role:'assistant',content:txt,snm:tc(emp.n),sav:BAV[emp.g]||'🤖',ts:NOW(),
+    opts:[
+      {label:'✅ Kirim Sekarang',fn:`sendFormEmail('${formCtx.type}')`},
+      {label:'✏️ Revisi',fn:`reviseForm()`}
+    ]
+  };
+  s.msgs.push(msg);appendMsg(msg);rCL_list();saveSession();
+}
+function reviseForm(){
+  if(!formCtx||!activeId)return;
+  const s=chats[activeId];if(!s)return;
+  const emp=s.grp?s.primaryEmp:s.emp;
+  formCtx.step=formCtx.fields.findIndex(f=>f.ask);
+  const msg={role:'assistant',content:'Oke! Kita mulai revisi dari awal ya. '+formCtx.fields[formCtx.step].label+':',
+    snm:tc(emp.n),sav:BAV[emp.g]||'🤖',ts:NOW()};
+  s.msgs.push(msg);appendMsg(msg);rCL_list();saveSession();
+}
+function sendFormEmail(formType){
+  const form=FORMS[formType];if(!form||!formCtx)return;
+  const to=$('gm-to');const cc=$('gm-cc');const subj=$('gm-subj');const body=$('gm-body');
+  if(to)to.value=form.approver;
+  if(cc)cc.value=form.cc.join(', ');
+  if(subj)subj.value=`[${form.title}] ${tc(CU.n)} – ${new Date().toLocaleDateString('id-ID')}`;
+  if(body){
+    const fields=formCtx.fields.map(f=>`${f.label}: ${formCtx.answers[f.key]||'—'}`).join('\n');
+    body.value=`Yth. ${form.approverName},\n\nDengan hormat, berikut pengajuan saya:\n\n${fields}\n\nMohon ditindaklanjuti. Terima kasih.\n\nHormat saya,\n${tc(CU.n)}\n${CU.p}${CU.dv?'\n'+CU.dv:''}`;
+  }
+  openOv('ov-gmail');
+}
+
+// ════════════════════════════════════════════
+// GOOGLE CALENDAR
+// ════════════════════════════════════════════
+let calSelSlot=null;
+function openCalScheduler(){
+  calParts=[];calSelSlot=null;
+  const s=chats[activeId];
+  if(s){
+    const emp=s.grp?s.members:[s.emp];
+    calParts=[...emp];
+    renderCalParticipants();
+  }
+  $('cal-topic').value='';
+  $('cal-add-srch').value='';
+  $('cal-slots').style.display='none';
+  openOv('ov-cal');
+  renderCalSearch('');
+}
+function renderCalSearch(q){
+  const res=DB.filter(e=>(!q||e.n.toLowerCase().includes(q.toLowerCase()))&&!calParts.find(p=>p.e===e.e)).slice(0,20);
+  $('cal-ppl-list').innerHTML=res.map(e=>`<div class="pi" onclick="addCalPart('${e.e}')">
+    <div class="pi-av">${BAV[e.g]||'👨‍💼'}</div>
+    <div class="pi-info"><div class="pi-nm">${tc(e.n)}</div><div class="pi-ps">${ESC(e.p)}</div></div>
+    <div class="pi-chk">+</div></div>`).join('');
+}
+function addCalPart(email){
+  const emp=DB.find(x=>x.e===email);if(!emp)return;
+  if(!calParts.find(p=>p.e===email))calParts.push(emp);
+  renderCalParticipants();renderCalSearch($('cal-add-srch').value);
+}
+function renderCalParticipants(){
+  $('cal-participants').innerHTML=calParts.map(p=>`<span class="gsc" onclick="removeCalPart('${p.e}')">${fn(p.n)} ✕</span>`).join('')+(calParts.length===0?'<span style="color:var(--tm);font-size:.75rem">Belum ada peserta</span>':'');
+}
+function removeCalPart(email){calParts=calParts.filter(p=>p.e!==email);renderCalParticipants();renderCalSearch($('cal-add-srch').value);}
+function selDuration(min,btn){calDur=min;document.querySelectorAll('[onclick^="selDuration"]').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');}
+async function findCalSlots(){
+  const topic=$('cal-topic').value.trim()||'Diskusi';
+  if(!calParts.length){toast('Tambahkan peserta terlebih dahulu');return;}
+  if(gToken&&gApiKey){
+    // Real Calendar API check
+    await findRealCalSlots(topic);
+  } else {
+    // Simulated slots
+    showSimulatedSlots(topic);
+  }
+}
+function showSimulatedSlots(topic){
+  const today=new Date();
+  const slots=[];
+  for(let d=1;d<=5;d++){
+    const dt=new Date(today);dt.setDate(today.getDate()+d);
+    if(dt.getDay()===0||dt.getDay()===6)continue;
+    const dateStr=dt.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'});
+    ['09:00','10:00','13:00','14:00','15:00'].forEach(t=>{
+      if(slots.length<6)slots.push({date:dateStr,time:t,dateObj:dt,isoDate:dt.toISOString().split('T')[0]});
+    });
+  }
+  $('cal-slots').style.display='block';
+  $('cal-slots-list').innerHTML=slots.map((sl,i)=>`
+    <div class="cal-slot" onclick="selectSlot(${i},this)" data-slot='${JSON.stringify(sl)}'>
+      📅 <strong>${sl.date}</strong> pukul <strong>${sl.time}</strong>
+      <span style="font-size:.7rem;color:var(--tm);margin-left:6px">${calDur} menit</span>
+    </div>`).join('');
+  document.querySelector('[onclick="findCalSlots()"]').textContent='Buat Event';
+  document.querySelector('[onclick="findCalSlots()"]').onclick=()=>createCalEvent(topic);
+}
+function selectSlot(i,el){
+  document.querySelectorAll('.cal-slot').forEach(s=>s.classList.remove('sel'));
+  el.classList.add('sel');
+  calSelSlot=JSON.parse(el.dataset.slot);
+  calSelSlot.idx=i;
+}
+async function createCalEvent(topic){
+  if(!calSelSlot){toast('Pilih slot waktu terlebih dahulu');return;}
+  if(gToken&&gApiKey){
+    await createRealCalEvent(topic);
+  } else {
+    // Simulated
+    closeOv('ov-cal');
+    const s=chats[activeId];
+    const emp=s?.grp?s.primaryEmp:s?.emp;
+    const confirmMsg={
+      role:'assistant',
+      content:`✅ Meeting berhasil dijadwalkan!\n\n📅 **${topic}**\n🗓 ${calSelSlot.date} pukul ${calSelSlot.time}\n⏱ ${calDur} menit\n👥 Peserta: ${calParts.map(p=>tc(p.n)).join(', ')}\n\n*Catatan: Untuk mengirim undangan kalender nyata, hubungkan akun Google di Pengaturan.*`,
+      snm:emp?tc(emp.n):'System',sav:emp?BAV[emp.g]:'🤖',ts:NOW()
+    };
+    if(s){s.msgs.push(confirmMsg);appendMsg(confirmMsg);rCL_list();saveSession();}
+    toast('Meeting dijadwalkan! ✅');
+  }
+}
+async function findRealCalSlots(topic){
+  try{
+    const now=new Date();const weekLater=new Date(now.getTime()+7*24*60*60*1000);
+    const freebusy={timeMin:now.toISOString(),timeMax:weekLater.toISOString(),items:calParts.map(p=>({id:p.e}))};
+    const r=await fetch(`https://www.googleapis.com/calendar/v3/freeBusy?key=${gApiKey}`,{
+      method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+gToken},
+      body:JSON.stringify(freebusy)
+    });
+    const d=await r.json();
+    if(d.error){showSimulatedSlots(topic);return;}
+    // Parse busy times and find free slots
+    const busyAll=[];
+    Object.values(d.calendars||{}).forEach(cal=>{(cal.busy||[]).forEach(b=>busyAll.push({start:new Date(b.start),end:new Date(b.end)}));});
+    // Generate potential 1-hour slots in business hours (9-17)
+    const slots=[];const sd=new Date(now);sd.setHours(9,0,0,0);
+    for(let i=0;i<7&&slots.length<6;i++){
+      sd.setDate(now.getDate()+i+1);
+      if(sd.getDay()===0||sd.getDay()===6)continue;
+      for(let h=9;h<=16;h+=1){
+        const slotStart=new Date(sd);slotStart.setHours(h,0,0,0);
+        const slotEnd=new Date(slotStart.getTime()+calDur*60000);
+        const busy=busyAll.some(b=>slotStart<b.end&&slotEnd>b.start);
+        if(!busy){
+          const dateStr=slotStart.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'});
+          const timeStr=`${String(h).padStart(2,'0')}:00`;
+          slots.push({date:dateStr,time:timeStr,dateObj:slotStart,isoDate:slotStart.toISOString()});
+        }
+        if(slots.length>=6)break;
+      }
+    }
+    if(!slots.length){showSimulatedSlots(topic);return;}
+    $('cal-slots').style.display='block';
+    $('cal-slots-list').innerHTML=slots.map((sl,i)=>`
+      <div class="cal-slot" onclick="selectSlot(${i},this)" data-slot='${JSON.stringify(sl)}'>
+        📅 <strong>${sl.date}</strong> pukul <strong>${sl.time}</strong>
+        <span style="font-size:.7rem;color:var(--green);margin-left:6px">✓ Semua tersedia</span>
+      </div>`).join('');
+    document.querySelector('[onclick="findCalSlots()"]').textContent='Buat Event';
+    document.querySelector('[onclick="findCalSlots()"]').onclick=()=>createCalEvent(topic);
+  }catch(err){showSimulatedSlots(topic);}
+}
+async function createRealCalEvent(topic){
+  if(!gToken||!calSelSlot)return;
+  try{
+    const startDt=new Date(calSelSlot.isoDate||calSelSlot.dateObj);
+    const [h,m]=(calSelSlot.time||'09:00').split(':');
+    startDt.setHours(parseInt(h),parseInt(m||'0'),0,0);
+    const endDt=new Date(startDt.getTime()+calDur*60000);
+    const event={
+      summary:topic,
+      description:`Meeting dijadwalkan via SimAsk`,
+      start:{dateTime:startDt.toISOString(),timeZone:'Asia/Jakarta'},
+      end:{dateTime:endDt.toISOString(),timeZone:'Asia/Jakarta'},
+      attendees:calParts.map(p=>({email:p.e})),
+      conferenceData:{createRequest:{requestId:'simask'+NOW(),conferenceSolutionKey:{type:'hangoutsMeet'}}}
+    };
+    const r=await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events?conferenceDataVersion=1',{
+      method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+gToken},
+      body:JSON.stringify(event)
+    });
+    const d=await r.json();
+    if(d.error){toast('Gagal membuat event: '+d.error.message);return;}
+    closeOv('ov-cal');
+    const meetLink=d.conferenceData?.entryPoints?.[0]?.uri||'';
+    const s=chats[activeId];const emp=s?.grp?s.primaryEmp:s?.emp;
+    const confirmMsg={
+      role:'assistant',
+      content:`✅ Meeting berhasil dibuat dan undangan dikirim!\n\n📅 **${topic}**\n🗓 ${calSelSlot.date} pukul ${calSelSlot.time}\n⏱ ${calDur} menit\n👥 Peserta: ${calParts.map(p=>tc(p.n)).join(', ')}${meetLink?'\n\n🔗 Google Meet: '+meetLink:''}`,
+      snm:emp?tc(emp.n):'System',sav:emp?BAV[emp.g]:'🤖',ts:NOW()
+    };
+    if(s){s.msgs.push(confirmMsg);appendMsg(confirmMsg);rCL_list();saveSession();}
+    toast('Meeting berhasil dibuat! 🗓');
+  }catch(err){toast('Error: '+err.message);}
+}
+
+// ════════════════════════════════════════════
+// GMAIL
+// ════════════════════════════════════════════
+function openGmailCompose(){
+  $('gm-to').value='';$('gm-cc').value='';$('gm-subj').value='';$('gm-body').value='';
+  openOv('ov-gmail');
+}
+async function sendGmail(){
+  const to=$('gm-to').value.trim();
+  const cc=$('gm-cc').value.trim();
+  const subj=$('gm-subj').value.trim();
+  const body=$('gm-body').value.trim();
+  if(!to||!subj){toast('Isi kolom To dan Subjek terlebih dahulu');return;}
+  if(!gToken){
+    // Show draft preview
+    closeOv('ov-gmail');
+    const s=chats[activeId];const emp=s?.grp?s.primaryEmp:s?.emp;
+    const draftMsg={
+      role:'assistant',
+      content:`📧 **Draft Email Siap**\n\n**To:** ${to}\n${cc?'**CC:** '+cc+'\n':''}**Subject:** ${subj}\n\n${body}\n\n⚠️ *Untuk benar-benar mengirim email, hubungkan akun Google di Pengaturan.*`,
+      snm:emp?tc(emp.n):'System',sav:emp?BAV[emp.g]:'🤖',ts:NOW()
+    };
+    if(s){s.msgs.push(draftMsg);appendMsg(draftMsg);rCL_list();saveSession();}
+    return;
+  }
+  // Real Gmail send
+  try{
+    const allTo=to.split(',').map(e=>e.trim());
+    const allCc=cc?cc.split(',').map(e=>e.trim()):[];
+    let raw=`From: ${CU.e}\r\nTo: ${allTo.join(',')}\r\n${allCc.length?'Cc: '+allCc.join(',')+'\r\n':''}Subject: ${subj}\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n${body}`;
+    const encoded=btoa(unescape(encodeURIComponent(raw))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    const r=await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send',{
+      method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+gToken},
+      body:JSON.stringify({raw:encoded})
+    });
+    const d=await r.json();
+    if(d.error){toast('Gagal kirim: '+d.error.message);return;}
+    closeOv('ov-gmail');
+    toast('Email berhasil dikirim! 📧');
+    const s=chats[activeId];const emp=s?.grp?s.primaryEmp:s?.emp;
+    const sentMsg={role:'assistant',content:`✅ Email berhasil dikirim ke **${to}**\n**Subject:** ${subj}`,snm:emp?tc(emp.n):'System',sav:emp?BAV[emp.g]:'🤖',ts:NOW()};
+    if(s){s.msgs.push(sentMsg);appendMsg(sentMsg);rCL_list();saveSession();}
+  }catch(err){toast('Error: '+err.message);}
+}
+
+// ════════════════════════════════════════════
+// INPUT
+// ════════════════════════════════════════════
+function onKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function grow(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px';}
+
+// ════════════════════════════════════════════
+// ADMIN
+// ════════════════════════════════════════════
+function renderAdm(f){
+  const rows=DB.filter(e=>!f||e.n.toLowerCase().includes(f.toLowerCase())||e.dv.toLowerCase().includes(f.toLowerCase())||e.p.toLowerCase().includes(f.toLowerCase()));
+  $('adm-count').textContent=rows.length;
+  $('adm-tbody').innerHTML=rows.map(e=>{
+    const i=DB.indexOf(e);
+    return`<tr><td><strong>${tc(e.n)}</strong></td><td style="font-size:.73rem">${ESC(e.dv)}</td><td>${ESC(e.p)}</td><td>${e.y}</td><td style="font-size:.71rem">${ESC(e.e)}</td><td><span class="disc-tag">${e.d}</span></td><td>${e.g}</td><td style="display:flex;gap:4px"><button class="ab edit" onclick="showEdit(${i})">Edit</button><button class="ab del" onclick="delEmp(${i})">Hapus</button></td></tr>`;
+  }).join('');
+}
+function delEmp(i){if(confirm(`Hapus ${DB[i].n}?`)){DB.splice(i,1);renderAdm($('adm-srch').value);toast('Karyawan dihapus');}}
+function showEdit(i){
+  editIdx=i;const e=DB[i];
+  $('ov-edit-title').textContent='✏️ Edit: '+tc(e.n);
+  $('ef-name').value=e.n;
+  populateDivSel('ef-div',e.dv);
+  populateDeptSel('ef-dt',e.dt);
+  $('ef-pos').value=e.p;$('ef-yr').value=e.y;$('ef-email').value=e.e;
+  $('ef-disc').value=e.d;$('ef-gender').value=e.g;
+  $('ef-save-btn').onclick=saveEdit;
+  openOv('ov-edit');
+}
+function saveEdit(){
+  if(editIdx<0)return;
+  DB[editIdx]={n:$('ef-name').value.trim().toUpperCase(),dv:getDivVal(),dt:getDeptVal(),p:$('ef-pos').value.trim(),y:parseInt($('ef-yr').value)||1990,e:$('ef-email').value.trim(),d:$('ef-disc').value.trim().toUpperCase(),g:$('ef-gender').value};
+  closeOv('ov-edit');renderAdm($('adm-srch').value);toast('Data diperbarui ✅');editIdx=-1;
+}
+function showAddEmp(){
+  editIdx=-1;
+  $('ov-edit-title').textContent='➕ Tambah Karyawan Baru';
+  $('ef-name').value='';$('ef-pos').value='';$('ef-disc').value='';populateDivSel('ef-div','');populateDeptSel('ef-dt','');
+  $('ef-yr').value=1995;$('ef-email').value='@simasjiwa.co.id';$('ef-gender').value='Pria';
+  $('ef-save-btn').onclick=()=>{
+    const emp={n:$('ef-name').value.trim().toUpperCase(),dv:$('ef-div').value.trim(),dt:$('ef-dept').value.trim(),p:$('ef-pos').value.trim(),y:parseInt($('ef-yr').value)||1995,e:$('ef-email').value.trim(),d:$('ef-disc').value.trim().toUpperCase(),g:$('ef-gender').value};
+    if(!emp.n||!emp.e){toast('Nama dan email wajib diisi');return;}
+    DB.push(emp);closeOv('ov-edit');renderAdm('');toast(`${tc(emp.n)} ditambahkan! ✅`);
+    $('ef-save-btn').onclick=saveEdit;
+  };
+  openOv('ov-edit');
+}
+
+// ════════════════════════════════════════════
+// SETTINGS
+// ════════════════════════════════════════════
+function openSettings(){$('set-pan').classList.add('open');}
+function closeSettings(){$('set-pan').classList.remove('open');}
+function setTheme(t){cfg.theme=t;applyTheme(t);$('th-lt').classList.toggle('act',t==='light');$('th-dk').classList.toggle('act',t==='dark');saveSession();}
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'');}
+function saveSetting(k,v){
+  cfg[k]=v;
+  if(k==='nickname')$('sb-name').textContent=v||fn(CU.n);
+  if(k==='apiKey')localStorage.setItem('sk3_apikey',v);
+  saveSession();
+}
+
+// ════════════════════════════════════════════
+// LOGOUT
+// ════════════════════════════════════════════
+function doLogout(){
+  saveSession();CU=null;isAdm=false;chats={};activeId=null;gToken=null;gUser=null;
+  cfg={theme:'light',nickname:'',cfNick:''};uAv='😊';formCtx=null;
+  $('login-email').value='';$('apw-in').value='';
+  $('apw-wrap').classList.remove('show');$('lerr').style.display='none';
+  showScr('scr-splash');
+}
+
+// ════════════════════════════════════════════
+// MOBILE
+// ════════════════════════════════════════════
+window.addEventListener('resize',()=>{
+  if(window.innerWidth>680){
+    $('sidebar').classList.remove('mob-hide');
+    $('back-btn').classList.add('hide');
+  }
+});
+
+// Load Google config on start
+loadGCfg();
+
+function swTab(t){
+  curTab=t;
+  document.querySelectorAll('.sb-tab').forEach(b=>b.classList.remove('on'));
+  const el=document.getElementById('tab-'+t);if(el)el.classList.add('on');
+  rCL_list();
+}
+
+function delChat(id,e){
+  if(e)e.stopPropagation();
+  if(!confirm('Hapus chat ini? Semua percakapan dan memori akan terhapus.'))return;
+  delete chats[id];
+  if(activeId===id){activeId=null;const ca=$('ca-chat');const wl=$('ca-welcome');if(ca)ca.classList.add('hide');if(wl)wl.classList.remove('hide');}
+  saveSession();rCL_list();toast('Chat dihapus 🗑');
+}
+
+function showChatInfo(){
+  const s=chats[activeId];if(!s)return;
+  if(s.grp){
+    const ov=document.getElementById('ov-ginfo');
+    if(!ov){const d=document.createElement('div');d.className='ov';d.id='ov-ginfo';
+      d.innerHTML=`<div class="ov-card" style="max-width:360px"><h3 id="ginfo-nm">👥 Info Grup</h3><p style="font-size:.77rem;color:var(--tm);margin-bottom:8px">Anggota:</p><div id="ginfo-mems" style="display:flex;flex-direction:column;gap:5px;max-height:300px;overflow-y:auto"></div><div class="ov-btns" style="margin-top:12px"><button class="btn-cancel" style="flex:1" onclick="closeOv('ov-ginfo')">Tutup</button></div></div>`;
+      document.body.appendChild(d);}
+    const gn=document.getElementById('ginfo-nm');if(gn)gn.textContent='👥 '+s.grpName;
+    const gm=document.getElementById('ginfo-mems');
+    if(gm)gm.innerHTML=(s.members||[]).map(m=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:9px;background:var(--lt)"><div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--pri),var(--acc));display:flex;align-items:center;justify-content:center;font-size:14px">${BAV[m.g]||'👨‍💼'}</div><div><div style="font-weight:600;font-size:.8rem">${tc(m.n)}</div><div style="font-size:.7rem;color:var(--tm)">${m.p}</div></div></div>`).join('');
+    openOv('ov-ginfo');
+  }
+}
+
+function onChatInput(el){
+  grow(el);
+  checkMention(el);
+}
+function checkMention(el){
+  const val=el.value;const pos=el.selectionStart;
+  const before=val.substring(0,pos);
+  const match=before.match(/@([\w.]*)$/);
+  const mac=document.getElementById('mention-ac');
+  if(match){
+    const q=match[1].toLowerCase();
+    const s=chats[activeId];
+    const pool=s&&s.grp?s.members:DB;
+    const res=(pool||[]).filter(e=>fn(e.n).toLowerCase().startsWith(q)||e.n.toLowerCase().includes(q)).slice(0,6);
+    if(res.length){
+      if(!mac){
+        const d=document.createElement('div');d.id='mention-ac';
+        d.style.cssText='position:absolute;bottom:100%;left:14px;right:14px;background:var(--sb);border:1.5px solid var(--bd);border-radius:12px;box-shadow:0 -4px 20px rgba(0,61,124,.12);z-index:20;overflow:hidden;max-height:180px;overflow-y:auto;';
+        const ia=document.querySelector('.inp-area');if(ia){ia.style.position='relative';ia.appendChild(d);}
+      }
+      const md=document.getElementById('mention-ac');
+      if(md){
+        md.style.display='block';
+        md.innerHTML=res.map(e=>`<div onclick="insertMention('${fn(e.n).replace(/'/g,"\\'")}',event)" style="display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;font-size:.8rem;transition:background .15s;" onmouseover="this.style.background='var(--lt)'" onmouseout="this.style.background=''">${BAV[e.g]||'👨‍💼'} <strong>${fn(e.n)}</strong> <span style="font-size:.7rem;color:var(--tm)">${e.p}</span></div>`).join('');
+      }
+      return;
+    }
+  }
+  if(mac)mac.style.display='none';
+}
+function insertMention(name,e){
+  if(e)e.preventDefault();
+  const inp=document.getElementById('chat-in');if(!inp)return;
+  const val=inp.value;const pos=inp.selectionStart;
+  const before=val.substring(0,pos).replace(/@[\w.]*$/,'@'+name+' ');
+  inp.value=before+val.substring(pos);
+  inp.focus();inp.setSelectionRange(before.length,before.length);
+  const mac=document.getElementById('mention-ac');if(mac)mac.style.display='none';
+}
+
+// ── ADMIN DROPDOWNS ──
+const ALL_DIVS=[...new Set(DB.map(e=>e.dv))].sort();
+const ALL_DEPTS=[...new Set(DB.map(e=>e.dt))].sort();
+
+function populateDivSel(selId,curVal){
+  const sel=$(selId);if(!sel)return;
+  sel.innerHTML=[...ALL_DIVS,'Lainnya'].map(v=>`<option value="${v}"${v===curVal?' selected':''}>${v}</option>`).join('');
+  const oth=$(selId.replace('ef-div','ef-div-oth').replace('ef-dt','ef-dt-oth'));
+  if(oth)oth.style.display=(sel.value==='Lainnya'?'block':'none');
+}
+function populateDeptSel(selId,curVal){
+  const sel=$(selId);if(!sel)return;
+  sel.innerHTML=[...ALL_DEPTS,'Lainnya'].map(v=>`<option value="${v}"${v===curVal?' selected':''}>${v}</option>`).join('');
+  const oth=$('ef-dt-oth');if(oth)oth.style.display=(sel.value==='Lainnya'?'block':'none');
+}
+function onDvChange(){const s=$('ef-div');if(!s)return;const o=$('ef-div-oth');if(o)o.style.display=(s.value==='Lainnya'?'block':'none');}
+function onDtChange(){const s=$('ef-dt');if(!s)return;const o=$('ef-dt-oth');if(o)o.style.display=(s.value==='Lainnya'?'block':'none');}
+function getDivVal(){const s=$('ef-div');if(!s)return'';return s.value==='Lainnya'?($('ef-div-oth').value.trim()):s.value;}
+function getDeptVal(){const s=$('ef-dt');if(!s)return'';return s.value==='Lainnya'?($('ef-dt-oth').value.trim()):s.value;}
+
+function toggleCF(){
+  const s=chats[activeId];if(!s||s.grp)return;
+  const email=s.emp&&s.emp.e;if(!email)return;
+  cfg.closeFriends=cfg.closeFriends||[];
+  const isCF=cfg.closeFriends.includes(email);
+  if(isCF){cfg.closeFriends=cfg.closeFriends.filter(e=>e!==email);toast('Dihapus dari Close Friends');}
+  else{cfg.closeFriends.push(email);toast('Ditambahkan ke ⭐ Close Friends!');}
+  saveSession();rCL_list();
+  // Update header star
+  const btn=document.getElementById('cf-btn');
+  if(btn)btn.textContent=isCF?'☆':'⭐';
+}
+
+</script>
+</body>
+</html>
