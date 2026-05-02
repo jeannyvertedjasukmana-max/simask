@@ -460,21 +460,6 @@ function chkAdm(el){
   else{el.classList.remove('gi-adm');if(apw)apw.classList.remove('on');}
 }
 
-function doEmailLogin(){
-  var email=(document.getElementById('inp-em').value||'').trim().toLowerCase();
-  var er=document.getElementById('lerr');
-  if(er)er.style.display='none';
-  // Will be fully handled by main script - this just triggers it
-  if(typeof _doEmailLoginFull==='function') _doEmailLoginFull(email);
-  else alert('Sistem sedang loading, coba lagi dalam 1 detik.');
-}
-
-function doGoogleLogin(){
-  if(!gCI){showSetup();return;}
-  if(typeof _doGoogleLoginFull==='function') _doGoogleLoginFull();
-  else alert('Sistem sedang loading, coba lagi dalam 1 detik.');
-}
-
 // Show correct section on load
 document.addEventListener('DOMContentLoaded',function(){
   var ss=document.getElementById('setup-sec');
@@ -2626,9 +2611,6 @@ document.addEventListener('DOMContentLoaded', function(){
   });
   initLogin();
   
-// Make full versions available to bootstrap stubs
-_doEmailLoginFull = doEmailLogin;
-_doGoogleLoginFull = doGoogleLogin;
 console.log('SimAsk v5 ready. DB:', DB.length, 'employees. JS OK.');
 });
 </script>
