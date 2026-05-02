@@ -828,12 +828,13 @@ function renderPendingFiles(){
   const area=G('ia-attachments');
   if(!pendingFiles.length){ area.style.display='none'; return; }
   area.style.display='flex';
-  area.innerHTML=pendingFiles.map((f,i)=>`
-    <div class="ia-attach">
-      <span>${getFileIcon(f.type)}</span>
-      <span>${f.name.substring(0,20)}${f.name.length>20?'...':''}</span>
-      <button onclick="removePendingFile(${i})">✕</button>
-    </div>`).join('');
+  area.innerHTML=pendingFiles.map((f,i)=>{
+    return '<div class="ia-attach">'
+      +'<span>'+getFileIcon(f.type)+'</span>'
+      +'<span>'+f.name.substring(0,20)+(f.name.length>20?'...':'')+'</span>'
+      +'<button onclick="removePendingFile('+i+')">✕</button>'
+      +'</div>';
+  }).join('');
 }
 
 function removePendingFile(i){
@@ -926,21 +927,13 @@ function saveKBEntry(){
     key='pos::'+G('kb-pos').value; label='Posisi: '+G('kb-pos').value;
   }
   const text=(G('kb-text').value||'').trim();
-  const docTexts=kbDocs.map(d=>d.text||d.note||'').filter(Boolean).join('
-
-');
-  const fullText=[text,docTexts].filter(Boolean).join('
-
-');
+  const docTexts=kbDocs.map(d=>d.text||d.note||'').filter(Boolean).join('\n\n');
+  const fullText=[text,docTexts].filter(Boolean).join('\n\n');
   if(!fullText){ toast('Isi knowledge terlebih dahulu'); return; }
   try{
     const kb=JSON.parse(localStorage.getItem('sk4_knowledgeBase')||'{}');
     const existing=kb[key]||'';
-    kb[key]=existing?(existing+'
-
----
-
-'+fullText):fullText;
+    kb[key]=existing?(existing+'\n\n---\n\n'+fullText):fullText;
     kb['__labels']=kb['__labels']||{};
     kb['__labels'][key]=label;
     localStorage.setItem('sk4_knowledgeBase',JSON.stringify(kb));
@@ -951,21 +944,34 @@ function saveKBEntry(){
 }
 
 function renderKBList(){
-  const el=G('kb-list'); if(!el)return;
+  var el=G('kb-list'); if(!el)return;
   try{
-    const kb=JSON.parse(localStorage.getItem('sk4_knowledgeBase')||'{}');
-    const labels=kb['__labels']||{};
-    const keys=Object.keys(kb).filter(k=>k!=='__labels');
-    if(!keys.length){ el.innerHTML='<p style="color:var(--tm);font-size:.79rem;text-align:center;padding:16px">Belum ada knowledge yang disimpan.</p>'; return; }
-    el.innerHTML=keys.map(k=>`
-      <div class="kb-entry">
-        <div class="kb-entry-hdr">
-          <div class="kb-entry-lbl">🏷️ ${labels[k]||k}</div>
-          <button class="kb-del" onclick="deleteKB('${k.replace(/'/g,"\'")}')">Hapus</button>
-        </div>
-        <div style="font-size:.76rem;color:var(--t2);line-height:1.5;max-height:80px;overflow:hidden">${ESC((kb[k]||'').substring(0,200))}${(kb[k]||'').length>200?'...':''}</div>
-      </div>`).join('');
-  }catch(e){ el.innerHTML='<p style="color:var(--re)">Error loading KB.</p>'; }
+    var kb=JSON.parse(localStorage.getItem('sk4_knowledgeBase')||'{}');
+    var labels=kb['__labels']||{};
+    var keys=Object.keys(kb).filter(function(k){return k!=='__labels';});
+    if(!keys.length){
+      el.innerHTML='<p style="color:var(--tm);font-size:.79rem;text-align:center;padding:16px">Belum ada knowledge yang disimpan.</p>';
+      return;
+    }
+    var html='';
+    for(var ki=0;ki<keys.length;ki++){
+      var k=keys[ki];
+      var lbl=labels[k]||k;
+      var preview=ESC((kb[k]||'').substring(0,200));
+      var more=(kb[k]||'').length>200?'...':'';
+      html+='<div class="kb-entry">';
+      html+='<div class="kb-entry-hdr">';
+      html+='<div class="kb-entry-lbl">&#127991; '+lbl+'</div>';
+      html+='<button class="kb-del" data-key="'+encodeURIComponent(k)+'" onclick="deleteKBBtn(this)">Hapus</button>';
+      html+='</div>';
+      html+='<div style="font-size:.76rem;color:var(--t2);line-height:1.5;max-height:80px;overflow:hidden">'+preview+more+'</div>';
+      html+='</div>';
+    }
+    el.innerHTML=html;
+  }catch(e){ el.innerHTML='<p style="color:var(--re)">Error loading KB: '+e.message+'</p>'; }
+}
+function deleteKBBtn(btn){
+  deleteKB(decodeURIComponent(btn.getAttribute('data-key')));
 }
 
 function deleteKB(key){
@@ -985,9 +991,7 @@ function getCustomKnowledge(dv, dt){
     const parts=[];
     if(kb[dv]) parts.push(kb[dv]);
     if(dt&&dt!==dv&&kb[dv+'::'+dt]) parts.push(kb[dv+'::'+dt]);
-    return parts.join('
-
-');
+    return parts.join('\n\n');
   }catch(e){ return ''; }
 }
 function initLogin(){
@@ -2037,7 +2041,7 @@ function showSimSlots(topic){
   }
   html+=slots.map((sl,i)=>{
     const ds=JSON.stringify({date:sl.date,time:sl.time,iso:sl.iso});
-    return '<div class="cs" onclick="doSelSlot('+i+',this)" data-s=''+ds.replace(/'/g,"&#39;")+''>'
+    return '<div class="cs" onclick="doSelSlot('+i+',this)" data-s="+ds.replace(/"/g,"&quot;")+">'
       +'📅 <strong>'+sl.date+'</strong> · <strong>'+sl.time+'</strong>'
       +' <span style="font-size:.68rem;color:var(--tm);margin-left:4px">'+calDur+' mnt</span></div>';
   }).join('');
@@ -2123,11 +2127,13 @@ function emlAC(inp, acId){
   ).slice(0,8);
   if(!res.length){ ac.className='eml-ac'; return; }
   ac.className='eml-ac on';
-  ac.innerHTML=res.map(e=>`
-    <div class="eml-ac-it" onclick="emlPick('${inp.id}','${acId}','${e.e}')">
-      <span>${BAV[e.g]||'👨‍💼'}</span>
-      <span><strong>${tc(e.n)}</strong><br/><span style="font-size:.69rem;color:var(--tm)">${e.e} · ${e.p}</span></span>
-    </div>`).join('');
+  ac.innerHTML=res.map(function(e){
+    return '<div class="eml-ac-it" onclick="emlPick(''+inp.id+'',''+acId+'',''+e.e+'')">'
+      +'<span>'+(BAV[e.g]||'👨‍💼')+'</span>'
+      +'<span><strong>'+tc(e.n)+'</strong><br/>'
+      +'<span style="font-size:.69rem;color:var(--tm)">'+e.e+' · '+e.p+'</span></span>'
+      +'</div>';
+  }).join('');
 }
 
 function emlPick(inpId, acId, email){
