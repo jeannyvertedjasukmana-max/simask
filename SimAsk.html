@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -2118,26 +2119,30 @@ async function doCreateRealMtg(topic){
 function doOpGmail(){ G('gml-to').value=''; G('gml-cc').value=''; G('gml-s').value=''; G('gml-b').value=''; doOpOv('ov-gml'); }
 
 function emlAC(inp, acId){
-  const q=(inp.value||'').trim().toLowerCase();
-  const ac=G(acId);
+  var q=(inp.value||'').trim().toLowerCase();
+  var ac=G(acId);
   if(!q||q.length<2){ ac.className='eml-ac'; return; }
-  // Search last token after comma/semicolon
-  const parts=q.split(/[,;]/); const last=parts[parts.length-1].trim();
+  var parts=q.split(/[,;]/); var last=parts[parts.length-1].trim();
   if(!last){ ac.className='eml-ac'; return; }
-  const res=DB.filter(e=>
-    e.n.toLowerCase().includes(last)||
-    e.e.toLowerCase().includes(last)||
-    e.p.toLowerCase().includes(last)
-  ).slice(0,8);
+  var res=DB.filter(function(e){
+    return e.n.toLowerCase().includes(last)||e.e.toLowerCase().includes(last)||e.p.toLowerCase().includes(last);
+  }).slice(0,8);
   if(!res.length){ ac.className='eml-ac'; return; }
   ac.className='eml-ac on';
-  ac.innerHTML=res.map(function(e){
-    return '<div class="eml-ac-it" onclick="emlPick(\''+inp.id+'\',\''+acId+'\',\''+e.e+'\')">'
-      +'<span>'+(BAV[e.g]||'👨‍💼')+'</span>'
-      +'<span><strong>'+tc(e.n)+'</strong><br/>'
-      +'<span style="font-size:.69rem;color:var(--tm)">'+e.e+' · '+e.p+'</span></span>'
-      +'</div>';
-  }).join('');
+  ac.innerHTML='';
+  for(var i=0;i<res.length;i++){
+    var emp=res[i];
+    var div=document.createElement('div');
+    div.className='eml-ac-it';
+    div.setAttribute('data-inp',inp.id);
+    div.setAttribute('data-ac',acId);
+    div.setAttribute('data-email',emp.e);
+    div.innerHTML='<span>'+(BAV[emp.g]||'👨‍💼')+'</span>'
+      +'<span><strong>'+tc(emp.n)+'</strong><br/>'
+      +'<span style="font-size:.69rem;color:var(--tm)">'+emp.e+' · '+emp.p+'</span></span>';
+    div.onclick=function(){emlPick(this.dataset.inp,this.dataset.ac,this.dataset.email);};
+    ac.appendChild(div);
+  }
 }
 
 function emlPick(inpId, acId, email){
@@ -2240,7 +2245,7 @@ document.addEventListener('DOMContentLoaded', function(){
   // Restore OAuth config
   try{var c=JSON.parse(localStorage.getItem('sk4_gcfg')||'{}');gCI=c.ci||'';gAK=c.ak||'';}catch(e){}
   window.addEventListener('resize', function(){
-    if(window.innerWidth>680){ G('sb').classList.remove('mh'); G('bbk').style.display='none'); }
+    if(window.innerWidth>680){ G('sb').classList.remove('mh'); G('bbk').style.display='none'; }
   });
   initLogin();
   console.log('SimAsk v5 ready. DB:', DB.length);
