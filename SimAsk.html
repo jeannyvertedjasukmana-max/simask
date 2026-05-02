@@ -460,12 +460,32 @@ function chkAdm(el){
   else{el.classList.remove('gi-adm');if(apw)apw.classList.remove('on');}
 }
 
-// Show correct section on load
+// Show correct section on load + wire up login buttons
 document.addEventListener('DOMContentLoaded',function(){
   var ss=document.getElementById('setup-sec');
   var ls=document.getElementById('login-sec');
   if(gCI){if(ss)ss.style.display='none';if(ls)ls.style.display='block';}
   else{if(ss)ss.style.display='block';if(ls)ls.style.display='none';}
+  
+  // Wire login buttons via event listeners (avoids onclick timing issue)
+  function waitForFn(name, cb, tries){
+    tries = tries||0;
+    if(typeof window[name]==='function') cb();
+    else if(tries < 50) setTimeout(function(){ waitForFn(name,cb,tries+1); }, 100);
+    else alert('Load error: '+name+' tidak ditemukan. Coba refresh halaman.');
+  }
+  
+  var gBtn=document.getElementById('google-login-btn');
+  if(gBtn) gBtn.onclick=function(){ waitForFn('doGoogleLogin',function(){ window.doGoogleLogin(); }); };
+  
+  var eBtn=document.getElementById('email-login-btn');
+  if(eBtn) eBtn.onclick=function(){ waitForFn('doEmailLogin',function(){ window.doEmailLogin(); }); };
+  
+  var ci2=document.getElementById('inp-em');
+  if(ci2) ci2.oninput=function(){ if(typeof window.chkAdm==='function') window.chkAdm(this); };
+  
+  var sgBtn=document.getElementById('settings-google-btn');
+  if(sgBtn) sgBtn.onclick=function(){ waitForFn('doGoogleLogin',function(){ window.doGoogleLogin(); }); };
 });
 </script>
 </head>
@@ -495,15 +515,15 @@ document.addEventListener('DOMContentLoaded',function(){
 
       <!-- Login Section -->
       <div id="login-sec" style="display:none">
-        <button class="btn-white" onclick="doGoogleLogin()">
+        <button class="btn-white" id="google-login-btn">
           <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.826.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
           Masuk dengan Google
         </button>
         <div class="divr">atau masuk manual</div>
-        <input type="email" id="inp-em" class="gi" placeholder="nama@simasjiwa.co.id" oninput="chkAdm(this)"/>
+        <input type="email" id="inp-em" class="gi" placeholder="nama@simasjiwa.co.id"/>
         <div class="apw" id="apw"><input type="password" id="inp-pw" class="gi" placeholder="Password Admin" style="margin-bottom:8px"/></div>
         <div id="lerr" class="lerr"></div>
-        <button class="btn-gold" onclick="doEmailLogin()">Masuk →</button>
+        <button class="btn-gold" id="email-login-btn">Masuk →</button>
         <p class="cfg-link" onclick="showSetup()">⚙️ Ubah konfigurasi OAuth</p>
       </div>
 
@@ -794,7 +814,7 @@ document.addEventListener('DOMContentLoaded',function(){
   <div>
     <div class="sl">Google Account</div>
     <div id="gp-st" style="font-size:.78rem;color:var(--tm)">Belum terhubung</div>
-    <button class="bp" style="margin-top:6px;width:100%;padding:8px;border-radius:8px;font-size:.78rem" onclick="doGoogleLogin()">Hubungkan Google</button>
+    <button class="bp" style="margin-top:6px;width:100%;padding:8px;border-radius:8px;font-size:.78rem" id="settings-google-btn">Hubungkan Google</button>
   </div>
   <button onclick="doClSet()" style="padding:9px;border-radius:8px;background:var(--lt);border:none;color:var(--p);font-size:.79rem;font-weight:600;transition:all var(--tr);width:100%">Tutup</button>
 </div>
@@ -2611,6 +2631,11 @@ document.addEventListener('DOMContentLoaded', function(){
   });
   initLogin();
   
+// Expose critical functions globally
+window.doGoogleLogin = doGoogleLogin;
+window.doEmailLogin  = doEmailLogin;
+window.doEmailLogin  = doEmailLogin;
+window.chkAdm        = function(el){ chkAdm && chkAdm(el); };
 console.log('SimAsk v5 ready. DB:', DB.length, 'employees. JS OK.');
 });
 </script>
