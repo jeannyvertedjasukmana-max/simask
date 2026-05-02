@@ -7,6 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>SimAsk – Asuransi Simas Jiwa</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
@@ -2131,7 +2132,7 @@ function emlAC(inp, acId){
   if(!res.length){ ac.className='eml-ac'; return; }
   ac.className='eml-ac on';
   ac.innerHTML=res.map(function(e){
-    return '<div class="eml-ac-it" onclick="emlPick(''+inp.id+'',''+acId+'',''+e.e+'')">'
+    return '<div class="eml-ac-it" onclick="emlPick(\''+inp.id+'\',\''+acId+'\',\''+e.e+'\')">'
       +'<span>'+(BAV[e.g]||'👨‍💼')+'</span>'
       +'<span><strong>'+tc(e.n)+'</strong><br/>'
       +'<span style="font-size:.69rem;color:var(--tm)">'+e.e+' · '+e.p+'</span></span>'
