@@ -542,7 +542,25 @@ function initLogin(){
 function showScr(id){document.querySelectorAll('.scr').forEach(function(s){s.classList.remove('on');}); var el=G(id); if(el)el.classList.add('on');}
 function chkAdm(el){var v=(el.value||'').trim().toLowerCase();var apw=G('apw');if(v==='master.admin@simasjiwa.co.id'){el.classList.add('gi-adm');if(apw)apw.classList.add('on');}else{el.classList.remove('gi-adm');if(apw)apw.classList.remove('on');}}
 function applyTheme(t){document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'');}
-function goApp(){ console.log('goApp: main script not loaded yet'); }
+function goApp(){
+  // If main script has loaded its real goApp, call it
+  if(window._goAppReady){
+    window._goAppReady();
+  } else {
+    // Main script not ready yet — wait up to 5s and retry
+    var tries=0;
+    var wait=setInterval(function(){
+      tries++;
+      if(window._goAppReady){
+        clearInterval(wait);
+        window._goAppReady();
+      } else if(tries>50){
+        clearInterval(wait);
+        alert('Gagal memuat aplikasi. Coba refresh halaman (Ctrl+Shift+R).');
+      }
+    },100);
+  }
+}
 
 document.addEventListener('DOMContentLoaded',function(){
   // Restore saved OAuth config
@@ -1142,6 +1160,7 @@ const DB=[
   {n:'IXORA LUCIANTIWY SIBARANI',dv:'UNIT KERJA KHUSUS APU PPT & PPPSPM',dt:'UNIT KERJA KHUSUS APU PPT & PPPSPM',p:'Unit Kerja Khusus APU PPT & PPPSPM Officer',y:1995,e:'ixora.sibarani@simasjiwa.co.id',d:'IS',g:'Wanita'}
 ];
 console.log('DB loaded:',DB.length,'employees');
+window.DB = DB; // share with inline script
 
 // (old state block removed - see v4 state below)
 
@@ -1154,8 +1173,8 @@ const CY = new Date().getFullYear();
 let pEmp=null, pCtx=null;
 let grpSel=[], calPts=[], calDur=30, calSlot=null, editIdx=-1;
 let fCtx=null, curTab='all';
-const AVF=['👩','🙋‍♀️','👩‍💻','👩‍🎓','🙆‍♀️','👩‍🦱','🤩','👸'];
-const AVM=['🧑','👨','🧔','🙋‍♂️','😎','🤓','👨‍💻','🧑‍💼'];
+const AVF=['👩','🙋‍♀️','👩‍💻','👩‍🎓','🙆‍♀️','👩‍🦱','🤩','👸']; window.AVF=AVF;
+const AVM=['🧑','👨','🧔','🙋‍♂️','😎','🤓','👨‍💻','🧑‍💼']; window.AVM=AVM;
 const BAV={Pria:'👨‍💼',Wanita:'👩‍💼'};
 const DISC={D:'dominan, tegas, langsung to the point, berorientasi hasil, tidak suka basa-basi',I:'ekspresif, antusias, hangat, suka bersosialisasi, optimis, sering pakai humor',S:'sabar, kooperatif, pendengar yang baik, menghindari konfrontasi, konsisten',C:'analitis, teliti, berbasis data, metodis, butuh detail dan akurasi tinggi'};
 const TOPICS=['Proses Bisnis','Formulir & Dokumen','Human Capital / HR','IT & Teknologi','Klaim & Underwriting','Finance & Akuntansi','Produk Asuransi','Pemasaran & Sales','Compliance & Legal','Investasi','AI & Digital','Sekadar Ngobrol'];
@@ -1588,6 +1607,8 @@ function goApp(){
   const hc=G('hchips'); hc.innerHTML='';
   TOPICS.forEach(t=>{ const c=document.createElement('button'); c.className='ch'; c.textContent=t; c.onclick=()=>c.classList.toggle('on'); hc.appendChild(c); });
 }
+window._goAppReady = goApp; // expose to inline script
+
 function applyTheme(t){ document.documentElement.setAttribute('data-theme',t==='dark'?'dark':''); }
 function doSetTheme(t){ cfg.theme=t; applyTheme(t); G('th-lt').classList.toggle('on',t==='light'); G('th-dk').classList.toggle('on',t==='dark'); saveS(); }
 function doSaveSt(k,v){ cfg[k]=v; if(k==='nick')G('sbnm').textContent=v||fn(CU.n); saveS(); }
