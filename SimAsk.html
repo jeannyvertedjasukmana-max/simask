@@ -421,7 +421,404 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
   z-index:200;pointer-events:none}
 </style>
 
+
 <script>
+// Bootstrap: define login functions early so buttons work immediately
+var gCI='', gAK='', gTok=null;
+try { var _c=JSON.parse(localStorage.getItem('sk4_gcfg')||'{}'); gCI=_c.ci||''; gAK=_c.ak||''; } catch(e){}
+
+function doSaveOAuth(){
+  var ci=(document.getElementById('inp-ci').value||'').trim();
+  var ak=(document.getElementById('inp-ak').value||'').trim();
+  var msg=document.getElementById('oauth-msg');
+  if(!ci){
+    if(msg){msg.style.display='block';msg.style.color='#FCA5A5';msg.textContent='⚠️ Client ID tidak boleh kosong';}
+    return;
+  }
+  gCI=ci; gAK=ak;
+  try{localStorage.setItem('sk4_gcfg',JSON.stringify({ci:ci,ak:ak}));}catch(e){}
+  if(msg){msg.style.display='block';msg.style.color='#86EFAC';msg.textContent='✅ Tersimpan! Sekarang klik Masuk dengan Google.';}
+  setTimeout(function(){
+    var ss=document.getElementById('setup-sec');
+    var ls=document.getElementById('login-sec');
+    if(ss)ss.style.display='none';
+    if(ls)ls.style.display='block';
+  },1000);
+}
+
+function showSetup(){
+  var ss=document.getElementById('setup-sec');
+  var ls=document.getElementById('login-sec');
+  if(ss)ss.style.display='block';
+  if(ls)ls.style.display='none';
+}
+
+function chkAdm(el){
+  var v=(el.value||'').trim().toLowerCase();
+  var apw=document.getElementById('apw');
+  if(v==='master.admin@simasjiwa.co.id'){el.classList.add('gi-adm');if(apw)apw.classList.add('on');}
+  else{el.classList.remove('gi-adm');if(apw)apw.classList.remove('on');}
+}
+
+function doEmailLogin(){
+  var email=(document.getElementById('inp-em').value||'').trim().toLowerCase();
+  var er=document.getElementById('lerr');
+  if(er)er.style.display='none';
+  // Will be fully handled by main script - this just triggers it
+  if(typeof _doEmailLoginFull==='function') _doEmailLoginFull(email);
+  else alert('Sistem sedang loading, coba lagi dalam 1 detik.');
+}
+
+function doGoogleLogin(){
+  if(!gCI){showSetup();return;}
+  if(typeof _doGoogleLoginFull==='function') _doGoogleLoginFull();
+  else alert('Sistem sedang loading, coba lagi dalam 1 detik.');
+}
+
+// Show correct section on load
+document.addEventListener('DOMContentLoaded',function(){
+  var ss=document.getElementById('setup-sec');
+  var ls=document.getElementById('login-sec');
+  if(gCI){if(ss)ss.style.display='none';if(ls)ls.style.display='block';}
+  else{if(ss)ss.style.display='block';if(ls)ls.style.display='none';}
+});
+</script>
+</head>
+<body>
+
+<!-- ══ SPLASH / LOGIN ══ -->
+<div id="js-error"></div>
+<div id="js-ver">SimAsk v5.0</div>
+<div id="sp" class="scr on">
+  <div class="sp-c">
+    <div class="sp-logo">🛡️</div>
+    <h1 class="sp-title">Sim<span>Ask</span></h1>
+    <p class="sp-sub">AI-powered Internal Assistant · Asuransi Simas Jiwa</p>
+    <div class="sp-card">
+      <p class="sp-hl">Masuk dengan akun ASJ kamu</p>
+
+      <!-- OAuth Setup Section -->
+      <div id="setup-sec">
+        <p style="color:rgba(255,255,255,.5);font-size:.76rem;margin-bottom:12px;line-height:1.5;text-align:center">Setup Google OAuth sekali saja sebelum login.</p>
+        <label class="field-lbl">Google OAuth Client ID</label>
+        <input type="text" id="inp-ci" class="gi" placeholder="xxxxx.apps.googleusercontent.com"/>
+        <label class="field-lbl">Google API Key</label>
+        <input type="text" id="inp-ak" class="gi" placeholder="AIza..."/>
+        <button class="btn-gold" onclick="doSaveOAuth()">Simpan Konfigurasi ✓</button>
+        <div id="oauth-msg" class="st-ok"></div>
+      </div>
+
+      <!-- Login Section -->
+      <div id="login-sec" style="display:none">
+        <button class="btn-white" onclick="doGoogleLogin()">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.826.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
+          Masuk dengan Google
+        </button>
+        <div class="divr">atau masuk manual</div>
+        <input type="email" id="inp-em" class="gi" placeholder="nama@simasjiwa.co.id" oninput="chkAdm(this)"/>
+        <div class="apw" id="apw"><input type="password" id="inp-pw" class="gi" placeholder="Password Admin" style="margin-bottom:8px"/></div>
+        <div id="lerr" class="lerr"></div>
+        <button class="btn-gold" onclick="doEmailLogin()">Masuk →</button>
+        <p class="cfg-link" onclick="showSetup()">⚙️ Ubah konfigurasi OAuth</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ ONBOARD: Avatar ══ -->
+<div id="ob" class="scr">
+  <div class="ob-box">
+    <h2 class="ob-t" id="ob-ti">Hei! 👋</h2>
+    <p class="ob-s">Pilih foto profil kamu:</p>
+    <div class="av-g" id="av-g"></div>
+    <button class="btn-gold" style="margin:0" onclick="doConfAv()">Lanjut ✨</button>
+  </div>
+</div>
+
+<!-- ══ ONBOARD: Start ══ -->
+<div id="strt" class="scr">
+  <div class="ob-box">
+    <h2 class="ob-t">Mau mulai dari mana? 🚀</h2>
+    <p class="ob-s">Pilih cara kamu pakai SimAsk.</p>
+    <div class="ch-row">
+      <button class="ch-btn" onclick="doStartDirect()"><span class="ch-ic">💬</span>Start Chat<div style="font-size:.7rem;opacity:.6;margin-top:4px">Langsung cari kolega</div></button>
+      <button class="ch-btn" onclick="doStartHelp()"><span class="ch-ic">🤔</span>Bantu Saya<div style="font-size:.7rem;opacity:.6;margin-top:4px">Belum tahu tanya siapa</div></button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div id="app" class="scr">
+  <div class="sb" id="sb">
+    <div class="sb-hdr">
+      <div class="sb-logo">Sim<span>Ask</span></div>
+      <div class="ha">
+        <button class="ib" onclick="doOpSet()" title="Pengaturan">⚙️</button>
+        <button class="ib" onclick="doOpNC()" title="Chat Baru">✏️</button>
+        <button class="ib" onclick="doOpGrp()" title="Grup Baru">👥</button>
+        <button class="ib" onclick="doLogout()" title="Keluar">🚪</button>
+      </div>
+    </div>
+    <div class="sb-me">
+      <div class="me-av" id="sbav">😊</div>
+      <div class="me-i">
+        <div class="me-n" id="sbnm">—</div>
+        <div class="me-r" id="sbrl">—</div>
+        <div class="gok" id="gok">✅ Google terhubung</div>
+      </div>
+    </div>
+    <div class="sb-sr"><div class="sr-w"><span class="sr-i">🔍</span><input class="sr-in" placeholder="Cari chat..." oninput="doFChats(this.value)"/></div></div>
+    <div class="sb-tabs">
+      <button class="sb-tab on" id="tab-all" onclick="doSwTab('all')">Semua</button>
+      <button class="sb-tab" id="tab-cf" onclick="doSwTab('cf')">⭐ Close Friends</button>
+    </div>
+    <div class="cl" id="cl"></div>
+    <button class="nc-b" onclick="doOpNC()">✉️ Chat Baru</button>
+  </div>
+  <div class="ma" id="ma">
+    <div id="wl" class="wl">
+      <div class="wl-i">💬</div>
+      <h2 class="wl-t">Selamat datang di SimAsk!</h2>
+      <p class="wl-s">Pilih kontak atau klik Chat Baru untuk mulai ngobrol.</p>
+    </div>
+    <div id="ca" class="ca" style="display:none">
+      <div class="ca-h">
+        <button class="ib" style="display:none" id="bbk" onclick="doBack()">←</button>
+        <div class="ca-av re" id="cahav" onclick="doShowGI()">🤖</div>
+        <div class="ca-i" onclick="doShowGI()">
+          <div class="ca-n" id="cahn">—</div>
+          <div class="ca-s" id="cahs"><span class="dot">●</span> Online</div>
+        </div>
+        <div class="ca-ac">
+          <button class="ib" id="cf-btn" onclick="doTogCF()" title="Close Friend">☆</button>
+          <button class="ib" onclick="doOpCal()" title="Jadwalkan Meeting">📅</button>
+          <button class="ib" onclick="doOpGmail()" title="Compose Email">📧</button>
+        </div>
+      </div>
+      <div class="msgs" id="msgs"></div>
+      <div class="ia" id="ia">
+        <div class="mac" id="mac"></div>
+        <div class="ia-attachments" id="ia-attachments" style="display:none"></div>
+        <div class="ia-row">
+          <button class="att-btn" onclick="triggerFileUpload()" title="Lampirkan dokumen">📎</button>
+          <input type="file" id="file-input" accept=".pdf,.doc,.docx,.txt,.xlsx,.xls,.png,.jpg,.jpeg" multiple style="display:none" onchange="handleFileAttach(this)"/>
+          <textarea class="ci2" id="ci2" placeholder="Ketik pesan... (@ untuk mention)" rows="1" onkeydown="onCKey(event)" oninput="onCInp(this)"></textarea>
+          <button class="sb2" onclick="doSend()">➤</button>
+        </div>
+      </div>
+    </div>
+    <div id="adm" class="adm" style="display:none">
+      <div class="adm-h">
+        <span style="font-size:18px">🔐</span>
+        <h2>Admin Panel <span class="adm-bk">MASTER ADMIN</span></h2>
+        <span style="font-size:.7rem;opacity:.65">Total: <span id="admc">0</span></span>
+      </div>
+      <!-- Admin Tabs -->
+      <div style="display:flex;border-bottom:1px solid var(--bd);flex-shrink:0;background:var(--sb)">
+        <button class="sb-tab on" id="adm-tab-emp" onclick="admSwTab('emp')" style="padding:10px 16px;font-size:.8rem">👥 Karyawan</button>
+        <button class="sb-tab" id="adm-tab-kb" onclick="admSwTab('kb')" style="padding:10px 16px;font-size:.8rem">📚 Knowledge Base</button>
+      </div>
+      <!-- Employee Tab -->
+      <div id="adm-sec-emp" class="adm-b">
+        <div class="adm-ctl"><input class="adm-si" id="admsr" placeholder="🔍 Cari nama, divisi, posisi..." oninput="doRAdm(this.value)"/><button class="ab add" onclick="doShowAdd()">+ Tambah</button></div>
+        <div class="tw"><table class="at"><thead><tr><th>Nama</th><th>Divisi</th><th>Posisi</th><th>Thn</th><th>Email</th><th>DISC</th><th>G</th><th>Aksi</th></tr></thead><tbody id="admtb"></tbody></table></div>
+      </div>
+      <!-- Knowledge Base Tab -->
+      <div id="adm-sec-kb" style="display:none;flex:1;overflow-y:auto;padding:16px">
+        <p style="font-size:.8rem;color:var(--t2);margin-bottom:14px;line-height:1.5">Tambahkan knowledge & skill khusus per divisi, departemen, atau posisi. Bot-person akan otomatis menggunakan info ini.</p>
+        <!-- Add New KB Entry -->
+        <div style="background:var(--lt);border-radius:11px;padding:14px;margin-bottom:14px;border:1.5px solid var(--bd)">
+          <p style="font-weight:700;font-size:.82rem;color:var(--p);margin-bottom:10px">➕ Tambah Knowledge Baru</p>
+          <label style="font-size:.71rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Scope</label>
+          <select id="kb-scope" class="kb-sel" onchange="updateKBSelectors()">
+            <option value="div">Per Divisi</option>
+            <option value="dept">Per Departemen</option>
+            <option value="pos">Per Posisi</option>
+          </select>
+          <div id="kb-div-wrap">
+            <label style="font-size:.71rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Divisi</label>
+            <select id="kb-div" class="kb-sel"></select>
+          </div>
+          <div id="kb-dept-wrap" style="display:none">
+            <label style="font-size:.71rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Departemen</label>
+            <select id="kb-dept" class="kb-sel"></select>
+          </div>
+          <div id="kb-pos-wrap" style="display:none">
+            <label style="font-size:.71rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Posisi</label>
+            <select id="kb-pos" class="kb-sel"></select>
+          </div>
+          <label style="font-size:.71rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px;margin-top:8px">Knowledge & Skill (tuliskan di sini)</label>
+          <textarea id="kb-text" class="kb-ta" placeholder="Contoh: Tim ini bertanggung jawab untuk proses X, Y, Z. Prosedur pengajuan A adalah... SLA untuk B adalah... Kontak untuk C adalah..."></textarea>
+          <label style="font-size:.71rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-top:8px;margin-bottom:3px">Upload Dokumen (opsional)</label>
+          <div id="kb-docs-preview" class="kb-docs"></div>
+          <label class="kb-file-btn" for="kb-file-input">📎 Upload Dokumen</label>
+          <input type="file" id="kb-file-input" accept=".pdf,.txt,.docx,.doc" multiple style="display:none" onchange="handleKBFile(this)"/>
+          <button onclick="saveKBEntry()" style="width:100%;margin-top:10px;padding:9px;border-radius:8px;background:linear-gradient(135deg,var(--p),var(--s));color:#fff;border:none;font-weight:600;font-size:.82rem;cursor:pointer">💾 Simpan Knowledge</button>
+        </div>
+        <!-- Existing KB Entries -->
+        <p style="font-weight:700;font-size:.82rem;color:var(--t1);margin-bottom:8px">📋 Knowledge yang Tersimpan</p>
+        <div id="kb-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY: New Chat -->
+<div class="ov" id="ov-nc" style="display:none">
+  <div class="ov-c">
+    <h3>💬 Mulai Chat Baru</h3>
+    <input class="ov-si" id="nc-sr" placeholder="Cari nama, posisi, divisi..." oninput="doRNC(this.value)"/>
+    <div class="pl" id="nc-pl"></div>
+    <div class="ob-btns"><button class="bc" style="flex:1" onclick="doClOv('ov-nc')">Tutup</button></div>
+  </div>
+</div>
+
+<!-- OVERLAY: Language -->
+<div class="ov" id="ov-lang" style="display:none">
+  <div class="ov-c" style="max-width:300px">
+    <h3>Pilih Gaya Bahasa 💬</h3>
+    <p style="color:var(--tm);font-size:.79rem;margin-bottom:10px">Ngobrol dengan <strong id="lang-nm" style="color:var(--t1)">—</strong>:</p>
+    <div class="lo">
+      <button class="lb" onclick="doSelLang('formal')">👔<br/><strong>Formal</strong><br/><span style="font-size:.7rem;color:var(--tm)">Profesional</span></button>
+      <button class="lb" onclick="doSelLang('informal')">😎<br/><strong>Santai</strong><br/><span style="font-size:.7rem;color:var(--tm)">Gen-Z</span></button>
+    </div>
+    <div class="ob-btns"><button class="bc" style="flex:1" onclick="doClOv('ov-lang')">Batal</button></div>
+  </div>
+</div>
+
+<!-- OVERLAY: Help -->
+<div class="ov" id="ov-help" style="display:none">
+  <div class="ov-c" style="max-width:430px">
+    <h3>🤔 Mau tanya topik apa?</h3>
+    <div class="chs" id="hchips" style="margin-bottom:9px"></div>
+    <input class="ov-si" id="hcust" placeholder="Atau ketik topik kamu..."/>
+    <div id="hrecs" style="display:none">
+      <p style="font-size:.76rem;font-weight:700;color:var(--t2);margin-bottom:5px">Kolega yang bisa membantu:</p>
+      <div class="pl" id="hrecs-pl" style="max-height:160px"></div>
+    </div>
+    <div class="ob-btns">
+      <button class="bc" style="flex:1" onclick="doClOv('ov-help')">Batal</button>
+      <button class="bp" style="flex:1" onclick="doFindRecs()">Cari Kolega</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY: Group Create -->
+<div class="ov" id="ov-grp" style="display:none">
+  <div class="ov-c">
+    <h3>👥 Buat Group Chat</h3>
+    <input class="ov-si" id="grp-nm" placeholder="Nama grup..."/>
+    <input class="ov-si" id="grp-sr" placeholder="Cari anggota..." oninput="doRGrpSr(this.value)"/>
+    <div class="gsc" id="grp-sel"></div>
+    <div class="pl" id="grp-pl"></div>
+    <div class="ob-btns"><button class="bc" style="flex:1" onclick="doClOv('ov-grp')">Batal</button><button class="bp" style="flex:1" onclick="doCreateGrp()">Buat Grup</button></div>
+  </div>
+</div>
+
+<!-- OVERLAY: Group Info -->
+<div class="ov" id="ov-gi" style="display:none">
+  <div class="ov-c" style="max-width:340px">
+    <h3 id="gi-nm">👥 Info Grup</h3>
+    <div class="pl" id="gi-mems"></div>
+    <div class="ob-btns"><button class="bc" style="flex:1" onclick="doClOv('ov-gi')">Tutup</button></div>
+  </div>
+</div>
+
+<!-- OVERLAY: Edit Employee -->
+<div class="ov" id="ov-edit" style="display:none">
+  <div class="em">
+    <h3 id="edit-ti">✏️ Edit</h3>
+    <div class="ef">
+      <div class="ef-f"><label>Nama Lengkap</label><input type="text" id="ef-n"/></div>
+      <div><label>Divisi</label><select id="ef-dv" onchange="onDvCh()"></select><input type="text" class="ef-oth" id="ef-dvo" placeholder="Nama divisi lainnya..."/></div>
+      <div><label>Departemen</label><select id="ef-dt" onchange="onDtCh()"></select><input type="text" class="ef-oth" id="ef-dto" placeholder="Nama departemen lainnya..."/></div>
+      <div class="ef-f"><label>Posisi</label><input type="text" id="ef-p"/></div>
+      <div><label>Tahun Lahir</label><input type="number" id="ef-y" min="1940" max="2010"/></div>
+      <div><label>Email</label><input type="email" id="ef-e"/></div>
+      <div><label>DISC</label><input type="text" id="ef-d" maxlength="4"/></div>
+      <div><label>Gender</label><select id="ef-g"><option>Pria</option><option>Wanita</option></select></div>
+    </div>
+    <div class="ob-btns"><button class="bc" style="flex:1" onclick="doClOv('ov-edit')">Batal</button><button class="bp" style="flex:1" id="ef-sv">Simpan</button></div>
+  </div>
+</div>
+
+<!-- OVERLAY: Calendar -->
+<div class="ov" id="ov-cal" style="display:none">
+  <div class="ov-c" style="max-width:430px">
+    <h3>📅 Jadwalkan Meeting</h3>
+    <input class="ov-si" id="cal-topic" placeholder="Topik meeting..."/>
+    <p style="font-size:.74rem;color:var(--tm);margin-bottom:5px">Peserta:</p>
+    <div class="gsc" id="cal-parts"></div>
+    <input class="ov-si" id="cal-sr" placeholder="Tambah peserta..." oninput="doRCalSr(this.value)"/>
+    <div class="pl" id="cal-pl" style="max-height:120px;margin-bottom:8px"></div>
+    <p style="font-size:.74rem;color:var(--tm);margin-bottom:5px">Durasi:</p>
+    <div style="display:flex;gap:7px;margin-bottom:9px;flex-wrap:wrap">
+      <button class="dbt on" onclick="doSelDur(30,this)">30 mnt</button>
+      <button class="dbt" onclick="doSelDur(60,this)">1 jam</button>
+      <button class="dbt" onclick="doSelDur(90,this)">1.5 jam</button>
+      <button class="dbt" onclick="doSelDur(120,this)">2 jam</button>
+    </div>
+    <div id="cal-slots" style="display:none">
+      <p style="font-size:.74rem;font-weight:700;color:var(--t2);margin-bottom:5px">Pilih slot waktu:</p>
+      <div id="cal-sl"></div>
+    </div>
+    <div class="ob-btns">
+      <button class="bc" style="flex:1" onclick="doClOv('ov-cal')">Batal</button>
+      <button class="bp" style="flex:1" id="cal-btn" onclick="doFindSlots()">Cek Ketersediaan</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERLAY: Gmail -->
+<div class="ov" id="ov-gml" style="display:none">
+  <div class="ov-c" style="max-width:480px">
+    <h3>📧 Compose Email</h3>
+    <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px">
+      <div style="position:relative">
+        <label style="font-size:.69rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">To</label>
+        <input type="text" class="ov-si" id="gml-to" placeholder="Ketik nama atau email..." style="margin-bottom:0" oninput="emlAC(this,'gml-to-ac')" autocomplete="off"/>
+        <div class="eml-ac" id="gml-to-ac"></div>
+      </div>
+      <div style="position:relative">
+        <label style="font-size:.69rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">CC</label>
+        <input type="text" class="ov-si" id="gml-cc" placeholder="Ketik nama atau email..." style="margin-bottom:0" oninput="emlAC(this,'gml-cc-ac')" autocomplete="off"/>
+        <div class="eml-ac" id="gml-cc-ac"></div>
+      </div>
+      <div><label style="font-size:.69rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Subjek</label><input type="text" class="ov-si" id="gml-s" placeholder="Subjek email..." style="margin-bottom:0"/></div>
+      <div><label style="font-size:.69rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Isi Email</label><textarea class="ov-si" id="gml-b" rows="5" style="resize:vertical;min-height:80px;margin-bottom:0" placeholder="Isi email..."></textarea></div>
+    </div>
+    <div class="ob-btns"><button class="bc" style="flex:1" onclick="doClOv('ov-gml')">Batal</button><button class="bp" style="flex:1" onclick="doSendEmail()">Kirim 📤</button></div>
+  </div>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div class="sp2" id="sp2">
+  <h3>⚙️ Pengaturan</h3>
+  <div>
+    <div class="sl">Anthropic API Key</div>
+    <input type="password" class="si" id="si-ak" placeholder="sk-ant-api03-..." oninput="doSaveAK(this.value)" autocomplete="off"/>
+    <div id="ak-st" style="font-size:.7rem;margin-top:3px;display:none"></div>
+    <div style="font-size:.67rem;color:var(--tm);margin-top:3px">Dari console.anthropic.com → API Keys</div>
+    <button onclick="doTestAK()" style="margin-top:7px;width:100%;padding:7px;border-radius:8px;background:rgba(0,112,205,.1);border:1.5px solid var(--bd);color:var(--p);font-size:.76rem;font-weight:600;cursor:pointer;transition:all .2s">🧪 Test Koneksi API</button>
+    <div id="ak-test-result" style="font-size:.73rem;margin-top:5px;display:none;line-height:1.5;padding:7px 9px;border-radius:7px;background:var(--bg)"></div>
+  </div>
+  <div><div class="sl">Tema</div><div style="display:flex;gap:7px"><button class="thb on" id="th-lt" onclick="doSetTheme('light')">☀️ Light</button><button class="thb" id="th-dk" onclick="doSetTheme('dark')">🌙 Dark</button></div></div>
+  <div><div class="sl">Nama Panggilan</div><input type="text" class="si" id="si-nk" placeholder="Panggil saya..." oninput="doSaveSt('nick',this.value)"/></div>
+  <div><div class="sl">Nickname Close Friend</div><input type="text" class="si" id="si-cf" placeholder="Panggilan bestie..." oninput="doSaveSt('cfNick',this.value)"/></div>
+  <div>
+    <div class="sl">Google Account</div>
+    <div id="gp-st" style="font-size:.78rem;color:var(--tm)">Belum terhubung</div>
+    <button class="bp" style="margin-top:6px;width:100%;padding:8px;border-radius:8px;font-size:.78rem" onclick="doGoogleLogin()">Hubungkan Google</button>
+  </div>
+  <button onclick="doClSet()" style="padding:9px;border-radius:8px;background:var(--lt);border:none;color:var(--p);font-size:.79rem;font-weight:600;transition:all var(--tr);width:100%">Tutup</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+<script>
+
 // ══════════════════════════════════════════════════════
 // DATABASE
 // ══════════════════════════════════════════════════════
@@ -2228,341 +2625,12 @@ document.addEventListener('DOMContentLoaded', function(){
     if(window.innerWidth>680){ G('sb').classList.remove('mh'); G('bbk').style.display='none'; }
   });
   initLogin();
-  console.log('SimAsk v5 ready. DB:', DB.length, 'employees. JS OK.');
+  
+// Make full versions available to bootstrap stubs
+_doEmailLoginFull = doEmailLogin;
+_doGoogleLoginFull = doGoogleLogin;
+console.log('SimAsk v5 ready. DB:', DB.length, 'employees. JS OK.');
 });
 </script>
-</head>
-<body>
-
-<!-- ══ SPLASH / LOGIN ══ -->
-<div id="js-error"></div>
-<div id="js-ver">SimAsk v5.0</div>
-<div id="sp" class="scr on">
-  <div class="sp-c">
-    <div class="sp-logo">🛡️</div>
-    <h1 class="sp-title">Sim<span>Ask</span></h1>
-    <p class="sp-sub">AI-powered Internal Assistant · Asuransi Simas Jiwa</p>
-    <div class="sp-card">
-      <p class="sp-hl">Masuk dengan akun ASJ kamu</p>
-
-      <!-- OAuth Setup Section -->
-      <div id="setup-sec">
-        <p style="color:rgba(255,255,255,.5);font-size:.76rem;margin-bottom:12px;line-height:1.5;text-align:center">Setup Google OAuth sekali saja sebelum login.</p>
-        <label class="field-lbl">Google OAuth Client ID</label>
-        <input type="text" id="inp-ci" class="gi" placeholder="xxxxx.apps.googleusercontent.com"/>
-        <label class="field-lbl">Google API Key</label>
-        <input type="text" id="inp-ak" class="gi" placeholder="AIza..."/>
-        <button class="btn-gold" onclick="doSaveOAuth()">Simpan Konfigurasi ✓</button>
-        <div id="oauth-msg" class="st-ok"></div>
-      </div>
-
-      <!-- Login Section -->
-      <div id="login-sec" style="display:none">
-        <button class="btn-white" onclick="doGoogleLogin()">
-          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.55 0 9s.348 2.826.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
-          Masuk dengan Google
-        </button>
-        <div class="divr">atau masuk manual</div>
-        <input type="email" id="inp-em" class="gi" placeholder="nama@simasjiwa.co.id" oninput="chkAdm(this)"/>
-        <div class="apw" id="apw"><input type="password" id="inp-pw" class="gi" placeholder="Password Admin" style="margin-bottom:8px"/></div>
-        <div id="lerr" class="lerr"></div>
-        <button class="btn-gold" onclick="doEmailLogin()">Masuk →</button>
-        <p class="cfg-link" onclick="showSetup()">⚙️ Ubah konfigurasi OAuth</p>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- ══ ONBOARD: Avatar ══ -->
-<div id="ob" class="scr">
-  <div class="ob-box">
-    <h2 class="ob-t" id="ob-ti">Hei! 👋</h2>
-    <p class="ob-s">Pilih foto profil kamu:</p>
-    <div class="av-g" id="av-g"></div>
-    <button class="btn-gold" style="margin:0" onclick="doConfAv()">Lanjut ✨</button>
-  </div>
-</div>
-
-<!-- ══ ONBOARD: Start ══ -->
-<div id="strt" class="scr">
-  <div class="ob-box">
-    <h2 class="ob-t">Mau mulai dari mana? 🚀</h2>
-    <p class="ob-s">Pilih cara kamu pakai SimAsk.</p>
-    <div class="ch-row">
-      <button class="ch-btn" onclick="doStartDirect()"><span class="ch-ic">💬</span>Start Chat<div style="font-size:.7rem;opacity:.6;margin-top:4px">Langsung cari kolega</div></button>
-      <button class="ch-btn" onclick="doStartHelp()"><span class="ch-ic">🤔</span>Bantu Saya<div style="font-size:.7rem;opacity:.6;margin-top:4px">Belum tahu tanya siapa</div></button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ MAIN APP ══ -->
-<div id="app" class="scr">
-  <div class="sb" id="sb">
-    <div class="sb-hdr">
-      <div class="sb-logo">Sim<span>Ask</span></div>
-      <div class="ha">
-        <button class="ib" onclick="doOpSet()" title="Pengaturan">⚙️</button>
-        <button class="ib" onclick="doOpNC()" title="Chat Baru">✏️</button>
-        <button class="ib" onclick="doOpGrp()" title="Grup Baru">👥</button>
-        <button class="ib" onclick="doLogout()" title="Keluar">🚪</button>
-      </div>
-    </div>
-    <div class="sb-me">
-      <div class="me-av" id="sbav">😊</div>
-      <div class="me-i">
-        <div class="me-n" id="sbnm">—</div>
-        <div class="me-r" id="sbrl">—</div>
-        <div class="gok" id="gok">✅ Google terhubung</div>
-      </div>
-    </div>
-    <div class="sb-sr"><div class="sr-w"><span class="sr-i">🔍</span><input class="sr-in" placeholder="Cari chat..." oninput="doFChats(this.value)"/></div></div>
-    <div class="sb-tabs">
-      <button class="sb-tab on" id="tab-all" onclick="doSwTab('all')">Semua</button>
-      <button class="sb-tab" id="tab-cf" onclick="doSwTab('cf')">⭐ Close Friends</button>
-    </div>
-    <div class="cl" id="cl"></div>
-    <button class="nc-b" onclick="doOpNC()">✉️ Chat Baru</button>
-  </div>
-  <div class="ma" id="ma">
-    <div id="wl" class="wl">
-      <div class="wl-i">💬</div>
-      <h2 class="wl-t">Selamat datang di SimAsk!</h2>
-      <p class="wl-s">Pilih kontak atau klik Chat Baru untuk mulai ngobrol.</p>
-    </div>
-    <div id="ca" class="ca" style="display:none">
-      <div class="ca-h">
-        <button class="ib" style="display:none" id="bbk" onclick="doBack()">←</button>
-        <div class="ca-av re" id="cahav" onclick="doShowGI()">🤖</div>
-        <div class="ca-i" onclick="doShowGI()">
-          <div class="ca-n" id="cahn">—</div>
-          <div class="ca-s" id="cahs"><span class="dot">●</span> Online</div>
-        </div>
-        <div class="ca-ac">
-          <button class="ib" id="cf-btn" onclick="doTogCF()" title="Close Friend">☆</button>
-          <button class="ib" onclick="doOpCal()" title="Jadwalkan Meeting">📅</button>
-          <button class="ib" onclick="doOpGmail()" title="Compose Email">📧</button>
-        </div>
-      </div>
-      <div class="msgs" id="msgs"></div>
-      <div class="ia" id="ia">
-        <div class="mac" id="mac"></div>
-        <div class="ia-attachments" id="ia-attachments" style="display:none"></div>
-        <div class="ia-row">
-          <button class="att-btn" onclick="triggerFileUpload()" title="Lampirkan dokumen">📎</button>
-          <input type="file" id="file-input" accept=".pdf,.doc,.docx,.txt,.xlsx,.xls,.png,.jpg,.jpeg" multiple style="display:none" onchange="handleFileAttach(this)"/>
-          <textarea class="ci2" id="ci2" placeholder="Ketik pesan... (@ untuk mention)" rows="1" onkeydown="onCKey(event)" oninput="onCInp(this)"></textarea>
-          <button class="sb2" onclick="doSend()">➤</button>
-        </div>
-      </div>
-    </div>
-    <div id="adm" class="adm" style="display:none">
-      <div class="adm-h">
-        <span style="font-size:18px">🔐</span>
-        <h2>Admin Panel <span class="adm-bk">MASTER ADMIN</span></h2>
-        <span style="font-size:.7rem;opacity:.65">Total: <span id="admc">0</span></span>
-      </div>
-      <!-- Admin Tabs -->
-      <div style="display:flex;border-bottom:1px solid var(--bd);flex-shrink:0;background:var(--sb)">
-        <button class="sb-tab on" id="adm-tab-emp" onclick="admSwTab('emp')" style="padding:10px 16px;font-size:.8rem">👥 Karyawan</button>
-        <button class="sb-tab" id="adm-tab-kb" onclick="admSwTab('kb')" style="padding:10px 16px;font-size:.8rem">📚 Knowledge Base</button>
-      </div>
-      <!-- Employee Tab -->
-      <div id="adm-sec-emp" class="adm-b">
-        <div class="adm-ctl"><input class="adm-si" id="admsr" placeholder="🔍 Cari nama, divisi, posisi..." oninput="doRAdm(this.value)"/><button class="ab add" onclick="doShowAdd()">+ Tambah</button></div>
-        <div class="tw"><table class="at"><thead><tr><th>Nama</th><th>Divisi</th><th>Posisi</th><th>Thn</th><th>Email</th><th>DISC</th><th>G</th><th>Aksi</th></tr></thead><tbody id="admtb"></tbody></table></div>
-      </div>
-      <!-- Knowledge Base Tab -->
-      <div id="adm-sec-kb" style="display:none;flex:1;overflow-y:auto;padding:16px">
-        <p style="font-size:.8rem;color:var(--t2);margin-bottom:14px;line-height:1.5">Tambahkan knowledge & skill khusus per divisi, departemen, atau posisi. Bot-person akan otomatis menggunakan info ini.</p>
-        <!-- Add New KB Entry -->
-        <div style="background:var(--lt);border-radius:11px;padding:14px;margin-bottom:14px;border:1.5px solid var(--bd)">
-          <p style="font-weight:700;font-size:.82rem;color:var(--p);margin-bottom:10px">➕ Tambah Knowledge Baru</p>
-          <label style="font-size:.71rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Scope</label>
-          <select id="kb-scope" class="kb-sel" onchange="updateKBSelectors()">
-            <option value="div">Per Divisi</option>
-            <option value="dept">Per Departemen</option>
-            <option value="pos">Per Posisi</option>
-          </select>
-          <div id="kb-div-wrap">
-            <label style="font-size:.71rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Divisi</label>
-            <select id="kb-div" class="kb-sel"></select>
-          </div>
-          <div id="kb-dept-wrap" style="display:none">
-            <label style="font-size:.71rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Departemen</label>
-            <select id="kb-dept" class="kb-sel"></select>
-          </div>
-          <div id="kb-pos-wrap" style="display:none">
-            <label style="font-size:.71rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Posisi</label>
-            <select id="kb-pos" class="kb-sel"></select>
-          </div>
-          <label style="font-size:.71rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px;margin-top:8px">Knowledge & Skill (tuliskan di sini)</label>
-          <textarea id="kb-text" class="kb-ta" placeholder="Contoh: Tim ini bertanggung jawab untuk proses X, Y, Z. Prosedur pengajuan A adalah... SLA untuk B adalah... Kontak untuk C adalah..."></textarea>
-          <label style="font-size:.71rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-top:8px;margin-bottom:3px">Upload Dokumen (opsional)</label>
-          <div id="kb-docs-preview" class="kb-docs"></div>
-          <label class="kb-file-btn" for="kb-file-input">📎 Upload Dokumen</label>
-          <input type="file" id="kb-file-input" accept=".pdf,.txt,.docx,.doc" multiple style="display:none" onchange="handleKBFile(this)"/>
-          <button onclick="saveKBEntry()" style="width:100%;margin-top:10px;padding:9px;border-radius:8px;background:linear-gradient(135deg,var(--p),var(--s));color:#fff;border:none;font-weight:600;font-size:.82rem;cursor:pointer">💾 Simpan Knowledge</button>
-        </div>
-        <!-- Existing KB Entries -->
-        <p style="font-weight:700;font-size:.82rem;color:var(--t1);margin-bottom:8px">📋 Knowledge yang Tersimpan</p>
-        <div id="kb-list"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- OVERLAY: New Chat -->
-<div class="ov" id="ov-nc" style="display:none">
-  <div class="ov-c">
-    <h3>💬 Mulai Chat Baru</h3>
-    <input class="ov-si" id="nc-sr" placeholder="Cari nama, posisi, divisi..." oninput="doRNC(this.value)"/>
-    <div class="pl" id="nc-pl"></div>
-    <div class="ob-btns"><button class="bc" style="flex:1" onclick="doClOv('ov-nc')">Tutup</button></div>
-  </div>
-</div>
-
-<!-- OVERLAY: Language -->
-<div class="ov" id="ov-lang" style="display:none">
-  <div class="ov-c" style="max-width:300px">
-    <h3>Pilih Gaya Bahasa 💬</h3>
-    <p style="color:var(--tm);font-size:.79rem;margin-bottom:10px">Ngobrol dengan <strong id="lang-nm" style="color:var(--t1)">—</strong>:</p>
-    <div class="lo">
-      <button class="lb" onclick="doSelLang('formal')">👔<br/><strong>Formal</strong><br/><span style="font-size:.7rem;color:var(--tm)">Profesional</span></button>
-      <button class="lb" onclick="doSelLang('informal')">😎<br/><strong>Santai</strong><br/><span style="font-size:.7rem;color:var(--tm)">Gen-Z</span></button>
-    </div>
-    <div class="ob-btns"><button class="bc" style="flex:1" onclick="doClOv('ov-lang')">Batal</button></div>
-  </div>
-</div>
-
-<!-- OVERLAY: Help -->
-<div class="ov" id="ov-help" style="display:none">
-  <div class="ov-c" style="max-width:430px">
-    <h3>🤔 Mau tanya topik apa?</h3>
-    <div class="chs" id="hchips" style="margin-bottom:9px"></div>
-    <input class="ov-si" id="hcust" placeholder="Atau ketik topik kamu..."/>
-    <div id="hrecs" style="display:none">
-      <p style="font-size:.76rem;font-weight:700;color:var(--t2);margin-bottom:5px">Kolega yang bisa membantu:</p>
-      <div class="pl" id="hrecs-pl" style="max-height:160px"></div>
-    </div>
-    <div class="ob-btns">
-      <button class="bc" style="flex:1" onclick="doClOv('ov-help')">Batal</button>
-      <button class="bp" style="flex:1" onclick="doFindRecs()">Cari Kolega</button>
-    </div>
-  </div>
-</div>
-
-<!-- OVERLAY: Group Create -->
-<div class="ov" id="ov-grp" style="display:none">
-  <div class="ov-c">
-    <h3>👥 Buat Group Chat</h3>
-    <input class="ov-si" id="grp-nm" placeholder="Nama grup..."/>
-    <input class="ov-si" id="grp-sr" placeholder="Cari anggota..." oninput="doRGrpSr(this.value)"/>
-    <div class="gsc" id="grp-sel"></div>
-    <div class="pl" id="grp-pl"></div>
-    <div class="ob-btns"><button class="bc" style="flex:1" onclick="doClOv('ov-grp')">Batal</button><button class="bp" style="flex:1" onclick="doCreateGrp()">Buat Grup</button></div>
-  </div>
-</div>
-
-<!-- OVERLAY: Group Info -->
-<div class="ov" id="ov-gi" style="display:none">
-  <div class="ov-c" style="max-width:340px">
-    <h3 id="gi-nm">👥 Info Grup</h3>
-    <div class="pl" id="gi-mems"></div>
-    <div class="ob-btns"><button class="bc" style="flex:1" onclick="doClOv('ov-gi')">Tutup</button></div>
-  </div>
-</div>
-
-<!-- OVERLAY: Edit Employee -->
-<div class="ov" id="ov-edit" style="display:none">
-  <div class="em">
-    <h3 id="edit-ti">✏️ Edit</h3>
-    <div class="ef">
-      <div class="ef-f"><label>Nama Lengkap</label><input type="text" id="ef-n"/></div>
-      <div><label>Divisi</label><select id="ef-dv" onchange="onDvCh()"></select><input type="text" class="ef-oth" id="ef-dvo" placeholder="Nama divisi lainnya..."/></div>
-      <div><label>Departemen</label><select id="ef-dt" onchange="onDtCh()"></select><input type="text" class="ef-oth" id="ef-dto" placeholder="Nama departemen lainnya..."/></div>
-      <div class="ef-f"><label>Posisi</label><input type="text" id="ef-p"/></div>
-      <div><label>Tahun Lahir</label><input type="number" id="ef-y" min="1940" max="2010"/></div>
-      <div><label>Email</label><input type="email" id="ef-e"/></div>
-      <div><label>DISC</label><input type="text" id="ef-d" maxlength="4"/></div>
-      <div><label>Gender</label><select id="ef-g"><option>Pria</option><option>Wanita</option></select></div>
-    </div>
-    <div class="ob-btns"><button class="bc" style="flex:1" onclick="doClOv('ov-edit')">Batal</button><button class="bp" style="flex:1" id="ef-sv">Simpan</button></div>
-  </div>
-</div>
-
-<!-- OVERLAY: Calendar -->
-<div class="ov" id="ov-cal" style="display:none">
-  <div class="ov-c" style="max-width:430px">
-    <h3>📅 Jadwalkan Meeting</h3>
-    <input class="ov-si" id="cal-topic" placeholder="Topik meeting..."/>
-    <p style="font-size:.74rem;color:var(--tm);margin-bottom:5px">Peserta:</p>
-    <div class="gsc" id="cal-parts"></div>
-    <input class="ov-si" id="cal-sr" placeholder="Tambah peserta..." oninput="doRCalSr(this.value)"/>
-    <div class="pl" id="cal-pl" style="max-height:120px;margin-bottom:8px"></div>
-    <p style="font-size:.74rem;color:var(--tm);margin-bottom:5px">Durasi:</p>
-    <div style="display:flex;gap:7px;margin-bottom:9px;flex-wrap:wrap">
-      <button class="dbt on" onclick="doSelDur(30,this)">30 mnt</button>
-      <button class="dbt" onclick="doSelDur(60,this)">1 jam</button>
-      <button class="dbt" onclick="doSelDur(90,this)">1.5 jam</button>
-      <button class="dbt" onclick="doSelDur(120,this)">2 jam</button>
-    </div>
-    <div id="cal-slots" style="display:none">
-      <p style="font-size:.74rem;font-weight:700;color:var(--t2);margin-bottom:5px">Pilih slot waktu:</p>
-      <div id="cal-sl"></div>
-    </div>
-    <div class="ob-btns">
-      <button class="bc" style="flex:1" onclick="doClOv('ov-cal')">Batal</button>
-      <button class="bp" style="flex:1" id="cal-btn" onclick="doFindSlots()">Cek Ketersediaan</button>
-    </div>
-  </div>
-</div>
-
-<!-- OVERLAY: Gmail -->
-<div class="ov" id="ov-gml" style="display:none">
-  <div class="ov-c" style="max-width:480px">
-    <h3>📧 Compose Email</h3>
-    <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:10px">
-      <div style="position:relative">
-        <label style="font-size:.69rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">To</label>
-        <input type="text" class="ov-si" id="gml-to" placeholder="Ketik nama atau email..." style="margin-bottom:0" oninput="emlAC(this,'gml-to-ac')" autocomplete="off"/>
-        <div class="eml-ac" id="gml-to-ac"></div>
-      </div>
-      <div style="position:relative">
-        <label style="font-size:.69rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">CC</label>
-        <input type="text" class="ov-si" id="gml-cc" placeholder="Ketik nama atau email..." style="margin-bottom:0" oninput="emlAC(this,'gml-cc-ac')" autocomplete="off"/>
-        <div class="eml-ac" id="gml-cc-ac"></div>
-      </div>
-      <div><label style="font-size:.69rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Subjek</label><input type="text" class="ov-si" id="gml-s" placeholder="Subjek email..." style="margin-bottom:0"/></div>
-      <div><label style="font-size:.69rem;font-weight:700;color:var(--tm);text-transform:uppercase;display:block;margin-bottom:3px">Isi Email</label><textarea class="ov-si" id="gml-b" rows="5" style="resize:vertical;min-height:80px;margin-bottom:0" placeholder="Isi email..."></textarea></div>
-    </div>
-    <div class="ob-btns"><button class="bc" style="flex:1" onclick="doClOv('ov-gml')">Batal</button><button class="bp" style="flex:1" onclick="doSendEmail()">Kirim 📤</button></div>
-  </div>
-</div>
-
-<!-- SETTINGS PANEL -->
-<div class="sp2" id="sp2">
-  <h3>⚙️ Pengaturan</h3>
-  <div>
-    <div class="sl">Anthropic API Key</div>
-    <input type="password" class="si" id="si-ak" placeholder="sk-ant-api03-..." oninput="doSaveAK(this.value)" autocomplete="off"/>
-    <div id="ak-st" style="font-size:.7rem;margin-top:3px;display:none"></div>
-    <div style="font-size:.67rem;color:var(--tm);margin-top:3px">Dari console.anthropic.com → API Keys</div>
-    <button onclick="doTestAK()" style="margin-top:7px;width:100%;padding:7px;border-radius:8px;background:rgba(0,112,205,.1);border:1.5px solid var(--bd);color:var(--p);font-size:.76rem;font-weight:600;cursor:pointer;transition:all .2s">🧪 Test Koneksi API</button>
-    <div id="ak-test-result" style="font-size:.73rem;margin-top:5px;display:none;line-height:1.5;padding:7px 9px;border-radius:7px;background:var(--bg)"></div>
-  </div>
-  <div><div class="sl">Tema</div><div style="display:flex;gap:7px"><button class="thb on" id="th-lt" onclick="doSetTheme('light')">☀️ Light</button><button class="thb" id="th-dk" onclick="doSetTheme('dark')">🌙 Dark</button></div></div>
-  <div><div class="sl">Nama Panggilan</div><input type="text" class="si" id="si-nk" placeholder="Panggil saya..." oninput="doSaveSt('nick',this.value)"/></div>
-  <div><div class="sl">Nickname Close Friend</div><input type="text" class="si" id="si-cf" placeholder="Panggilan bestie..." oninput="doSaveSt('cfNick',this.value)"/></div>
-  <div>
-    <div class="sl">Google Account</div>
-    <div id="gp-st" style="font-size:.78rem;color:var(--tm)">Belum terhubung</div>
-    <button class="bp" style="margin-top:6px;width:100%;padding:8px;border-radius:8px;font-size:.78rem" onclick="doGoogleLogin()">Hubungkan Google</button>
-  </div>
-  <button onclick="doClSet()" style="padding:9px;border-radius:8px;background:var(--lt);border:none;color:var(--p);font-size:.79rem;font-weight:600;transition:all var(--tr);width:100%">Tutup</button>
-</div>
-
-<div class="toast" id="toast"></div>
-
 </body>
 </html>
