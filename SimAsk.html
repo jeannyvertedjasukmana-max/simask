@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>SimAsk – Asuransi Simas Jiwa</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -410,11 +413,19 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
   .sb.mh{transform:translateX(-100%)}
   #bbk{display:flex!important}
 }
+
+/* ERROR DISPLAY */
+#js-error{position:fixed;top:0;left:0;right:0;background:#DC2626;color:#fff;padding:10px 16px;
+  font-size:.82rem;font-weight:600;z-index:9999;display:none;line-height:1.5}
+#js-ver{position:fixed;bottom:4px;right:8px;font-size:.65rem;color:rgba(255,255,255,.25);
+  z-index:200;pointer-events:none}
 </style>
 </head>
 <body>
 
 <!-- ══ SPLASH / LOGIN ══ -->
+<div id="js-error"></div>
+<div id="js-ver">SimAsk v5.0</div>
 <div id="sp" class="scr on">
   <div class="sp-c">
     <div class="sp-logo">🛡️</div>
@@ -742,7 +753,7 @@ button{cursor:pointer;font-family:inherit}input,textarea,select{font-family:inhe
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script defer>
 // ══════════════════════════════════════════════════════
 // DATABASE
 // ══════════════════════════════════════════════════════
@@ -1324,6 +1335,33 @@ function showSetup(){
   G('login-sec').style.display='none';
 }
 function doSaveOAuth(){
+  try{
+    var ciEl = document.getElementById('inp-ci');
+    var akEl = document.getElementById('inp-ak');
+    var msgEl = document.getElementById('oauth-msg');
+    var ci = ciEl ? ciEl.value.trim() : '';
+    var ak = akEl ? akEl.value.trim() : '';
+    if(!ci){
+      if(msgEl){ msgEl.className='st-err'; msgEl.style.display='block'; msgEl.textContent='⚠️ Client ID tidak boleh kosong'; }
+      else { alert('Client ID tidak boleh kosong'); }
+      return;
+    }
+    gCI = ci; gAK = ak;
+    localStorage.setItem('sk4_gcfg', JSON.stringify({ci:ci, ak:ak}));
+    if(msgEl){ msgEl.className='st-ok'; msgEl.style.display='block'; msgEl.textContent='✅ Tersimpan! Klik Masuk dengan Google.'; }
+    else { alert('Tersimpan! Klik Masuk dengan Google.'); }
+    setTimeout(function(){
+      var ss=document.getElementById('setup-sec');
+      var ls=document.getElementById('login-sec');
+      if(ss) ss.style.display='none';
+      if(ls) ls.style.display='block';
+    }, 1000);
+  }catch(e){
+    alert('Error doSaveOAuth: '+e.message);
+    console.error('doSaveOAuth error:', e);
+  }
+}
+function _doSaveOAuthOLD(){
   const ci = (G('inp-ci').value||'').trim();
   const ak = (G('inp-ak').value||'').trim();
   const msg = G('oauth-msg');
@@ -2527,8 +2565,22 @@ function doShowAdd(){
 // INIT
 // ══════════════════════════════════════════════════════
 window.addEventListener('resize',()=>{ if(window.innerWidth>680){ G('sb').classList.remove('mh'); G('bbk').style.display='none'; } });
+
+// Global error handler - show errors visibly on screen
+window.onerror = function(msg, src, line, col, err){
+  const el = G('js-error');
+  if(el){
+    el.style.display='block';
+    el.innerHTML = '❌ JS Error: '+msg+' (line '+line+')<br>'+
+      '<small>If you see this, copy this message and report it. '  +
+      'Try hard-refresh: Ctrl+Shift+R (Windows) or Cmd+Shift+R (Mac)</small>';
+  }
+  console.error('SimAsk Error:', msg, 'line:', line, err);
+  return false;
+};
+
 initLogin();
-console.log('SimAsk v4 ready. DB:', DB.length, 'employees.');
+console.log('SimAsk v5 ready. DB:', DB.length, 'employees. JS OK.');
 </script>
 </body>
 </html>
